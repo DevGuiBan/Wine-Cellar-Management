@@ -10,4 +10,4 @@ public class WineCellarManagementApplication {
         SpringApplication.run(WineCellarManagementApplication.class, args);
     }
 
-}
+}   
