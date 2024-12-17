@@ -18,20 +18,20 @@ public class ClientService {
 
     public Client save(ClientDTO clientDTO) {
         Client client = new Client();
-        client.setNome(clientDTO.getNome());
+        client.setName(clientDTO.getName());
         client.setEmail(clientDTO.getEmail());
-        client.setTelefone(clientDTO.getTelefone());
-        client.setEndereco(clientDTO.getEndereco());
+        client.setPhone_number(clientDTO.getPhoneNumber());
+        client.setAddress(clientDTO.getAddress());
         return clientRepository.save(client);
     }
 
     public List<ClientDTO> listAll() {
         return clientRepository.findAll().stream().map(client -> {
             ClientDTO dto = new ClientDTO();
-            dto.setNome(client.getNome());
+            dto.setName(client.getName());
             dto.setEmail(client.getEmail());
-            dto.setTelefone(client.getTelefone());
-            dto.setEndereco(client.getEndereco());
+            dto.setPhoneNumber(client.getPhone_number());
+            dto.setAddress(client.getAddress());
             return dto;
         }).collect(Collectors.toList());
     }
