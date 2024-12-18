@@ -1,5 +1,4 @@
 /*
-
 package com.ggnarp.winecellarmanagement.controller;
 
 import com.ggnarp.winecellarmanagement.dto.SupplierDTO;
@@ -15,7 +14,7 @@ import java.util.List;
 @requestMapping("api/supplier")
 public class SupplierController {
 
-    private final SupplierService;
+    private final SupplierService supplierService;
 
     public SupplierController(SupplierService supplierService) {
         this.supplierService = supplierService;

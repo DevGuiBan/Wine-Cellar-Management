@@ -4,6 +4,6 @@ create table if not exists product(
     quantity int,
     id_product_type int,
     id_supplier int,
-    price double precision,
+    price numeric,
     description varchar(200)
 );
