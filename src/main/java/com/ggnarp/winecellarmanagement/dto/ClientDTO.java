@@ -8,17 +8,17 @@ import lombok.Data;
 @Data
 public class ClientDTO {
 
-    @NotBlank(message = "O nome é obrigatório.")
+    @NotBlank(message = "Name is mandatory.")
     private String name;
 
-    @NotBlank(message = "O e-mail é obrigatório.")
-    @Email(message = "O e-mail deve ser válido.")
+    @NotBlank(message = "E-mail is mandatory")
+    @Email(message = "E-mail must be valid.")
     private String email;
 
-    @NotBlank(message = "O telefone é obrigatório.")
-    @Pattern(regexp = "\\d{10,11}", message = "O telefone deve conter entre 10 e 11 dígitos.")
-    private String phoneNumber;
+    @NotBlank(message = "Phone number is mandatory.")
+    @Pattern(regexp = "\\d{10,11}", message = "Phone number most contain between, 10 and 11 digits.")
+    private String phone_number;
 
-    @NotBlank(message = "O endereço é obrigatório.")
+    @NotBlank(message = "Address is mandatory.")
     private String address;
 }

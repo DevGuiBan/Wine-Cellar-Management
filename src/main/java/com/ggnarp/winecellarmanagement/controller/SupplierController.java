@@ -21,6 +21,9 @@ public class SupplierController {
     }
 
     @postMapping
-    public ResponseEntity(Supplier)
+    public ResponseEntity<Supplier> register(@RequestBody @Valid SupplierDTO supplierDTO) {
+        Supplier supplier = supplierService.save(SupplierDTO);
+        return ResponseEntity.ok(supplier);
+    }
 }
 */

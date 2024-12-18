@@ -20,7 +20,7 @@ public class ClientService {
         Client client = new Client();
         client.setName(clientDTO.getName());
         client.setEmail(clientDTO.getEmail());
-        client.setPhone_number(clientDTO.getPhoneNumber());
+        client.setPhone_number(clientDTO.getPhone_number());
         client.setAddress(clientDTO.getAddress());
         return clientRepository.save(client);
     }
@@ -30,7 +30,7 @@ public class ClientService {
             ClientDTO dto = new ClientDTO();
             dto.setName(client.getName());
             dto.setEmail(client.getEmail());
-            dto.setPhoneNumber(client.getPhone_number());
+            dto.setPhone_number(client.getPhone_number());
             dto.setAddress(client.getAddress());
             return dto;
         }).collect(Collectors.toList());

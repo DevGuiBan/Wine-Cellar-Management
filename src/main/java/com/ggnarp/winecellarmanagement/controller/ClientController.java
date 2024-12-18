@@ -20,13 +20,13 @@ public class ClientController {
     }
 
     @PostMapping
-    public ResponseEntity<Client> cadastrar(@RequestBody @Valid ClientDTO clientDTO) {
+    public ResponseEntity<Client> resgister(@RequestBody @Valid ClientDTO clientDTO) {
         Client client = clientService.save(clientDTO);
         return ResponseEntity.ok(client);
     }
 
     @GetMapping
-    public ResponseEntity<List<ClientDTO>> listarTodos() {
+    public ResponseEntity<List<ClientDTO>> list() {
         List<ClientDTO> clients = clientService.listAll();
         return ResponseEntity.ok(clients);
     }
