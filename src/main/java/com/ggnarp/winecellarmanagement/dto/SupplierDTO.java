@@ -24,6 +24,6 @@ public class SupplierDTO {
 
     @NotBlank(message = "The cpnj is required")
     @Pattern(regexp = "^\\d{2}\\.\\d{3}\\.\\d{3}/\\d{4}-\\d{2}$",message = "The CNPJ must be in the format 99.999.999/9999-99")
-    private String cpnj;
+    private String cnpj;
 
 }

@@ -1,4 +1,3 @@
-/*
 package com.ggnarp.winecellarmanagement.controller;
 
 import com.ggnarp.winecellarmanagement.dto.SupplierDTO;
@@ -10,8 +9,8 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@RequestController
-@requestMapping("api/supplier")
+@RestController
+@RequestMapping("api/supplier")
 public class SupplierController {
 
     private final SupplierService supplierService;
@@ -20,10 +19,15 @@ public class SupplierController {
         this.supplierService = supplierService;
     }
 
-    @postMapping
+    @PostMapping
     public ResponseEntity<Supplier> register(@RequestBody @Valid SupplierDTO supplierDTO) {
-        Supplier supplier = supplierService.save(SupplierDTO);
+        Supplier supplier = supplierService.save(supplierDTO);
         return ResponseEntity.ok(supplier);
     }
+
+    @GetMapping
+    public ResponseEntity<List<SupplierDTO>> list() {
+        List<SupplierDTO> suppliers = supplierService.listAll();
+        return ResponseEntity.ok(suppliers);
+    }
 }
-*/
