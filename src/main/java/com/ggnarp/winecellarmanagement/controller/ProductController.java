@@ -41,4 +41,37 @@ public class ProductController {
         }
     }
 
+    @GetMapping("/{id}")
+    public ResponseEntity<Product> getById(@PathVariable Long id) {
+        try{
+            Product product = productService.getById(id);
+            return ResponseEntity.status(HttpStatus.OK).body(product);
+        }
+        catch(Exception e){
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        }
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<Product> update(@PathVariable Long id, @RequestBody ProductDTO productDTO) {
+        try{
+            Product updatedProduct = productService.update(id, productDTO);
+            return ResponseEntity.status(HttpStatus.OK).body(updatedProduct);
+        }
+        catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        }
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> delete(@PathVariable Long id) {
+        try{
+            productService.delete(id);
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+        }
+        catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        }
+    }
+
 }

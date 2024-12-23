@@ -38,7 +38,7 @@ public class ProductTypeService {
                     existingProductType.setName(productTypeDTO.getName());
                     return productTypeRepository.save(existingProductType);
                 })
-                .orElseThrow(() -> new ResourceAccessException("ProductType com id " + id + " não encontrado."));
+                .orElseThrow(() -> new ResourceAccessException("ProductType with this id " + id + " not found."));
 
     }
 
@@ -46,7 +46,7 @@ public class ProductTypeService {
         if (productTypeRepository.existsById(id)) {
             productTypeRepository.deleteById(id);
         } else {
-            throw new ResourceAccessException("ProductType com id " + id + " não encontrado.");
+            throw new ResourceAccessException("ProductType with this id " + id + " not found.");
         }
     }
 
