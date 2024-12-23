@@ -8,6 +8,9 @@ import lombok.Data;
 @Data
 public class ClientDTO {
 
+    @NotBlank(message = "The client needs an id")
+    private Long id;
+
     @NotBlank(message = "The name is required")
     private String name;
 

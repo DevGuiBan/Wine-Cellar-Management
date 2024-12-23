@@ -34,6 +34,7 @@ public class SupplierService {
             dto.setPhone_number(supplier.getPhone_number());
             dto.setAddress(supplier.getAddress());
             dto.setCnpj(supplier.getCnpj());
+            dto.setId(supplier.getId());
             return dto;
         }).collect(Collectors.toList());
     }

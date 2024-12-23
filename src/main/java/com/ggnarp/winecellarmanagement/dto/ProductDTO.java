@@ -8,6 +8,9 @@ import java.math.BigDecimal;
 @Data
 public class ProductDTO {
 
+    @NotBlank(message = "The product needs an id")
+    private Long id;
+
     @NotBlank(message = "The name is required")
     private String name;
 

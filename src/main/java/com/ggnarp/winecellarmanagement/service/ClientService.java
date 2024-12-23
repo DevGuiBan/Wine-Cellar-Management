@@ -32,6 +32,7 @@ public class ClientService {
             dto.setEmail(client.getEmail());
             dto.setPhone_number(client.getPhone_number());
             dto.setAddress(client.getAddress());
+            dto.setId(client.getId());
             return dto;
         }).collect(Collectors.toList());
     }

@@ -7,6 +7,10 @@ import lombok.Data;
 
 @Data
 public class SupplierDTO {
+
+    @NotBlank(message = "The supplier needs an id")
+    private Long id;
+
     @NotBlank(message = "The name of the supplier is required")
     private String name;
 
