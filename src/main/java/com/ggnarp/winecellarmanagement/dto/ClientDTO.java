@@ -2,14 +2,16 @@ package com.ggnarp.winecellarmanagement.dto;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import lombok.Data;
+
+import java.util.UUID;
 
 @Data
 public class ClientDTO {
 
-    @NotBlank(message = "The client needs an id")
-    private Long id;
+    private UUID id;
 
     @NotBlank(message = "The name is required")
     private String name;
@@ -19,7 +21,7 @@ public class ClientDTO {
     private String email;
 
     @NotBlank(message = "The phone number is required")
-    @Pattern(regexp = "^\\(?\\d{2}\\)?\\s?(9?\\d{4})-?\\d{4}$\n", message = "The phone number must be in the format (99) 99999-9999")
+    @Pattern(regexp = "^\\(?\\d{2}\\)?\\s?(9?\\d{4})-?\\d{4}$", message = "The phone number must be in the format (99) 99999-9999")
     private String phone_number;
 
     @NotBlank(message = "The address is required.")

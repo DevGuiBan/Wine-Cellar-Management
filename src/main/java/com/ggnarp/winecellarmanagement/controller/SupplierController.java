@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("api/supplier")
@@ -17,6 +18,13 @@ public class SupplierController {
 
     public SupplierController(SupplierService supplierService) {
         this.supplierService = supplierService;
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<Supplier> getSupplier(@PathVariable UUID id) {
+        Supplier supplier = supplierService
+                .getById(id);
+        return ResponseEntity.ok(supplier);
     }
 
     @PostMapping
