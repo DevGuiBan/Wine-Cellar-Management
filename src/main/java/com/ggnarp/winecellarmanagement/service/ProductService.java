@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.ResourceAccessException;
 
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
@@ -39,25 +40,33 @@ public class ProductService {
         }).collect(Collectors.toList());
     }
 
-    public Product getById(Long id) {
+    public Product getById(UUID id) {
         return productRepository.findById(id)
                 .orElseThrow(() -> new ResourceAccessException("ProductType with this id " + id + " has not found."));
     }
 
-    public Product update(Long id, ProductDTO productDTO) {
+    public Product update(UUID id, ProductDTO productDTO) {
         return productRepository.findById(id)
                 .map(existingProduct -> {
-                    existingProduct.setName(productDTO.getName());
-                    existingProduct.setQuantity(productDTO.getQuantity());
-                    existingProduct.setDescription(productDTO.getDescription());
-                    existingProduct.setPrice(productDTO.getPrice());
+                    if (productDTO.getName() != null) {
+                        existingProduct.setName(productDTO.getName());
+                    }
+                    if (productDTO.getQuantity() != null) {
+                        existingProduct.setQuantity(productDTO.getQuantity());
+                    }
+                    if (productDTO.getDescription() != null) {
+                        existingProduct.setDescription(productDTO.getDescription());
+                    }
+                    if (productDTO.getPrice() != null) {
+                        existingProduct.setPrice(productDTO.getPrice());
+                    }
                     return productRepository.save(existingProduct);
                 })
                 .orElseThrow(() -> new ResourceAccessException("Product with this id " + id + " not found."));
-
     }
 
-    public void delete(Long id) {
+
+    public void delete(UUID id) {
         if (productRepository.existsById(id)) {
             productRepository.deleteById(id);
         } else {
