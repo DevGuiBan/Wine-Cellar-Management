@@ -30,4 +30,12 @@ public class Product {
 
     @Column(nullable = false)
     private String description;
+
+    @ManyToOne
+    @JoinColumn(name = "id_product_type", nullable = false)
+    private ProductType productType;
+
+    @ManyToOne
+    @JoinColumn(name = "id_supplier", nullable = false)
+    private Supplier supplier;
 }

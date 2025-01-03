@@ -1,6 +1,8 @@
 package com.ggnarp.winecellarmanagement.dto;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 import lombok.Data;
 
 import java.math.BigDecimal;
@@ -17,13 +19,34 @@ public class ProductDTO {
     @NotBlank
     private String description;
 
-    @NotBlank
+    @Positive
     private Integer quantity;
 
-    @NotBlank
+    @Positive
     private BigDecimal price;
 
-    private int id_product_type;
+    @NotNull
+    private UUID id_product_type;
 
-    private int id_supplier;
+    @NotNull
+    private UUID id_supplier;
+
+    private ProductTypeDTO productType;
+    private SupplierDTO supplier;
+
+    @Data
+    public static class ProductTypeDTO {
+        private UUID id;
+        private String name;
+    }
+
+    @Data
+    public static class SupplierDTO {
+        private UUID id;
+        private String name;
+        private String email;
+        private String phone_number;
+        private String address;
+        private String cnpj;
+    }
 }

@@ -54,7 +54,7 @@ public class ProductController {
     @GetMapping("/{id}")
     public ResponseEntity<?> getById(@PathVariable UUID id) {
         try{
-            Product product = productService.getById(id);
+            ProductDTO product = productService.getById(id);
             return ResponseEntity.status(HttpStatus.OK).body(product);
         }
         catch(Exception e){

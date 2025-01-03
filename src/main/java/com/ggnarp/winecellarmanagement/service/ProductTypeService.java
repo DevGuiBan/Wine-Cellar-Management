@@ -53,7 +53,7 @@ public class ProductTypeService {
 
     public ProductType getById(UUID id) {
         return productTypeRepository.findById(id)
-                .orElseThrow(() -> new ResourceAccessException("ProductType com id " + id + " não encontrado."));
+                .orElseThrow(() -> new ResourceAccessException("ProductType with this id " + id + " not found"));
     }
 
 }
