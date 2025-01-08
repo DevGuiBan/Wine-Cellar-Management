@@ -1,9 +1,12 @@
 package com.ggnarp.winecellarmanagement.service;
 
 import com.ggnarp.winecellarmanagement.dto.SupplierDTO;
+import com.ggnarp.winecellarmanagement.entity.ProductType;
 import com.ggnarp.winecellarmanagement.entity.Supplier;
 import com.ggnarp.winecellarmanagement.repository.SupplierRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.ResourceAccessException;
+
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -48,16 +51,27 @@ public class SupplierService {
     }
 
     public Supplier update(UUID id, SupplierDTO supplierDTO) {
-        Supplier existingSupplier = supplierRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Supplier with ID " + id + " not found"));
+        return supplierRepository.findById(id)
+                .map(existingSupplier -> {
+                    if (supplierDTO.getName() != null) {
+                        existingSupplier.setName(supplierDTO.getName());
+                    }
+                    if (supplierDTO.getAddress() != null) {
+                        existingSupplier.setAddress(supplierDTO.getAddress());
+                    }
+                    if (supplierDTO.getCnpj() != null) {
+                        existingSupplier.setCnpj(supplierDTO.getCnpj());
+                    }
+                    if (supplierDTO.getPhone_number() != null) {
+                        existingSupplier.setPhone_number(supplierDTO.getPhone_number());
+                    }
+                    if (supplierDTO.getEmail() != null) {
+                        existingSupplier.setEmail(supplierDTO.getEmail());
+                    }
 
-        existingSupplier.setName(supplierDTO.getName());
-        existingSupplier.setEmail(supplierDTO.getEmail());
-        existingSupplier.setPhone_number(supplierDTO.getPhone_number());
-        existingSupplier.setAddress(supplierDTO.getAddress());
-        existingSupplier.setCnpj(supplierDTO.getCnpj());
-
-        return supplierRepository.save(existingSupplier);
+                    return supplierRepository.save(existingSupplier);
+                })
+                .orElseThrow(() -> new ResourceAccessException("Supplier with id " + id + " not found"));
     }
 
     public Supplier getById(UUID id) {

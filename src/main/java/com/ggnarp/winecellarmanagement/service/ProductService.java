@@ -124,8 +124,6 @@ public class ProductService {
                 .orElseThrow(() -> new ResourceAccessException("Product with id " + id + " not found"));
     }
 
-
-
     public void delete(UUID id) {
         if (productRepository.existsById(id)) {
             productRepository.deleteById(id);
