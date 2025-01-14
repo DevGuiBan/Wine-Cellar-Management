@@ -16,7 +16,7 @@ public class SupplierDTO {
     private String name;
 
     @NotBlank(message = "The address is required")
-    @Pattern(regexp = "^(.+)\\s+(\\d+)\\s+(.+?)\\s*-\\s*([A-Z]{2})$",message = "The address must be in the format street number city - sig")
+    @Pattern(regexp = "^([^,]+),([^,]+),(\\d+),([^,]+)$\n",message = "The address must be in the format street number city - sig")
     private String address;
 
     @NotBlank(message = "The phone number is required")
