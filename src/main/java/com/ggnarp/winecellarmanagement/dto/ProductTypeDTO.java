@@ -7,7 +7,7 @@ import java.util.UUID;
 @Data
 public class ProductTypeDTO {
 
-    private UUID id;
+    private Long id;
 
     @NotBlank(message = "The name os the type of product is required")
     private String name;

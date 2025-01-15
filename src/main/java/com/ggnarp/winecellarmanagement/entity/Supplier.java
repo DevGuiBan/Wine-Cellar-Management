@@ -31,4 +31,7 @@ public class Supplier {
 
     @Column(nullable = false)
     private String cnpj;
+
+    @Column(nullable = true)
+    private String observation;
 }

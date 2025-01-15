@@ -11,7 +11,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.ResourceAccessException;
 
 import java.util.List;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
@@ -85,14 +84,14 @@ public class ProductService {
                 .collect(Collectors.toList());
     }
 
-    public ProductDTO getById(UUID id) {
+    public ProductDTO getById(Long id) {
         return productRepository
                 .findById(id)
                 .map(this::mapToDTO).
                 orElseThrow(() -> new ResourceAccessException("Product with ID " + id + " not found."));
     }
 
-    public Product update(UUID id, ProductDTO productDTO) {
+    public Product update(Long id, ProductDTO productDTO) {
         return productRepository.findById(id)
                 .map(existingProduct -> {
                     if (productDTO.getName() != null) {
@@ -124,7 +123,7 @@ public class ProductService {
                 .orElseThrow(() -> new ResourceAccessException("Product with id " + id + " not found"));
     }
 
-    public void delete(UUID id) {
+    public void delete(Long id) {
         if (productRepository.existsById(id)) {
             productRepository.deleteById(id);
         } else {

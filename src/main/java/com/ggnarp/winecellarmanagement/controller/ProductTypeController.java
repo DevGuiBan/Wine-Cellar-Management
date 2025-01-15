@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.*;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 
 @RestController
 @RequestMapping("api/product_type")
@@ -38,7 +37,7 @@ public class ProductTypeController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<?> getById(@PathVariable UUID id) {
+    public ResponseEntity<?> getById(@PathVariable Long id) {
         try{
             ProductType productType = productTypeService.getById(id);
             return ResponseEntity.status(HttpStatus.OK).body(productType);
@@ -66,7 +65,7 @@ public class ProductTypeController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<?> update(@PathVariable UUID id, @RequestBody ProductTypeDTO productTypeDTO) {
+    public ResponseEntity<?> update(@PathVariable Long id, @RequestBody ProductTypeDTO productTypeDTO) {
         try{
             ProductType updatedProductType = productTypeService.update(id, productTypeDTO);
             return ResponseEntity.status(HttpStatus.OK).body(updatedProductType);
@@ -80,7 +79,7 @@ public class ProductTypeController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> delete(@PathVariable UUID id) {
+    public ResponseEntity<?> delete(@PathVariable Long id) {
         try{
             productTypeService.delete(id);
             return ResponseEntity.status(HttpStatus.NO_CONTENT).build();

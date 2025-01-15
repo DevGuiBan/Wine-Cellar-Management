@@ -1,7 +1,6 @@
 package com.ggnarp.winecellarmanagement.service;
 
 import com.ggnarp.winecellarmanagement.dto.SupplierDTO;
-import com.ggnarp.winecellarmanagement.entity.ProductType;
 import com.ggnarp.winecellarmanagement.entity.Supplier;
 import com.ggnarp.winecellarmanagement.repository.SupplierRepository;
 import org.springframework.stereotype.Service;
@@ -27,6 +26,7 @@ public class SupplierService {
         supplier.setPhone_number(supplierDTO.getPhone_number());
         supplier.setAddress(supplierDTO.getAddress());
         supplier.setCnpj(supplierDTO.getCnpj());
+        supplier.setObservation(supplierDTO.getObservation());
         return supplierRepository.save(supplier);
     }
 
@@ -39,6 +39,7 @@ public class SupplierService {
             dto.setAddress(supplier.getAddress());
             dto.setCnpj(supplier.getCnpj());
             dto.setId(supplier.getId());
+            dto.setObservation(supplier.getObservation());
             return dto;
         }).collect(Collectors.toList());
     }
@@ -67,6 +68,9 @@ public class SupplierService {
                     }
                     if (supplierDTO.getEmail() != null) {
                         existingSupplier.setEmail(supplierDTO.getEmail());
+                    }
+                    if(supplierDTO.getObservation() != null){
+                        existingSupplier.setObservation(supplierDTO.getObservation());
                     }
 
                     return supplierRepository.save(existingSupplier);

@@ -10,6 +10,7 @@ import java.awt.*;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.math.BigInteger;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
@@ -367,7 +368,7 @@ public class EditarProduto extends javax.swing.JFrame {
         try {
             // making the request
             String urlAPI = this.dotenv.get("API_HOST");
-            URL url = new URL(urlAPI + "/product/" + this.id_product);
+            URL url = new URL(urlAPI + "/product/" + new BigInteger(this.id_product));
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
             connection.setRequestMethod("GET");
 

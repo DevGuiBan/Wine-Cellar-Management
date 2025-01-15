@@ -168,10 +168,12 @@ public class ListarFornecedor extends javax.swing.JFrame {
         jPanel8.setPreferredSize(new java.awt.Dimension(392, 50));
         jPanel8.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 20, 5));
 
-        jTextField4.setBackground(new java.awt.Color(255, 255, 255));
+        jTextField4.setBackground(new java.awt.Color(240, 240, 240));
         jTextField4.setBorder(new MatteBorder(2,2,2,2,new Color(128, 0, 32)));
         jTextField4.setFont(new java.awt.Font("Cormorant Garamond",Font.BOLD,14));
-        jTextField4.setText("Pesquisar fornecedor...");
+        jTextField4.setText("Pesquisar fornecedor");
+        jTextField4.setBorder(null);
+        jTextField4.setHorizontalAlignment(javax.swing.JTextField.CENTER);
         jTextField4.setToolTipText("");
         jTextField4.setPreferredSize(new java.awt.Dimension(200, 40));
         jPanel8.add(jTextField4);

@@ -365,6 +365,7 @@ public class CadastrarFornecedor extends javax.swing.JFrame {
             String email = jTextField3.getText();
             String cnpj = jTextField4.getText();
             String address = jTextField5.getText();
+            String observations = jTextField6.getText();
 
 
             // creating the json to send
@@ -374,6 +375,7 @@ public class CadastrarFornecedor extends javax.swing.JFrame {
             jsonData.addProperty("email",email);
             jsonData.addProperty("cnpj",cnpj);
             jsonData.addProperty("address",address);
+            jsonData.addProperty("observations",observations);
 
             // making the request
             String urlAPI = this.dotenv.get("API_HOST");
@@ -398,13 +400,22 @@ public class CadastrarFornecedor extends javax.swing.JFrame {
                 jTextField3.setText("");
                 jTextField4.setText("");
                 jTextField5.setText("");
+                jTextField6.setText("");
+
                 JOptionPane.showOptionDialog(rootPane,
                         "O fornecedor e suas informações foram cadastradas com sucesso!",
                         "Fornecedor Cadastrado",
                         JOptionPane.DEFAULT_OPTION,
                         JOptionPane.INFORMATION_MESSAGE,
                         null,null,null);
+
                 connection.disconnect();
+
+                JFrame tela = new ListarFornecedor();
+                SwingUtilities.invokeLater(() -> {
+                    this.setVisible(false);
+                    tela.setVisible(true);
+                });
             }
             else{
                 try (BufferedReader br = new BufferedReader(new InputStreamReader(connection.getErrorStream(), "utf-8"))) {

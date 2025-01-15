@@ -360,6 +360,7 @@ public class EditarFornecedor extends javax.swing.JFrame {
             String cnpj = jTextField4.getText();
             String phone_number = jTextField2.getText();
             String email = jTextField3.getText();
+            String observations = jTextField6.getText();
 
             // creating the json to send
             JsonObject jsonData = new JsonObject();
@@ -368,6 +369,7 @@ public class EditarFornecedor extends javax.swing.JFrame {
             jsonData.addProperty("cnpj", cnpj);
             jsonData.addProperty("phone_number", phone_number);
             jsonData.addProperty("email", email);
+            jsonData.addProperty("observation", observations);
 
             // making the request
             String urlAPI = this.dotenv.get("API_HOST");
@@ -392,13 +394,21 @@ public class EditarFornecedor extends javax.swing.JFrame {
                 jTextField3.setText("");
                 jTextField4.setText("");
                 jTextField5.setText("");
+                jTextField6.setText("");
                 JOptionPane.showOptionDialog(rootPane,
                         "O fornecedor e suas informações foram atualizadas com sucesso!",
                         "Fornecedor Atualizado",
                         JOptionPane.DEFAULT_OPTION,
                         JOptionPane.INFORMATION_MESSAGE,
                         null,null,null);
+
                 connection.disconnect();
+
+                JFrame tela = new ListarFornecedor();
+                SwingUtilities.invokeLater(() -> {
+                    this.setVisible(false);
+                    tela.setVisible(true);
+                });
             } else {
                 try (BufferedReader br = new BufferedReader(new InputStreamReader(connection.getErrorStream(), "utf-8"))) {
                     String responseLine;
@@ -445,6 +455,9 @@ public class EditarFornecedor extends javax.swing.JFrame {
                 jTextField3.setText(suppliers.get("email").getAsString());
                 jTextField4.setText(suppliers.get("cnpj").getAsString());
                 jTextField5.setText(suppliers.get("address").getAsString());
+                if(suppliers.has("observation") && !suppliers.get("observation").isJsonNull()){
+                    jTextField6.setText(suppliers.get("observation").getAsString());
+                }
 
                 connection.disconnect();
             }

@@ -16,7 +16,7 @@ public class SupplierDTO {
     private String name;
 
     @NotBlank(message = "The address is required")
-    @Pattern(regexp = "^([^,]+),([^,]+),(\\d+),([^,]+)$\n",message = "The address must be in the format street number city - sig")
+    @Pattern(regexp = "^([^,]+),([^,]+),(\\d+),([^,]+)$",message = "The address must be in the format street,zone,number,sig")
     private String address;
 
     @NotBlank(message = "The phone number is required")
@@ -30,5 +30,7 @@ public class SupplierDTO {
     @NotBlank(message = "The cpnj is required")
     @Pattern(regexp = "^\\d{2}\\.\\d{3}\\.\\d{3}/\\d{4}-\\d{2}$",message = "The CNPJ must be in the format - 99.999.999/9999-99")
     private String cnpj;
+
+    private String observation;
 
 }

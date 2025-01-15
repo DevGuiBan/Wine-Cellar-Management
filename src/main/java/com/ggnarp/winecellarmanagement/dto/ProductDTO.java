@@ -11,7 +11,7 @@ import java.util.UUID;
 @Data
 public class ProductDTO {
 
-    private UUID id;
+    private Long id;
 
     @NotBlank
     private String name;
@@ -26,7 +26,7 @@ public class ProductDTO {
     private BigDecimal price;
 
     @NotNull
-    private UUID id_product_type;
+    private Long id_product_type;
 
     @NotNull
     private UUID id_supplier;
@@ -36,7 +36,7 @@ public class ProductDTO {
 
     @Data
     public static class ProductTypeDTO {
-        private UUID id;
+        private Long id;
         private String name;
     }
 
