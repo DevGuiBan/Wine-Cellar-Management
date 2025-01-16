@@ -6,6 +6,7 @@ import com.google.gson.JsonObject;
 
 import javax.swing.*;
 import javax.swing.border.MatteBorder;
+import javax.swing.text.MaskFormatter;
 import java.awt.*;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -14,6 +15,9 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.Objects;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 /**
  *
  * @author rafaj
@@ -51,14 +55,18 @@ public class EditarFornecedor extends javax.swing.JFrame {
         jLabel3 = new javax.swing.JLabel();
         jTextField1 = new javax.swing.JTextField();
         jLabel4 = new javax.swing.JLabel();
-        jTextField4 = new javax.swing.JTextField();
         jLabel5 = new javax.swing.JLabel();
-        jTextField5 = new javax.swing.JTextField();
         jPanel7 = new javax.swing.JPanel();
         jLabel6 = new javax.swing.JLabel();
-        jTextField2 = new javax.swing.JTextField();
         jLabel7 = new javax.swing.JLabel();
         jTextField3 = new javax.swing.JTextField();
+        try{
+            jTextField2 = new javax.swing.JFormattedTextField(new MaskFormatter("(##) #####-####"));
+            jTextField4 = new javax.swing.JFormattedTextField(new MaskFormatter("##.###.###/####-##"));
+            jTextField5 = new javax.swing.JFormattedTextField();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
         jLabel8 = new javax.swing.JLabel();
         jTextField6 = new javax.swing.JTextField();
         jButton4 = new javax.swing.JButton();
@@ -178,6 +186,26 @@ public class EditarFornecedor extends javax.swing.JFrame {
         jTextField5.setBackground(new java.awt.Color(255, 255, 255));
         jTextField5.setBorder(new MatteBorder(2,2,2,2,new Color(128,0,32)));
         jTextField5.setFont(new java.awt.Font("Cormorant Garamond", 1, 18));
+        String regex = "^(.+?) - (.+?) - (\\d+) - ([A-Z]{2})$";
+        Pattern pattern = Pattern.compile(regex);
+        jTextField5.setInputVerifier(new InputVerifier() {
+            @Override
+            public boolean verify(JComponent input) {
+                String text = ((JFormattedTextField) input).getText();
+                Matcher matcher = pattern.matcher(text);
+                if (matcher.matches()) {
+                    input.setBackground(Color.WHITE);
+                    return true;
+                } else {
+                    input.setBackground(Color.PINK);
+                    JOptionPane.showMessageDialog(EditarFornecedor.super.rootPane,
+                            "O formato deve ser: rua - bairro - numero - UF",
+                            "Formato Inválido",
+                            JOptionPane.ERROR_MESSAGE);
+                    return false;
+                }
+            }
+        });
         jPanel6.add(jTextField5);
 
         jPanel7.setBackground(new java.awt.Color(204, 153, 0));
@@ -362,6 +390,14 @@ public class EditarFornecedor extends javax.swing.JFrame {
             String email = jTextField3.getText();
             String observations = jTextField6.getText();
 
+            if(name == null || name.isEmpty()){
+                throw new Exception("Informe o nome do Fornecedor!");
+            }
+
+            if(email == null || email.isEmpty()){
+                throw new Exception("Informe o e-mail do Fornecedor!");
+            }
+
             // creating the json to send
             JsonObject jsonData = new JsonObject();
             jsonData.addProperty("name", name);
@@ -533,10 +569,10 @@ public class EditarFornecedor extends javax.swing.JFrame {
     private javax.swing.JPanel jPanel7;
     private javax.swing.JSeparator jSeparator1;
     private javax.swing.JTextField jTextField1;
-    private javax.swing.JTextField jTextField2;
+    private javax.swing.JFormattedTextField jTextField2;
     private javax.swing.JTextField jTextField3;
-    private javax.swing.JTextField jTextField4;
-    private javax.swing.JTextField jTextField5;
+    private javax.swing.JFormattedTextField jTextField4;
+    private javax.swing.JFormattedTextField jTextField5;
     private javax.swing.JTextField jTextField6;
     // End of variables declaration//GEN-END:variables
 }

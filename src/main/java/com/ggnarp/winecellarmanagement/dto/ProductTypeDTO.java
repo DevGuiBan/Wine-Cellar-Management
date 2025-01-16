@@ -9,7 +9,7 @@ public class ProductTypeDTO {
 
     private Long id;
 
-    @NotBlank(message = "The name os the type of product is required")
+    @NotBlank(message = "O nome do Produto é necessário para realizar o cadastro")
     private String name;
 
 }

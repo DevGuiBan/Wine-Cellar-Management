@@ -2,6 +2,7 @@ package resources.interfaces;
 
 import javax.swing.*;
 import javax.swing.border.MatteBorder;
+import javax.swing.text.MaskFormatter;
 import java.awt.*;
 import java.nio.charset.StandardCharsets;
 import java.util.Objects;
@@ -11,6 +12,9 @@ import java.net.URL;
 import java.io.OutputStream;
 import java.io.InputStreamReader;
 import java.io.BufferedReader;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import io.github.cdimascio.dotenv.Dotenv;
 
 /**
@@ -51,16 +55,20 @@ public class CadastrarFornecedor extends javax.swing.JFrame {
         jLabel3 = new javax.swing.JLabel();
         jTextField1 = new javax.swing.JTextField();
         jLabel4 = new javax.swing.JLabel();
-        jTextField4 = new javax.swing.JTextField();
+        try{
+            jTextField2 = new javax.swing.JFormattedTextField(new MaskFormatter("(##) #####-####"));
+            jTextField4 = new javax.swing.JFormattedTextField(new MaskFormatter("##.###.###/####-##"));
+            jTextField5 = new javax.swing.JFormattedTextField();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        jTextField3 = new javax.swing.JTextField();
+        jTextField6 = new javax.swing.JTextField();
         jLabel5 = new javax.swing.JLabel();
-        jTextField5 = new javax.swing.JTextField();
         jPanel7 = new javax.swing.JPanel();
         jLabel6 = new javax.swing.JLabel();
-        jTextField2 = new javax.swing.JTextField();
         jLabel7 = new javax.swing.JLabel();
-        jTextField3 = new javax.swing.JTextField();
         jLabel8 = new javax.swing.JLabel();
-        jTextField6 = new javax.swing.JTextField();
         jButton4 = new javax.swing.JButton();
         jButton5 = new javax.swing.JButton();
 
@@ -169,7 +177,6 @@ public class CadastrarFornecedor extends javax.swing.JFrame {
         jTextField4.setBackground(new java.awt.Color(255, 255, 255));
         jTextField4.setBorder(new MatteBorder(2,2,2,2,new Color(128,0,32)));
         jTextField4.setFont(new java.awt.Font("Cormorant Garamond", 1, 18));
-        jTextField4.setText("00.000.000/0000-00");
         jPanel6.add(jTextField4);
 
         jLabel5.setFont(new java.awt.Font("Cormorant Garamond", 1, 18)); // NOI18N
@@ -179,7 +186,42 @@ public class CadastrarFornecedor extends javax.swing.JFrame {
         jTextField5.setBackground(new java.awt.Color(255, 255, 255));
         jTextField5.setBorder(new MatteBorder(2,2,2,2,new Color(128,0,32)));
         jTextField5.setFont(new java.awt.Font("Cormorant Garamond", 1, 18));
-        jTextField5.setText("Rua,Bairro,N°,Cidade");
+        String regex = "^(.+?) - (.+?) - (\\d+) - ([A-Z]{2})$";
+        Pattern pattern = Pattern.compile(regex);
+        jTextField5.setInputVerifier(new InputVerifier() {
+            @Override
+            public boolean verify(JComponent input) {
+                String text = ((JFormattedTextField) input).getText();
+                Matcher matcher = pattern.matcher(text);
+                if (matcher.matches()) {
+                    input.setBackground(Color.WHITE);
+                    return true;
+                } else {
+                    input.setBackground(Color.PINK);
+                    JOptionPane.showMessageDialog(CadastrarFornecedor.super.rootPane,
+                            "O formato deve ser: rua - bairro - numero - UF",
+                            "Formato Inválido",
+                            JOptionPane.ERROR_MESSAGE);
+                    return false;
+                }
+            }
+        });
+        jTextField5.setText("Rua - Bairro - Número - UF");
+        jTextField5.addFocusListener(new java.awt.event.FocusListener() {
+            @Override
+            public void focusGained(java.awt.event.FocusEvent evt) {
+                if (jTextField5.getText().equals("Rua - Bairro - Número - UF")) {
+                    jTextField5.setText("");
+                }
+            }
+
+            @Override
+            public void focusLost(java.awt.event.FocusEvent evt) {
+                if (jTextField5.getText().isEmpty()) {
+                    jTextField5.setText("Rua - Bairro - Número - UF");
+                }
+            }
+        });
         jPanel6.add(jTextField5);
 
         jPanel7.setBackground(new java.awt.Color(204, 153, 0));
@@ -193,7 +235,6 @@ public class CadastrarFornecedor extends javax.swing.JFrame {
         jTextField2.setBackground(new java.awt.Color(255, 255, 255));
         jTextField2.setBorder(new MatteBorder(2,2,2,2,new Color(128,0,32)));
         jTextField2.setFont(new java.awt.Font("Cormorant Garamond", 1, 18));
-        jTextField2.setText("(00) 90000-0000");
         jPanel7.add(jTextField2);
 
         jLabel7.setFont(new java.awt.Font("Cormorant Garamond", 1, 18)); // NOI18N
@@ -203,7 +244,6 @@ public class CadastrarFornecedor extends javax.swing.JFrame {
         jTextField3.setBackground(new java.awt.Color(255, 255, 255));
         jTextField3.setBorder(new MatteBorder(2,2,2,2,new Color(128,0,32)));
         jTextField3.setFont(new java.awt.Font("Cormorant Garamond", 1, 18));
-        jTextField3.setText("email@exemplo.com");
         jPanel7.add(jTextField3);
 
         jLabel8.setFont(new java.awt.Font("Cormorant Garamond", 1, 18)); // NOI18N
@@ -367,7 +407,6 @@ public class CadastrarFornecedor extends javax.swing.JFrame {
             String address = jTextField5.getText();
             String observations = jTextField6.getText();
 
-
             // creating the json to send
             JsonObject jsonData = new JsonObject();
             jsonData.addProperty("name",name);
@@ -475,10 +514,10 @@ public class CadastrarFornecedor extends javax.swing.JFrame {
     private javax.swing.JPanel jPanel7;
     private javax.swing.JSeparator jSeparator1;
     private javax.swing.JTextField jTextField1;
-    private javax.swing.JTextField jTextField2;
+    private javax.swing.JFormattedTextField jTextField2;
     private javax.swing.JTextField jTextField3;
-    private javax.swing.JTextField jTextField4;
-    private javax.swing.JTextField jTextField5;
+    private javax.swing.JFormattedTextField jTextField4;
+    private javax.swing.JFormattedTextField jTextField5;
     private javax.swing.JTextField jTextField6;
     // End of variables declaration//GEN-END:variables
 }

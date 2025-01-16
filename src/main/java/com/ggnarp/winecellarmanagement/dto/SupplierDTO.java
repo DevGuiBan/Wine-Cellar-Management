@@ -12,23 +12,23 @@ public class SupplierDTO {
 
     private UUID id;
 
-    @NotBlank(message = "The name of the supplier is required")
+    @NotBlank(message = "O Nome do Fornecedor é necessário para realizar o cadastro!")
     private String name;
 
     @NotBlank(message = "The address is required")
-    @Pattern(regexp = "^([^,]+),([^,]+),(\\d+),([^,]+)$",message = "The address must be in the format street,zone,number,sig")
+    @Pattern(regexp = "^(.+?) - (.+?) - (\\d+) - ([A-Z]{2})$",message = "O Endereço deve ser no formato Rua - Bairro - N° - UF")
     private String address;
 
     @NotBlank(message = "The phone number is required")
-    @Pattern(regexp = "^\\(?\\d{2}\\)?\\s?(9?\\d{4})-?\\d{4}$",message = "The phone number must be in the format (99) 99999-9999")
+    @Pattern(regexp = "^\\(?\\d{2}\\)?\\s?(9?\\d{4})-?\\d{4}$",message = "O número de telefone deve ser no formato (99) 99999-9999")
     private String phone_number;
 
-    @NotBlank(message = "The e-mail is required")
-    @Email(message = "The e-mail have is valid")
+    @NotBlank(message = "É necessário um e-mail para realizar o cadastro!")
+    @Email(message = "O e-mail precisa ser válido")
     private String email;
 
-    @NotBlank(message = "The cpnj is required")
-    @Pattern(regexp = "^\\d{2}\\.\\d{3}\\.\\d{3}/\\d{4}-\\d{2}$",message = "The CNPJ must be in the format - 99.999.999/9999-99")
+    @NotBlank(message = "O CNPJ é necessário para relaizar o cadastro!")
+    @Pattern(regexp = "^\\d{2}\\.\\d{3}\\.\\d{3}/\\d{4}-\\d{2}$",message = "O CNPJ deve ser no formato - 99.999.999/9999-99")
     private String cnpj;
 
     private String observation;

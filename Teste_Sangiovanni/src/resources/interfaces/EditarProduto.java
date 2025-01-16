@@ -534,6 +534,16 @@ public class EditarProduto extends javax.swing.JFrame {
             Supplier id_supplier = (Supplier) Objects.requireNonNull(jComboBox1.getSelectedItem());
             ProductType id_product_type = (ProductType) Objects.requireNonNull(jComboBox3.getSelectedItem());
 
+            if(name == null || name.isEmpty()){
+                throw new Exception("Informe o nome do Produto!");
+            }
+            if(description == null || description.isEmpty()){
+                throw new Exception("Informe a descrição do Produto!");
+            }
+            if(price == 0){
+                throw new Exception("Informe um preço para o Produto!");
+            }
+
             // creating the json to send
             JsonObject jsonData = new JsonObject();
             jsonData.addProperty("name", name);
@@ -568,11 +578,16 @@ public class EditarProduto extends javax.swing.JFrame {
                 jComboBox3.setSelectedIndex(0);
                 jComboBox1.setSelectedIndex(0);
                 JOptionPane.showOptionDialog(rootPane,
-                        "O produto foi atualizadas com sucesso!",
+                        "O produto foi atualizado com sucesso!",
                         "Produto Atualizado",
                         JOptionPane.DEFAULT_OPTION,
                         JOptionPane.INFORMATION_MESSAGE,
                         null,null,null);
+                JFrame tela = new ListarProduto();
+                SwingUtilities.invokeLater(() -> {
+                            this.dispose();
+                            tela.setVisible(true);
+                        });
                 connection.disconnect();
             } else {
                 try (BufferedReader br = new BufferedReader(new InputStreamReader(connection.getErrorStream(), "utf-8"))) {
@@ -587,6 +602,13 @@ public class EditarProduto extends javax.swing.JFrame {
                         JOptionPane.DEFAULT_OPTION,
                         JOptionPane.ERROR_MESSAGE,
                         null,null,null);
+
+                JFrame tela = new ListarProduto();
+                SwingUtilities.invokeLater(() -> {
+                    this.dispose();
+                    tela.setVisible(true);
+                });
+
                 connection.disconnect();
             }
 

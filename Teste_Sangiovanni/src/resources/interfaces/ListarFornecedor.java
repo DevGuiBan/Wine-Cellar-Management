@@ -176,6 +176,21 @@ public class ListarFornecedor extends javax.swing.JFrame {
         jTextField4.setHorizontalAlignment(javax.swing.JTextField.CENTER);
         jTextField4.setToolTipText("");
         jTextField4.setPreferredSize(new java.awt.Dimension(200, 40));
+        jTextField4.addFocusListener(new java.awt.event.FocusListener() {
+            @Override
+            public void focusGained(java.awt.event.FocusEvent evt) {
+                if (jTextField4.getText().equals("Pesquisar fornecedor")) {
+                    jTextField4.setText("");
+                }
+            }
+
+            @Override
+            public void focusLost(java.awt.event.FocusEvent evt) {
+                if (jTextField4.getText().isEmpty()) {
+                    jTextField4.setText("Pesquisar fornecedor");
+                }
+            }
+        });
         jPanel8.add(jTextField4);
         jPanel8.add(filler1);
 
@@ -240,6 +255,12 @@ public class ListarFornecedor extends javax.swing.JFrame {
         jTable2.setBackground(new java.awt.Color(255, 255, 255));
         jTable2.setSelectionBackground(new java.awt.Color(228, 236, 242));
         jTable2.setSelectionForeground(new java.awt.Color(0, 0, 0));
+
+        for (int i = 0; i < jTable2.getColumnCount(); i++) {
+            if (!jTable2.getColumnName(i).equals("Ações")) {
+                jTable2.getColumnModel().getColumn(i).setCellRenderer(centerRenderer);
+            }
+        }
 
         jTable2.getColumn("Ações").setCellRenderer(new ButtonRenderer());
         jTable2.getColumn("Ações").setCellEditor(new ButtonEditor(jTable2,this.rootPane,this.dotenv.get("API_HOST")));
@@ -517,8 +538,8 @@ class ButtonEditor extends AbstractCellEditor implements TableCellEditor {
         this.editButton.setForeground(new java.awt.Color(128, 0, 32));
         this.editButton.setFocusPainted(false);
         this.editButton.setBorder(null);
-        this.editButton.setContentAreaFilled(false); // Remove o fundo preenchido
-        this.editButton.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR)); // Cursor de clique
+        this.editButton.setContentAreaFilled(false);
+        this.editButton.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
 
         this.deleteButton.setIcon(new javax.swing.ImageIcon(Objects.requireNonNull(
                 getClass().getResource("/resources/images/excluir.png"))));
@@ -527,8 +548,8 @@ class ButtonEditor extends AbstractCellEditor implements TableCellEditor {
         this.deleteButton.setForeground(new java.awt.Color(128, 0, 32));
         this.deleteButton.setFocusPainted(false);
         this.deleteButton.setBorder(null);
-        this.deleteButton.setContentAreaFilled(false); // Remove o fundo preenchido
-        this.deleteButton.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR)); // Cursor de clique
+        this.deleteButton.setContentAreaFilled(false);
+        this.deleteButton.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
 
         panel.add(editButton);
         panel.add(deleteButton);
@@ -556,7 +577,7 @@ class ButtonEditor extends AbstractCellEditor implements TableCellEditor {
                     null,
                     options,
                     options[0]);
-            if (confirmation == JOptionPane.YES_OPTION) {
+            if (confirmation == 1) {
                 try{
                     int cellIndex = table.getSelectedRow();
                     Object cellValue = table.getValueAt(cellIndex,0);
@@ -592,7 +613,10 @@ class ButtonEditor extends AbstractCellEditor implements TableCellEditor {
                     JOptionPane.showMessageDialog(this.frame,ex.getMessage());
                 }
             }
-            stopCellEditing();
+            else{
+                stopCellEditing();
+            }
+
         });
     }
 

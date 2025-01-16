@@ -173,6 +173,21 @@ public class ListarProduto extends javax.swing.JFrame {
         jTextField4.setBorder(null);
         jTextField4.setToolTipText("");
         jTextField4.setPreferredSize(new java.awt.Dimension(200, 40));
+        jTextField4.addFocusListener(new java.awt.event.FocusListener() {
+            @Override
+            public void focusGained(java.awt.event.FocusEvent evt) {
+                if (jTextField4.getText().equals("Pesquisar produto")) {
+                    jTextField4.setText("");
+                }
+            }
+
+            @Override
+            public void focusLost(java.awt.event.FocusEvent evt) {
+                if (jTextField4.getText().isEmpty()) {
+                    jTextField4.setText("Pesquisar produto");
+                }
+            }
+        });
         jPanel8.add(jTextField4);
         jPanel8.add(filler1);
 
@@ -239,6 +254,12 @@ public class ListarProduto extends javax.swing.JFrame {
         jTable2.setBackground(new java.awt.Color(255, 255, 255));
         jTable2.setSelectionBackground(new java.awt.Color(228, 236, 242));
         jTable2.setSelectionForeground(new java.awt.Color(0, 0, 0));
+
+        for (int i = 0; i < jTable2.getColumnCount(); i++) {
+            if (!jTable2.getColumnName(i).equals("Ações")) {
+                jTable2.getColumnModel().getColumn(i).setCellRenderer(centerRenderer);
+            }
+        }
 
         jTable2.getColumn("Ações").setCellRenderer(new ButtonRendererProduct());
         jTable2.getColumn("Ações").setCellEditor(new ButtonEditorProduct(jTable2, this.rootPane,this.dotenv.get("API_HOST")));
@@ -554,7 +575,7 @@ class ButtonEditorProduct extends AbstractCellEditor implements TableCellEditor 
                     null,
                     options,
                     options[0]);
-            if (confirmation == JOptionPane.YES_OPTION) {
+            if (confirmation == 1) {
                 try{
                     int cellIndex = table.getSelectedRow();
                     Object cellValue = table.getValueAt(cellIndex,0);
@@ -590,7 +611,10 @@ class ButtonEditorProduct extends AbstractCellEditor implements TableCellEditor 
                     JOptionPane.showMessageDialog(this.frame,ex.getMessage());
                 }
             }
-            stopCellEditing();
+            else{
+                stopCellEditing();
+            }
+
         });
     }
 
