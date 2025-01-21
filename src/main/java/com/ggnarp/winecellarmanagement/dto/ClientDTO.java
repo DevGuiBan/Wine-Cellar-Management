@@ -2,7 +2,6 @@ package com.ggnarp.winecellarmanagement.dto;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import lombok.Data;
 
@@ -13,18 +12,18 @@ public class ClientDTO {
 
     private UUID id;
 
-    @NotBlank(message = "The name is required")
+    @NotBlank(message = "O nome é necessário")
     private String name;
 
-    @NotBlank(message = "The e-mail is required")
-    @Email(message = "The e-mail have is valid.")
+    @NotBlank
+    @Email(message = "Insira um e-mail válido")
     private String email;
 
-    @NotBlank(message = "The phone number is required")
-    @Pattern(regexp = "^\\(?\\d{2}\\)?\\s?(9?\\d{4})-?\\d{4}$", message = "The phone number must be in the format (99) 99999-9999")
+    @NotBlank(message = "O número de telefone é necessário")
+    @Pattern(regexp = "^\\(?\\d{2}\\)?\\s?(9?\\d{4})-?\\d{4}$", message = "O número de telefone deve ser no formato (33) 98888-8888")
     private String phone_number;
 
-    @NotBlank(message = "The address is required.")
-    @Pattern(regexp = "^(.+)\\s+(\\d+)\\s+(.+?)\\s*-\\s*([A-Z]{2})$",message = "The address must be in the format street number city - sig")
+    @NotBlank(message = "O endereço é necessário")
+    @Pattern(regexp = "^(.+?) - (.+?) - (\\d+) - ([A-Z]{2})$",message = "O Endereço deve ser no formato Rua - Bairro - N° - UF")
     private String address;
 }

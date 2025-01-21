@@ -4,10 +4,14 @@ import com.ggnarp.winecellarmanagement.dto.ClientDTO;
 import com.ggnarp.winecellarmanagement.entity.Client;
 import com.ggnarp.winecellarmanagement.service.ClientService;
 import jakarta.validation.Valid;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/client")
@@ -20,14 +24,73 @@ public class ClientController {
     }
 
     @PostMapping
-    public ResponseEntity<Client> resgister(@RequestBody @Valid ClientDTO clientDTO) {
-        Client client = clientService.save(clientDTO);
-        return ResponseEntity.ok(client);
+    public ResponseEntity<?> resgister(@RequestBody @Valid ClientDTO clientDTO) {
+        try{
+            Client client = clientService.save(clientDTO);
+            return ResponseEntity.status(HttpStatus.CREATED).body(client);
+        }
+        catch(Exception e){
+            Map<String, String> errorResponse = new HashMap<>();
+            errorResponse.put("error", "Erro ao cadastar o cliente no servidor");
+            errorResponse.put("message", e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+        }
+
     }
 
     @GetMapping
-    public ResponseEntity<List<ClientDTO>> list() {
-        List<ClientDTO> clients = clientService.listAll();
-        return ResponseEntity.ok(clients);
+    public ResponseEntity<?> list() {
+        try{
+            List<ClientDTO> clients = clientService.listAll();
+            return ResponseEntity.status(HttpStatus.OK).body(clients);
+        }
+        catch(Exception e){
+            Map<String, String> errorResponse = new HashMap<>();
+            errorResponse.put("error", "Erro ao procurar os clientes no servidor");
+            errorResponse.put("message", e.getMessage());
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
+        }
+
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<?> getSupplier(@PathVariable UUID id) {
+        try{
+            Client client = clientService.getById(id);
+            return ResponseEntity.status(HttpStatus.OK).body(client);
+        }
+        catch(Exception e){
+            Map<String, String> errorResponse = new HashMap<>();
+            errorResponse.put("error", "Erro ao procurar um cliente com este id: " + id);
+            errorResponse.put("message", e.getMessage());
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
+        }
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<?> update(@PathVariable UUID id, @RequestBody ClientDTO clientDTO) {
+        try{
+            Client updatedCLient = clientService.update(id, clientDTO);
+            return ResponseEntity.status(HttpStatus.OK).body(updatedCLient);
+        }
+        catch (Exception e) {
+            Map<String, String> errorResponse = new HashMap<>();
+            errorResponse.put("error", "Erro ao atualizar as informações do cliente com este id: " + id);
+            errorResponse.put("message", e.getMessage());
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
+        }
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> delete(@PathVariable UUID id) {
+        try{
+            this.clientService.delete(id);
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+        } catch (Exception e) {
+            Map<String, String> errorResponse = new HashMap<>();
+            errorResponse.put("error", "Erro ao excluir o cliente com este id: " + id);
+            errorResponse.put("message", e.getMessage());
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
+        }
     }
 }

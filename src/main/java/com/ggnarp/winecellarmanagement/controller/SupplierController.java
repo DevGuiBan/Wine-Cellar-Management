@@ -1,13 +1,10 @@
 package com.ggnarp.winecellarmanagement.controller;
 
-import com.ggnarp.winecellarmanagement.dto.ProductDTO;
 import com.ggnarp.winecellarmanagement.dto.SupplierDTO;
-import com.ggnarp.winecellarmanagement.entity.Product;
 import com.ggnarp.winecellarmanagement.entity.Supplier;
 import com.ggnarp.winecellarmanagement.service.SupplierService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
