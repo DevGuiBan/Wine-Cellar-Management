@@ -417,7 +417,7 @@ public class CadastrarProduto extends javax.swing.JFrame {
                 }
                 connection.disconnect();
                 JOptionPane.showOptionDialog(rootPane,
-                        "Não foi possível cadastrar o produto, verifique as informações dos campos e tente novamente!\n" + response.toString(),
+                        "Por favor, verifique as informações dos campos e tente novamente!\n",
                         "Produto Não Cadastrado",
                         JOptionPane.DEFAULT_OPTION,
                         JOptionPane.ERROR_MESSAGE,

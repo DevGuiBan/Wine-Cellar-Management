@@ -597,7 +597,7 @@ public class EditarProduto extends javax.swing.JFrame {
                     }
                 }
                 JOptionPane.showOptionDialog(rootPane,
-                        "Não foi possível atualizar as informações do produto, verifique as informações dos campos e tente novamente!\n" + response.toString(),
+                        "Por favor, verifique as informações dos campos e tente novamente!\n",
                         "Produto Não Atualizado",
                         JOptionPane.DEFAULT_OPTION,
                         JOptionPane.ERROR_MESSAGE,

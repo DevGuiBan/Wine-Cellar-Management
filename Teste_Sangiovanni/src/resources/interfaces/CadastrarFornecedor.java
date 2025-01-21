@@ -465,7 +465,7 @@ public class CadastrarFornecedor extends javax.swing.JFrame {
                 }
                 connection.disconnect();
                 JOptionPane.showOptionDialog(rootPane,
-                        "Não foi possível cadastrar o fornecedor e suas informações, verifique as informações dos campos!\n" + response.toString(),
+                        "Por favor, verifique as informações dos campos e tente novamente!\n",
                         "Fornecedor Não Cadastrado",
                         JOptionPane.DEFAULT_OPTION,
                         JOptionPane.ERROR_MESSAGE,
