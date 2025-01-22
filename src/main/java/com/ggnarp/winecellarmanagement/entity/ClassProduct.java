@@ -1,19 +1,18 @@
 package com.ggnarp.winecellarmanagement.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.UUID;
-
 @Entity
-@Table(name = "product_type")
+@Table(name = "class_products")
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+public class ClassProduct {
 
-public class ProductType {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -21,7 +20,4 @@ public class ProductType {
     @Column(nullable = false)
     private String name;
 
-    @ManyToOne
-    @JoinColumn(name = "id_class_product", nullable = false)
-    private ClassProduct classProduct;
 }

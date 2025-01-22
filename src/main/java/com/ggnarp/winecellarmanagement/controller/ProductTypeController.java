@@ -39,7 +39,7 @@ public class ProductTypeController {
     @GetMapping("/{id}")
     public ResponseEntity<?> getById(@PathVariable Long id) {
         try{
-            ProductType productType = productTypeService.getById(id);
+            ProductTypeDTO productType = productTypeService.getById(id);
             return ResponseEntity.status(HttpStatus.OK).body(productType);
         }
         catch(Exception e){

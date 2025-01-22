@@ -1,9 +1,7 @@
 package com.ggnarp.winecellarmanagement.service;
 
 import com.ggnarp.winecellarmanagement.dto.ClientDTO;
-import com.ggnarp.winecellarmanagement.dto.SupplierDTO;
 import com.ggnarp.winecellarmanagement.entity.Client;
-import com.ggnarp.winecellarmanagement.entity.Supplier;
 import com.ggnarp.winecellarmanagement.repository.ClientRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.ResourceAccessException;
