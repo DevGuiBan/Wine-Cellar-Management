@@ -453,7 +453,7 @@ public class EditarFornecedor extends javax.swing.JFrame {
                     }
                 }
                 JOptionPane.showOptionDialog(rootPane,
-                        "Por favor, verifique as informações dos campos e tente novamente!\n",
+                        "Não foi possível atualizar o fornecedor e suas informações, verifique as informações dos campos e tente novamente!\n" + response.toString(),
                         "Fornecedor Não Atualizado",
                         JOptionPane.DEFAULT_OPTION,
                         JOptionPane.ERROR_MESSAGE,

@@ -4,18 +4,7 @@
  */
 package resources.interfaces;
 
-import com.google.gson.Gson;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
-import io.github.cdimascio.dotenv.Dotenv;
-
 import javax.swing.*;
-import javax.swing.table.DefaultTableModel;
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.util.Objects;
 
 /**
@@ -23,14 +12,12 @@ import java.util.Objects;
  * @author rafaj
  */
 public class ListarCliente extends javax.swing.JFrame {
-    private final Dotenv dotenv;
+
     /**
      * Creates new form CadastrarProduto
      */
-    public ListarCliente()
-    {
+    public ListarCliente() {
         initComponents();
-        this.dotenv = Dotenv.load();
     }
 
     /**
@@ -349,62 +336,95 @@ public class ListarCliente extends javax.swing.JFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_jButton8ActionPerformed
 
-    private void getClient(){
-
-        try{
-            String urlAPI = this.dotenv.get("API_HOST");
-            URL url = new URL(urlAPI + "/client");
-            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-            connection.setRequestMethod("GET");
-
-            int responseCode = connection.getResponseCode();
-            if (responseCode == HttpURLConnection.HTTP_OK) {
-                BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-                StringBuilder response = new StringBuilder();
-                String line;
-                while ((line = reader.readLine()) != null) {
-                    response.append(line);
-                }
-                reader.close();
-
-                Gson gson = new Gson();
-                JsonArray client = JsonParser.parseString(response.toString()).getAsJsonArray();
-
-                DefaultTableModel tableModel = (DefaultTableModel) jTable2.getModel();
-                tableModel.setRowCount(0);
-
-                for (int i = 0; i < client.size(); i++) {
-                    JsonObject clientObject = client.get(i).getAsJsonObject();
-                    String code = clientObject.get("code").getAsString();
-                    String name = clientObject.get("name").getAsString();
-                    String cpf = clientObject.get("cpf").getAsString();
-                    String birthday = clientObject.get("birthday").getAsString();
-                    String phone_number = clientObject.get("phone_number").getAsString();
-                    String email = clientObject.get("email").getAsString();
-                    String orderCount = "0";
-
-                    tableModel.addRow(new Object[]{code, name, cpf, birthday, phone_number, email, orderCount});
-                    connection.disconnect();
-                }
-            } else {
-                JOptionPane.showOptionDialog(rootPane,
-                        "Ocorreu um erro ao carregar os fornecedores",
-                        "Problema no Servidor",
-                        JOptionPane.DEFAULT_OPTION,
-                        JOptionPane.ERROR_MESSAGE,
-                        null,null,null);
-                connection.disconnect();
-            }
-        } catch (Exception e) {
-            JOptionPane.showMessageDialog(rootPane, e.getMessage());
-        }
-    }
-
-
     /**
      * @param args the command line arguments
      */
-    public void main(String[] args) {
+    public static void main(String args[]) {
+        /* Set the Nimbus look and feel */
+        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
+        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
+         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
+         */
+        try {
+            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
+                if ("Nimbus".equals(info.getName())) {
+                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
+                    break;
+                }
+            }
+        } catch (ClassNotFoundException ex) {
+            java.util.logging.Logger.getLogger(ListarCliente.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        } catch (InstantiationException ex) {
+            java.util.logging.Logger.getLogger(ListarCliente.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        } catch (IllegalAccessException ex) {
+            java.util.logging.Logger.getLogger(ListarCliente.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
+            java.util.logging.Logger.getLogger(ListarCliente.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        }
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
 
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
@@ -436,4 +456,3 @@ public class ListarCliente extends javax.swing.JFrame {
     private javax.swing.JTextField jTextField4;
     // End of variables declaration//GEN-END:variables
 }
-
