@@ -7,4 +7,5 @@ import java.util.UUID;
 
 public interface SupplierRepository extends JpaRepository<Supplier, UUID> {
     boolean existsByCnpj(String cnpj);
+    boolean existsByEmail(String email);
 }

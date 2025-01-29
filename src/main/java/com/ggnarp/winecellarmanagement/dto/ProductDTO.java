@@ -3,6 +3,7 @@ package com.ggnarp.winecellarmanagement.dto;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.PositiveOrZero;
 import lombok.Data;
 
 import java.math.BigDecimal;
@@ -13,15 +14,17 @@ public class ProductDTO {
 
     private Long id;
 
-    @NotBlank
+    @NotBlank(message = "O nome do produto é necessário para o cadastro do produto!")
     private String name;
 
-    @NotBlank
+    @NotBlank(message = "Uma descrição é necessária!")
     private String description;
 
+    @NotBlank(message = "É preciso especificar uma quantidade!")
     @Positive
     private Integer quantity;
 
+    @NotBlank(message = "É preciso especificar um preço!")
     @Positive
     private BigDecimal price;
 

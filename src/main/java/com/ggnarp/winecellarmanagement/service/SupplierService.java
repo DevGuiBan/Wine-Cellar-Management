@@ -21,8 +21,12 @@ public class SupplierService {
 
     public Supplier save(SupplierDTO supplierDTO) {
         if (supplierRepository.existsByCnpj(supplierDTO.getCnpj())) {
-            throw new IllegalArgumentException("This supplier has already been registered with this CNPJ" + supplierDTO.getCnpj());
+            throw new IllegalArgumentException("Já há um fornecedor cadastrado com este CNPJ: " + supplierDTO.getCnpj());
         }
+        if (supplierRepository.existsByEmail(supplierDTO.getEmail())) {
+            throw new IllegalArgumentException("Já há um fornecedor cadastrado com este E-mail: " + supplierDTO.getEmail());
+        }
+
         Supplier supplier = new Supplier();
         supplier.setName(supplierDTO.getName());
         supplier.setCnpj(supplierDTO.getCnpj());

@@ -6,6 +6,8 @@ import javax.swing.text.MaskFormatter;
 import java.awt.*;
 import java.nio.charset.StandardCharsets;
 import java.util.Objects;
+
+import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -399,7 +401,6 @@ public class CadastrarFornecedor extends javax.swing.JFrame {
 
     private void jButton5ActionPerformed(java.awt.event.ActionEvent evt){
         try{
-            // getting the data to send for api
             String name = jTextField1.getText();
             String phone_number = jTextField2.getText();
             String email = jTextField3.getText();
@@ -407,7 +408,6 @@ public class CadastrarFornecedor extends javax.swing.JFrame {
             String address = jTextField5.getText();
             String observations = jTextField6.getText();
 
-            // creating the json to send
             JsonObject jsonData = new JsonObject();
             jsonData.addProperty("name",name);
             jsonData.addProperty("phone_number",phone_number);
@@ -416,7 +416,6 @@ public class CadastrarFornecedor extends javax.swing.JFrame {
             jsonData.addProperty("address",address);
             jsonData.addProperty("observations",observations);
 
-            // making the request
             String urlAPI = this.dotenv.get("API_HOST");
             URL url = new URL(urlAPI+"/supplier");
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
@@ -424,14 +423,12 @@ public class CadastrarFornecedor extends javax.swing.JFrame {
             connection.setRequestProperty("Content-Type", "application/json");
             connection.setDoOutput(true);
 
-            // send the request with json
             try (OutputStream os = connection.getOutputStream()) {
                 byte[] input = jsonData.toString().getBytes(StandardCharsets.UTF_8);
                 os.write(input, 0, input.length);
             }
 
             int statusCode = connection.getResponseCode();
-            StringBuilder response = new StringBuilder();
 
             if(statusCode>=200 && statusCode<=300){
                 jTextField1.setText("");
@@ -458,10 +455,24 @@ public class CadastrarFornecedor extends javax.swing.JFrame {
             }
             else{
                 try (BufferedReader br = new BufferedReader(new InputStreamReader(connection.getErrorStream(), "utf-8"))) {
+                    StringBuilder response = new StringBuilder();
                     String responseLine;
                     while ((responseLine = br.readLine()) != null) {
                         response.append(responseLine.trim());
                     }
+
+                    // Converter resposta JSON para exibir mensagens de erro detalhadas
+                    Gson gson = new Gson();
+                    JsonObject errorResponse = gson.fromJson(response.toString(), JsonObject.class);
+
+                    // Montar mensagem de erro para exibição no Swing
+                    StringBuilder errorMessage = new StringBuilder("Erros encontrados:\n");
+                    for (String field : errorResponse.keySet()) {
+                        errorMessage.append("- ").append(errorResponse.get(field).getAsString()).append("\n");
+                    }
+
+                    // Exibir mensagem de erro
+                    JOptionPane.showMessageDialog(rootPane, errorMessage.toString(), "Erro ao Cadastrar", JOptionPane.ERROR_MESSAGE);
                 }
                 connection.disconnect();
                 JOptionPane.showOptionDialog(rootPane,

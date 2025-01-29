@@ -358,17 +358,15 @@ public class CadastrarProduto extends javax.swing.JFrame {
         });
     }
 
-    private void jButton5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton5ActionPerformed
+    private void jButton5ActionPerformed(java.awt.event.ActionEvent evt) {
         try {
-            // getting the data to send for api
-            String name = jTextField1.getText();
+            String name = jTextField1.getText().trim();
             int quantity = (int) jSpinner2.getValue();
             Double price = (Double) jSpinner1.getValue();
-            String description = jTextField2.getText();
+            String description = jTextField2.getText().trim();
             Supplier id_supplier = (Supplier) Objects.requireNonNull(jComboBox1.getSelectedItem());
             ProductType id_product_type = (ProductType) Objects.requireNonNull(jComboBox3.getSelectedItem());
 
-            // creating the json to send
             JsonObject jsonData = new JsonObject();
             jsonData.addProperty("name", name);
             jsonData.addProperty("quantity", quantity);
@@ -377,7 +375,6 @@ public class CadastrarProduto extends javax.swing.JFrame {
             jsonData.addProperty("id_supplier", id_supplier.getId());
             jsonData.addProperty("id_product_type", id_product_type.getId());
 
-            // making the request
             String urlAPI = this.dotenv.get("API_HOST");
             URL url = new URL(urlAPI + "/product");
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
@@ -385,14 +382,12 @@ public class CadastrarProduto extends javax.swing.JFrame {
             connection.setRequestProperty("Content-Type", "application/json");
             connection.setDoOutput(true);
 
-            // send the request with json
             try (OutputStream os = connection.getOutputStream()) {
                 byte[] input = jsonData.toString().getBytes(StandardCharsets.UTF_8);
                 os.write(input, 0, input.length);
             }
 
             int statusCode = connection.getResponseCode();
-            StringBuilder response = new StringBuilder();
 
             if (statusCode >= 200 && statusCode <= 300) {
                 jSpinner1.setValue(0);
@@ -401,32 +396,37 @@ public class CadastrarProduto extends javax.swing.JFrame {
                 jTextField2.setText("");
                 jComboBox3.setSelectedIndex(0);
                 jComboBox1.setSelectedIndex(0);
-                JOptionPane.showOptionDialog(rootPane,
+
+                JOptionPane.showMessageDialog(rootPane,
                         "O Produto foi cadastrado com sucesso!",
                         "Produto Cadastrado",
-                        JOptionPane.DEFAULT_OPTION,
-                        JOptionPane.INFORMATION_MESSAGE,
-                        null,null,null);
-                connection.disconnect();
+                        JOptionPane.INFORMATION_MESSAGE);
             } else {
-                try (BufferedReader br = new BufferedReader(new InputStreamReader(connection.getErrorStream(), "utf-8"))) {
+                StringBuilder response = new StringBuilder();
+                try (BufferedReader br = new BufferedReader(new InputStreamReader(connection.getErrorStream(), StandardCharsets.UTF_8))) {
                     String responseLine;
                     while ((responseLine = br.readLine()) != null) {
                         response.append(responseLine.trim());
                     }
                 }
-                connection.disconnect();
-                JOptionPane.showOptionDialog(rootPane,
-                        "Por favor, verifique as informações dos campos e tente novamente!\n",
-                        "Produto Não Cadastrado",
-                        JOptionPane.DEFAULT_OPTION,
-                        JOptionPane.ERROR_MESSAGE,
-                        null,null,null);
+
+                Gson gson = new Gson();
+                JsonObject errorResponse = gson.fromJson(response.toString(), JsonObject.class);
+
+                StringBuilder errorMessage = new StringBuilder("Erros encontrados:\n");
+                for (String field : errorResponse.keySet()) {
+                    errorMessage.append("- ").append(errorResponse.get(field).getAsString()).append("\n");
+                }
+
+                JOptionPane.showMessageDialog(rootPane,
+                        errorMessage.toString(),
+                        "Erro ao Cadastrar",
+                        JOptionPane.ERROR_MESSAGE);
             }
 
-
+            connection.disconnect();
         } catch (Exception e) {
-            JOptionPane.showMessageDialog(rootPane, e.getMessage());
+            JOptionPane.showMessageDialog(rootPane, "Erro: " + e.getMessage(), "Erro", JOptionPane.ERROR_MESSAGE);
         }
     }
 

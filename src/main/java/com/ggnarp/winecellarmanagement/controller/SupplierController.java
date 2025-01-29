@@ -31,7 +31,7 @@ public class SupplierController {
         }
         catch(Exception e){
             Map<String, String> errorResponse = new HashMap<>();
-            errorResponse.put("error", "Error in searching the supplier with this id: " + id);
+            errorResponse.put("error", "Erro ao pesquisar o fornecedor com este id:" + id);
             errorResponse.put("message", e.getMessage());
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
         }
@@ -45,7 +45,7 @@ public class SupplierController {
         }
         catch (Exception e){
             Map<String, String> errorResponse = new HashMap<>();
-            errorResponse.put("error", "Error in creating the supplier");
+            errorResponse.put("error", "Erro ao criar fornecedor");
             errorResponse.put("message", e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
         }
@@ -60,7 +60,7 @@ public class SupplierController {
         }
         catch (Exception e) {
             Map<String, String> errorResponse = new HashMap<>();
-            errorResponse.put("error", "Error in found all suppliers");
+            errorResponse.put("error", "Erro ao encontrar todos os fornecedores");
             errorResponse.put("message", e.getMessage());
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
         }
@@ -75,7 +75,7 @@ public class SupplierController {
         }
         catch (Exception e) {
             Map<String, String> errorResponse = new HashMap<>();
-            errorResponse.put("error", "Error in updating the supplier with this id: " + id);
+            errorResponse.put("error", "Erro ao atualizar o fornecedor com este id: " + id);
             errorResponse.put("message", e.getMessage());
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
         }
@@ -88,7 +88,7 @@ public class SupplierController {
             return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
         } catch (Exception e) {
             Map<String, String> errorResponse = new HashMap<>();
-            errorResponse.put("error", "Error in deleting supplier with this id: " + id);
+            errorResponse.put("error", "Erro ao excluir fornecedor com este id: " + id);
             errorResponse.put("message", e.getMessage());
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
         }

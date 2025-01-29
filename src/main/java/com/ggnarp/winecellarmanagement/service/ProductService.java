@@ -30,12 +30,12 @@ public class ProductService {
         ProductType productType = productTypeRepository
                 .findById(productDTO.getId_product_type())
                 .orElseThrow(() -> new ResourceAccessException(
-                        "ProductType with id " + productDTO.getId_product_type() + " not found"));
+                        "Tipo de produto com ID " + productDTO.getId_product_type() + " não encontrado"));
 
         Supplier supplier = supplierRepository
                 .findById(productDTO.getId_supplier())
                 .orElseThrow(() -> new ResourceAccessException(
-                        "Supplier with id " + productDTO.getId_supplier() + " not found"));
+                        "Fornecedor com ID " + productDTO.getId_supplier() + " não encontrado"));
 
         Product prod = new Product();
         prod.setName(productDTO.getName());
@@ -88,7 +88,7 @@ public class ProductService {
         return productRepository
                 .findById(id)
                 .map(this::mapToDTO).
-                orElseThrow(() -> new ResourceAccessException("Product with ID " + id + " not found."));
+                orElseThrow(() -> new ResourceAccessException("Produto com ID " + id + " não encontrado."));
     }
 
     public Product update(Long id, ProductDTO productDTO) {
@@ -109,25 +109,25 @@ public class ProductService {
                     if (productDTO.getId_product_type() != null) {
                         ProductType productType = productTypeRepository.findById(productDTO.getId_product_type())
                                 .orElseThrow(() -> new ResourceAccessException(
-                                        "ProductType with id " + productDTO.getId_product_type() + " not found"));
+                                        "Tipo de produto com ID " + productDTO.getId_product_type() + " não encontrado."));
                         existingProduct.setProductType(productType);
                     }
                     if (productDTO.getId_supplier() != null) {
                         Supplier supplier = supplierRepository.findById(productDTO.getId_supplier())
                                 .orElseThrow(() -> new ResourceAccessException(
-                                        "Supplier with id " + productDTO.getId_supplier() + " not found"));
+                                        "Fornecedor com ID " + productDTO.getId_supplier() + " não encontrado."));
                         existingProduct.setSupplier(supplier);
                     }
                     return productRepository.save(existingProduct);
                 })
-                .orElseThrow(() -> new ResourceAccessException("Product with id " + id + " not found"));
+                .orElseThrow(() -> new ResourceAccessException("Produto com ID " + id + " não encontrado."));
     }
 
     public void delete(Long id) {
         if (productRepository.existsById(id)) {
             productRepository.deleteById(id);
         } else {
-            throw new ResourceAccessException("ProductType with this id " + id + " not found.");
+            throw new ResourceAccessException("Tipo de produto com esse ID " + id + " não encontrado.");
         }
     }
 

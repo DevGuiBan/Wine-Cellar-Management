@@ -30,7 +30,7 @@ public class ProductController {
         }
         catch(Exception e){
             Map<String, String> errorResponse = new HashMap<>();
-            errorResponse.put("error", "Product not created");
+            errorResponse.put("error", "Produto não criado");
             errorResponse.put("message", e.getMessage());
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
         }
@@ -44,7 +44,7 @@ public class ProductController {
         }
         catch (Exception e) {
             Map<String, String> errorResponse = new HashMap<>();
-            errorResponse.put("error", "Products not found");
+            errorResponse.put("error", "Produtos não encontrados");
             errorResponse.put("message", e.getMessage());
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
         }
@@ -58,7 +58,7 @@ public class ProductController {
         }
         catch(Exception e){
             Map<String, String> errorResponse = new HashMap<>();
-            errorResponse.put("error", "Error in searching the product");
+            errorResponse.put("error", "Erro na pesquisa do produto");
             errorResponse.put("message", e.getMessage());
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
         }
@@ -72,7 +72,7 @@ public class ProductController {
         }
         catch (Exception e) {
             Map<String, String> errorResponse = new HashMap<>();
-            errorResponse.put("error", "Error in updating product");
+            errorResponse.put("error", "Erro na atualização do produto");
             errorResponse.put("message", e.getMessage());
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
         }
@@ -86,7 +86,7 @@ public class ProductController {
         }
         catch (Exception e) {
             Map<String, String> errorResponse = new HashMap<>();
-            errorResponse.put("error", "Error in deleting product");
+            errorResponse.put("error", "Erro ao excluir o produto ");
             errorResponse.put("message", e.getMessage());
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
         }
