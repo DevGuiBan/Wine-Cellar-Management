@@ -4,6 +4,9 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.time.LocalDate;
+import java.util.Date;
 import java.util.UUID;
 
 @Entity
@@ -28,4 +31,10 @@ public class Client {
 
     @Column(nullable = false)
     private String address;
+
+    @Column(nullable = false)
+    private LocalDate date_brith;
+
+    @Column(nullable = false,unique = true)
+    private String cpf;
 }

@@ -1,18 +1,37 @@
 package resources.interface_card;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+import io.github.cdimascio.dotenv.Dotenv;
 import resources.interfaces.EditarProduto;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
-import javax.swing.table.DefaultTableCellRenderer;
-import javax.swing.table.JTableHeader;
-import javax.swing.table.TableCellEditor;
-import javax.swing.table.TableCellRenderer;
+import javax.swing.table.*;
 import java.awt.*;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.math.BigInteger;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.Objects;
 
 public class ListarCliente extends JPanel {
-    public ListarCliente(JRootPane rootPane,JPanel mainPanel){
+    private JRootPane rootPane;
+    private JPanel mainPanel;
+    private Dotenv dotenv;
+
+    public ListarCliente(JRootPane rootPane,JPanel mainPanel,CadastrarCliente cardCli){
+      this.rootPane = rootPane;
+      this.mainPanel = mainPanel;
+      this.dotenv = Dotenv.load();
+      this.initComponents(cardCli);
+      this.getClientes();
+    }
+
+    private void initComponents(CadastrarCliente card){
         // iniciar Componentes
         jPanelTopoTabela = new javax.swing.JPanel();
         jPanelTabela = new javax.swing.JPanel();
@@ -128,7 +147,7 @@ public class ListarCliente extends JPanel {
         }
 
         jtable.getColumn("Ações").setCellRenderer(new ButtonRendererProductClient());
-        jtable.getColumn("Ações").setCellEditor(new ButtonEditorProductClient(jtable, rootPane,"ssss"));
+        jtable.getColumn("Ações").setCellEditor(new ButtonEditorProductClient(jtable, rootPane,this.dotenv.get("api_host"),card,this.mainPanel));
 
         jScrollPane.setViewportView(jtable);
         jScrollPane.setBorder(javax.swing.BorderFactory.createMatteBorder(2, 2, 2, 2, new java.awt.Color(128, 0, 32)));
@@ -140,6 +159,55 @@ public class ListarCliente extends JPanel {
         jPanel4.add(jPanelTabela);
         setBorder(new EmptyBorder(20, 20, 20, 20));
         add(jPanel4);
+    }
+
+    public void getClientes(){
+        try {
+            String urlAPI = this.dotenv.get("API_HOST");
+            URL url = new URL(urlAPI + "/client");
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.setRequestMethod("GET");
+
+            int responseCode = connection.getResponseCode();
+            if (responseCode == HttpURLConnection.HTTP_OK) {
+                BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+                StringBuilder response = new StringBuilder();
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    response.append(line);
+                }
+                reader.close();
+
+                Gson gson = new Gson();
+                JsonArray products = JsonParser.parseString(response.toString()).getAsJsonArray();
+
+                DefaultTableModel tableModel = (DefaultTableModel) jtable.getModel();
+                tableModel.setRowCount(0);
+
+                for (int i = 0; i < products.size(); i++) {
+                    JsonObject product = products.get(i).getAsJsonObject();
+                    String id = product.get("id").getAsString();
+                    String name = product.get("name").getAsString();
+                    String cpf = product.get("cpf").getAsString();
+                    String address = product.get("address").getAsString();
+                    String phone_number = product.get("phone_number").getAsString();
+                    String email = product.get("email").getAsString();
+                    String data = product.get("date_brith").getAsString();
+                    tableModel.addRow(new Object[]{id, name,address,cpf,data,phone_number,email});
+                    connection.disconnect();
+                }
+            } else {
+                JOptionPane.showOptionDialog(rootPane,
+                        "Ocorreu um erro ao carregar os cliente",
+                        "Problema no Servidor",
+                        JOptionPane.DEFAULT_OPTION,
+                        JOptionPane.ERROR_MESSAGE,
+                        null,null,null);
+                connection.disconnect();
+            }
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(rootPane, e.getMessage());
+        }
     }
 
     private javax.swing.JTextField pesquisaProduto;
@@ -197,7 +265,7 @@ class ButtonEditorProductClient extends AbstractCellEditor implements TableCellE
     private final JFrame frame;
     private final String APIURL;
 
-    public ButtonEditorProductClient(JTable table,JRootPane rootPane,String APIURL) {
+    public ButtonEditorProductClient(JTable table,JRootPane rootPane,String APIURL,CadastrarCliente cardCli,JPanel mainPanel) {
         this.table = table;
         this.frame = (JFrame) SwingUtilities.getWindowAncestor(rootPane);
         this.APIURL = APIURL;
@@ -232,11 +300,9 @@ class ButtonEditorProductClient extends AbstractCellEditor implements TableCellE
         editButton.addActionListener(evt -> {
             int cellIndex = table.getSelectedRow();
             Object cellValue = table.getValueAt(cellIndex,0);
-            JFrame tela = new EditarProduto(cellValue.toString());
-            SwingUtilities.invokeLater(() -> {
-                this.frame.setVisible(false);
-                tela.setVisible(true);
-            });
+            cardCli.setId(cellValue.toString());
+            CardLayout cl = (CardLayout) mainPanel.getLayout();
+            cl.show(mainPanel, "cadastrar_cliente");
             stopCellEditing();
         });
 

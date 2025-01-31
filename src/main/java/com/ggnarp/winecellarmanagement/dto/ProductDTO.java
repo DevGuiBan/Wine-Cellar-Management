@@ -20,11 +20,11 @@ public class ProductDTO {
     @NotBlank(message = "Uma descrição é necessária!")
     private String description;
 
-    @NotBlank(message = "É preciso especificar uma quantidade!")
+    @NotNull(message = "É preciso especificar uma quantidade!")
     @Positive
     private Integer quantity;
 
-    @NotBlank(message = "É preciso especificar um preço!")
+    @NotNull(message = "É preciso especificar um preço!")
     @Positive
     private BigDecimal price;
 

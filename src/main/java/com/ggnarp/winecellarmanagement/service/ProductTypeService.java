@@ -1,9 +1,7 @@
 package com.ggnarp.winecellarmanagement.service;
 
 import com.ggnarp.winecellarmanagement.dto.ProductTypeDTO;
-import com.ggnarp.winecellarmanagement.entity.ClassProduct;
 import com.ggnarp.winecellarmanagement.entity.ProductType;
-import com.ggnarp.winecellarmanagement.repository.ClassProductRepository;
 import com.ggnarp.winecellarmanagement.repository.ProductTypeRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.ResourceAccessException;
@@ -14,11 +12,9 @@ import java.util.stream.Collectors;
 @Service
 public class ProductTypeService {
     private final ProductTypeRepository productTypeRepository;
-    private final ClassProductRepository classProductRepository;
 
-    public ProductTypeService(ProductTypeRepository productTypeRepository,ClassProductRepository classProductRepository) {
+    public ProductTypeService(ProductTypeRepository productTypeRepository) {
         this.productTypeRepository = productTypeRepository;
-        this.classProductRepository = classProductRepository;
     }
 
     private ProductTypeDTO mapToDTO(ProductType productType) {
@@ -26,26 +22,13 @@ public class ProductTypeService {
         dto.setId(productType.getId());
         dto.setName(productType.getName());
 
-        // Map Class Product
-        ProductTypeDTO.ClassProductDTO classProductDTO = new ProductTypeDTO.ClassProductDTO();
-        classProductDTO.setId_class(productType.getClassProduct().getId());
-        classProductDTO.setName(productType.getClassProduct().getName());
-        dto.setClassProduct(classProductDTO);
-
-        dto.setId_class_product(productType.getClassProduct().getId());
-
         return dto;
     }
 
     public ProductType save(ProductTypeDTO productTypeDTO) {
         ProductType productType = new ProductType();
-        ClassProduct classProduct = classProductRepository
-                .findById(productTypeDTO.getId_class_product())
-                .orElseThrow(() -> new ResourceAccessException(
-                        "Tipo de Produto com este id:" + productTypeDTO.getId_class_product() + " não foi encontrado"));
-
         productType.setName(productTypeDTO.getName());
-        productType.setClassProduct(classProduct);
+
         return productTypeRepository.save(productType);
     }
 
@@ -66,12 +49,6 @@ public class ProductTypeService {
                 .map(existingProductType -> {
                     if(!productTypeDTO.getName().isBlank()){
                         existingProductType.setName(productTypeDTO.getName());
-                    }
-                    if(productTypeDTO.getId_class_product()!=null){
-                        ClassProduct classProduct = classProductRepository.findById(productTypeDTO.getId_class_product())
-                                .orElseThrow(() -> new ResourceAccessException(
-                                        "Classe de Produto com este id:" + productTypeDTO.getId_class_product() + " não foi encontrado"));
-                        existingProductType.setClassProduct(classProduct);
                     }
 
                     return productTypeRepository.save(existingProductType);

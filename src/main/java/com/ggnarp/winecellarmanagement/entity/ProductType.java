@@ -21,7 +21,4 @@ public class ProductType {
     @Column(nullable = false)
     private String name;
 
-    @ManyToOne
-    @JoinColumn(name = "id_class_product", nullable = false)
-    private ClassProduct classProduct;
 }

@@ -1,5 +1,6 @@
 package resources.interface_card;
 
+import com.google.gson.*;
 import resources.interfaces.ProductType;
 import resources.interfaces.Supplier;
 
@@ -7,14 +8,54 @@ import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.MatteBorder;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.FocusAdapter;
-import java.awt.event.FocusEvent;
+import java.awt.event.*;
+import java.io.OutputStream;
+import java.math.BigInteger;
 import java.util.Objects;
 
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+
+import io.github.cdimascio.dotenv.Dotenv;
+
 public class CadastrarProduto extends JPanel {
+    private Dotenv dotenv;
+    private JRootPane framePrincipal;
+    private JPanel mainPanel;
+    private String id;
+
     public CadastrarProduto(JPanel mainPanel, JRootPane framePrincipal) {
+        this.mainPanel = mainPanel;
+        this.framePrincipal = framePrincipal;
+        this.dotenv = Dotenv.load();
+        this.initComponentes();
+        getSupplier();
+        getProductType();
+    }
+
+    public void setId(String id) {
+        this.id = id;
+        this.getProduct();
+        this.jButtonCadastrar.setText("Atualizar");
+        jLabelCadastro.setText("Editar Produto");
+    }
+
+    public void reset() {
+        this.jComboBoxSupplier.setSelectedIndex(0);
+        this.jComboBoxProductType.setSelectedIndex(0);
+        this.jSpinnerQuantidade.setValue(0);
+        this.jSpinnerPrecoVenda.setValue(0);
+        this.jTextFieldDescricao.setText("Descrição do Produto");
+        this.jTextFieldNome.setText("Nome do Produto");
+        this.jButtonCadastrar.setText("Cadastrar");
+        jLabelCadastro.setText("Cadastrar Produto");
+    }
+
+    private void initComponentes() {
         // inicialização de variáveis
         frame = (JFrame) SwingUtilities.getWindowAncestor(framePrincipal);
 
@@ -26,8 +67,8 @@ public class CadastrarProduto extends JPanel {
         jLabelNome = new JLabel();
         jLabelFornecedor = new JLabel();
 
-        jSpinnerPrecoVenda = new JSpinner((new SpinnerNumberModel(0.0, 0.0, Long.MAX_VALUE, 0.1)));
-        jSpinnerQuantidade = new JSpinner((new SpinnerNumberModel(0.0, 0.0, Integer.MAX_VALUE, 1)));
+        jSpinnerPrecoVenda = new JSpinner(new SpinnerNumberModel(0.0, 0.0, Double.MAX_VALUE, 0.1));
+        jSpinnerQuantidade = new JSpinner(new SpinnerNumberModel(0, 0, Integer.MAX_VALUE, 1));
 
         jTextFieldNome = new JTextField();
         jTextFieldDescricao = new JTextField();
@@ -51,7 +92,7 @@ public class CadastrarProduto extends JPanel {
         // configuração do card
         setBackground(new Color(243, 243, 223));
         setPreferredSize(new Dimension(1366, 650)); // tamanho do painel que tem tudo
-        setLayout(new FlowLayout(FlowLayout.CENTER,30,30));
+        setLayout(new FlowLayout(FlowLayout.CENTER, 30, 30));
 
         gbc.fill = GridBagConstraints.HORIZONTAL; // Permitir redimensionamento horizontal
         gbc.anchor = GridBagConstraints.WEST; // Alinhamento à esquerda
@@ -204,7 +245,7 @@ public class CadastrarProduto extends JPanel {
         jSpinnerPrecoVenda.setFont(new Font("Cormorant Garamond", 1, 18));
         jSpinnerPrecoVenda.setBorder(new MatteBorder(2, 2, 2, 2, new Color(128, 0, 32)));
         jSpinnerPrecoVenda.setPreferredSize(fieldSize);
-        JSpinner.NumberEditor editor = new JSpinner.NumberEditor(jSpinnerPrecoVenda, "R$ #,##0.00"); // máscara de preço pro spinner
+        JSpinner.NumberEditor editor = new JSpinner.NumberEditor(jSpinnerPrecoVenda, "0.00"); // máscara de preço pro spinner
         jSpinnerPrecoVenda.setEditor(editor);
         gbc.gridx = 0;
         gbc.gridy = 5;
@@ -237,7 +278,7 @@ public class CadastrarProduto extends JPanel {
         jButtonVisualizarProduto.setOpaque(false);
         jButtonVisualizarProduto.setFocusPainted(false);
         jButtonVisualizarProduto.setFocusable(false);
-        jButtonVisualizarProduto.setBorder(new EmptyBorder(0,0,0,460));
+        jButtonVisualizarProduto.setBorder(new EmptyBorder(0, 0, 0, 460));
         jButtonVisualizarProduto.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent evt) {
                 abrirModalTiposProdutos(frame);
@@ -248,9 +289,10 @@ public class CadastrarProduto extends JPanel {
         jButtonCancelar.setFont(new Font("Cormorant Garamond SemiBold", 0, 18));
         jButtonCancelar.setText("Cancelar");
         jButtonCancelar.setFocusPainted(false);
-        jButtonCancelar.setBorder(new EmptyBorder(5,20,5,20));
+        jButtonCancelar.setBorder(new EmptyBorder(5, 20, 5, 20));
         jButtonCancelar.addActionListener(e -> {
             // Redireciona para "listar_produtos"
+            this.reset();
             CardLayout cl = (CardLayout) mainPanel.getLayout();
             cl.show(mainPanel, "card1");
         });
@@ -260,6 +302,7 @@ public class CadastrarProduto extends JPanel {
         jButtonCadastrar.setForeground(new Color(255, 255, 200));
         jButtonCadastrar.setText("Cadastrar");
         jButtonCadastrar.setFocusPainted(false);
+        jButtonCadastrar.addActionListener(evt->cadastrarProduto());
 
 
         jPanel.add(jPanelContent);
@@ -269,8 +312,8 @@ public class CadastrarProduto extends JPanel {
         jPanelButtons.add(jButtonVisualizarProduto);
         jPanelButtons.add(jButtonCancelar);
         jPanelButtons.add(jButtonCadastrar);
-        jPanelButtons.setLayout(new FlowLayout(FlowLayout.RIGHT,10,10));
-        jPanelButtons.setBorder(new EmptyBorder(5,10,5,140));
+        jPanelButtons.setLayout(new FlowLayout(FlowLayout.RIGHT, 10, 10));
+        jPanelButtons.setBorder(new EmptyBorder(5, 10, 5, 140));
 
         jPanel.add(jPanelButtons);
 
@@ -278,7 +321,7 @@ public class CadastrarProduto extends JPanel {
 
     }
 
-    public void abrirModalTiposProdutos(JFrame parent) {
+    private void abrirModalTiposProdutos(JFrame parent) {
         JDialog modal = new JDialog(parent, "Tipos de Produtos", true);
         modal.setSize(400, 300);
         modal.setLayout(new BorderLayout());
@@ -291,23 +334,18 @@ public class CadastrarProduto extends JPanel {
         titleLabel.setFont(new Font("Cormorant Garamond SemiBold", Font.BOLD, 18));
         titleLabel.setForeground(Color.BLACK);
 
-        JPanel closePanel = new JPanel(new BorderLayout());
-        closePanel.setBackground(Color.WHITE);
-
         topPanel.add(titleLabel, BorderLayout.WEST);
-        topPanel.add(closePanel, BorderLayout.EAST);
 
-        DefaultListModel<String> model = new DefaultListModel<>();
-        model.addElement("Espumante");
-        model.addElement("Refrigerante");
-
-        JList<String> list = new JList<>(model);
-        list.setFont(new Font("Cormorant Garamond", Font.PLAIN, 16));
-        list.setForeground(Color.BLACK);
-        list.setBackground(new Color(238,238,238));
-        list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-
-        list.setFixedCellHeight(40);
+        DefaultListModel<ProductType> model = new DefaultListModel<>();
+        JList<ProductType> list = new JList<>(model);
+        list.setCellRenderer((jList, value, index, isSelected, cellHasFocus) -> {
+            JLabel label = new JLabel(value.getName());
+            label.setFont(new Font("Cormorant Garamond SemiBold", Font.BOLD, 14));
+            label.setForeground(Color.BLACK);
+            label.setOpaque(true);
+            label.setBackground(isSelected ? new Color(200, 200, 255) : Color.WHITE);
+            return label;
+        });
 
         JScrollPane scrollPane = new JScrollPane(list);
         scrollPane.setBorder(new EmptyBorder(5, 10, 5, 10));
@@ -340,42 +378,476 @@ public class CadastrarProduto extends JPanel {
         bottomPanel.add(editarButton);
         bottomPanel.add(removerButton);
 
+        carregarTiposProduto(model);
+
         novoButton.addActionListener(e -> {
-            String novoItem = JOptionPane.showInputDialog(modal, "Digite o novo tipo de produto:");
-            if (novoItem != null && !novoItem.trim().isEmpty()) {
-                model.addElement(novoItem.trim());
-            } else {
-                JOptionPane.showMessageDialog(modal, "O item não pode estar vazio!", "Erro", JOptionPane.ERROR_MESSAGE);
+            String novoNome = JOptionPane.showInputDialog(modal, "Digite o novo tipo de produto:");
+            if (novoNome != null && !novoNome.trim().isEmpty()) {
+                adicionarTipoProduto(novoNome, model);
             }
         });
 
         editarButton.addActionListener(e -> {
             int selectedIndex = list.getSelectedIndex();
             if (selectedIndex != -1) {
-                String novoNome = JOptionPane.showInputDialog(modal, "Editar:", model.getElementAt(selectedIndex));
+                ProductType selectedType = model.get(selectedIndex);
+                String novoNome = JOptionPane.showInputDialog(modal, "Editar:", selectedType.getName());
                 if (novoNome != null && !novoNome.trim().isEmpty()) {
-                    model.set(selectedIndex, novoNome.trim());
+                    editarTipoProduto(selectedType.getId(), novoNome, model, selectedIndex);
                 }
-            } else {
-                JOptionPane.showMessageDialog(modal, "Selecione um item para editar.", "Erro", JOptionPane.ERROR_MESSAGE);
             }
         });
 
         removerButton.addActionListener(e -> {
             int selectedIndex = list.getSelectedIndex();
             if (selectedIndex != -1) {
-                model.remove(selectedIndex);
-            } else {
-                JOptionPane.showMessageDialog(modal, "Selecione um item para remover.", "Erro", JOptionPane.ERROR_MESSAGE);
+                ProductType selectedType = model.get(selectedIndex);
+                removerTipoProduto(selectedType.getId(), model, selectedIndex);
+            }
+        });
+
+        list.addMouseListener(new MouseAdapter() {
+            public void mouseClicked(MouseEvent e) {
+                if (e.getClickCount() == 2) {
+                    int selectedIndex = list.getSelectedIndex();
+                    if (selectedIndex != -1) {
+                        ProductType selectedType = model.get(selectedIndex);
+                        String novoNome = JOptionPane.showInputDialog(modal, "Editar:", selectedType.getName());
+                        if (novoNome != null && !novoNome.trim().isEmpty()) {
+                            editarTipoProduto(selectedType.getId(), novoNome, model, selectedIndex);
+                        }
+                    }
+                }
             }
         });
 
         modal.add(topPanel, BorderLayout.NORTH);
         modal.add(scrollPane, BorderLayout.CENTER);
         modal.add(bottomPanel, BorderLayout.SOUTH);
-
         modal.setLocationRelativeTo(parent);
         modal.setVisible(true);
+    }
+
+    private void carregarTiposProduto(DefaultListModel<ProductType> model) {
+        try {
+            String urlAPI = this.dotenv.get("API_HOST");
+            URL url = new URL(urlAPI + "/product_type");
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.setRequestMethod("GET");
+
+            int responseCode = connection.getResponseCode();
+            if (responseCode == HttpURLConnection.HTTP_OK) {
+                BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+                StringBuilder response = new StringBuilder();
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    response.append(line);
+                }
+                reader.close();
+
+                Gson gson = new Gson();
+                JsonArray productType = JsonParser.parseString(response.toString()).getAsJsonArray();
+
+                for (JsonElement element : productType) {
+                    JsonObject type = element.getAsJsonObject();
+                    String id = type.get("id").getAsString();
+                    String name = type.get("name").getAsString();
+
+                    model.addElement(new ProductType(id, name));
+                }
+
+            } else {
+                JOptionPane.showMessageDialog(framePrincipal, "Erro ao carregar os Tipos de Produto: " + responseCode);
+            }
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(framePrincipal, e.getMessage());
+        }
+    }
+
+    private void adicionarTipoProduto(String nome, DefaultListModel<ProductType> model) {
+        try {
+            // creating the json to send
+            JsonObject jsonData = new JsonObject();
+            jsonData.addProperty("name", nome);
+
+            // making the request
+            String urlAPI = this.dotenv.get("API_HOST");
+            URL url = new URL(urlAPI + "/product_type");
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.setRequestMethod("POST");
+            connection.setRequestProperty("Content-Type", "application/json");
+            connection.setDoOutput(true);
+
+            // send the request with json
+            try (OutputStream os = connection.getOutputStream()) {
+                byte[] input = jsonData.toString().getBytes(StandardCharsets.UTF_8);
+                os.write(input, 0, input.length);
+            }
+
+            int statusCode = connection.getResponseCode();
+            StringBuilder response = new StringBuilder();
+
+            if (statusCode >= 200 && statusCode < 300) {
+                try (BufferedReader br = new BufferedReader(new InputStreamReader(connection.getInputStream(), StandardCharsets.UTF_8))) {
+                    String responseLine;
+                    while ((responseLine = br.readLine()) != null) {
+                        response.append(responseLine.trim());
+                    }
+                }
+
+                // Convertendo a resposta JSON para obter o ID
+                JsonObject jsonResponse = JsonParser.parseString(response.toString()).getAsJsonObject();
+                String id = jsonResponse.get("id").getAsString(); // Supondo que a API retorna { "id": "123", "name": "Novo Produto" }
+
+                // Criando o objeto ProductType e adicionando à lista
+                ProductType novoTipo = new ProductType(id, nome);
+                model.addElement(novoTipo);
+
+                this.getProductType();
+
+                JOptionPane.showOptionDialog(this.framePrincipal,
+                        "O tipo de Produto foi cadastrado com sucesso!",
+                        "Tipo de Produto Cadastrado",
+                        JOptionPane.DEFAULT_OPTION,
+                        JOptionPane.INFORMATION_MESSAGE,
+                        null, null, null);
+
+                connection.disconnect();
+            } else {
+                try (BufferedReader br = new BufferedReader(new InputStreamReader(connection.getErrorStream(), "utf-8"))) {
+                    String responseLine;
+                    while ((responseLine = br.readLine()) != null) {
+                        response.append(responseLine.trim());
+                    }
+                }
+                connection.disconnect();
+                JOptionPane.showOptionDialog(this.framePrincipal,
+                        "Não foi possível cadastrar o tipo de produto, verifique as informações dos campos!\n" + response.toString(),
+                        "Tipo de Produto Não Cadastrado",
+                        JOptionPane.DEFAULT_OPTION,
+                        JOptionPane.ERROR_MESSAGE,
+                        null, null, null);
+            }
+
+
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this.framePrincipal, e.getMessage());
+        }
+    }
+
+    private void editarTipoProduto(String id, String novoNome, DefaultListModel<ProductType> model, int index) {
+        try {
+            // creating the json to send
+            JsonObject jsonData = new JsonObject();
+            jsonData.addProperty("name", novoNome);
+
+            // making the request
+            String urlAPI = this.dotenv.get("API_HOST");
+            URL url = new URL(urlAPI + "/product_type/" + id);
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.setRequestMethod("PUT");
+            connection.setRequestProperty("Content-Type", "application/json");
+            connection.setDoOutput(true);
+
+            // send the request with json
+            try (OutputStream os = connection.getOutputStream()) {
+                byte[] input = jsonData.toString().getBytes(StandardCharsets.UTF_8);
+                os.write(input, 0, input.length);
+            }
+
+            int statusCode = connection.getResponseCode();
+            StringBuilder response = new StringBuilder();
+
+            if (statusCode >= 200 && statusCode <= 300) {
+
+                ProductType prod = model.getElementAt(index);
+                prod.setName(novoNome);
+                model.setElementAt(prod, index);
+
+                this.getProductType();
+
+                JOptionPane.showOptionDialog(this.framePrincipal,
+                        "O tipo de produto foi atualizado com sucesso!",
+                        "Tipo de Produto Atualizado",
+                        JOptionPane.DEFAULT_OPTION,
+                        JOptionPane.INFORMATION_MESSAGE,
+                        null, null, null);
+
+                connection.disconnect();
+
+            } else {
+                try (BufferedReader br = new BufferedReader(new InputStreamReader(connection.getErrorStream(), "utf-8"))) {
+                    String responseLine;
+                    while ((responseLine = br.readLine()) != null) {
+                        response.append(responseLine.trim());
+                    }
+                }
+                JOptionPane.showOptionDialog(this.framePrincipal,
+                        "Não foi possível atualizar o tipo de produto, verifique as informações e tente novamente!\n" + response.toString(),
+                        "Tipo de Produto Não Atualizado",
+                        JOptionPane.DEFAULT_OPTION,
+                        JOptionPane.ERROR_MESSAGE,
+                        null, null, null);
+                connection.disconnect();
+            }
+
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this.framePrincipal, e.getMessage());
+        }
+    }
+
+    private void removerTipoProduto(String id, DefaultListModel<ProductType> model, int index) {
+        try {
+            URL url = new URL(this.dotenv.get("API_HOST") + "/product_type/" + id);
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+
+            connection.setRequestMethod("DELETE");
+
+            int responseCode = connection.getResponseCode();
+            if (responseCode == HttpURLConnection.HTTP_NO_CONTENT || responseCode == HttpURLConnection.HTTP_OK) {
+                model.removeElementAt(index);
+                this.getProductType();
+                JOptionPane.showOptionDialog(this.frame,
+                        "O tipo de produto foi deletado com sucesso",
+                        "Tipo de Produto Deletado",
+                        JOptionPane.DEFAULT_OPTION,
+                        JOptionPane.INFORMATION_MESSAGE,
+                        null,
+                        null,
+                        null);
+            } else {
+                JOptionPane.showOptionDialog(this.frame,
+                        "Ocorreu um erro no servidor ao deletar o tipo de produto",
+                        "Erro ao deletar o tipo de produto produto",
+                        JOptionPane.DEFAULT_OPTION,
+                        JOptionPane.ERROR_MESSAGE,
+                        null,
+                        null,
+                        null);
+            }
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this.frame, e.getMessage());
+        }
+
+    }
+
+    private void getSupplier() {
+        try {
+            String urlAPI = this.dotenv.get("API_HOST");
+            URL url = new URL(urlAPI + "/supplier");
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.setRequestMethod("GET");
+
+            int responseCode = connection.getResponseCode();
+            if (responseCode == HttpURLConnection.HTTP_OK) {
+                BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+                StringBuilder response = new StringBuilder();
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    response.append(line);
+                }
+                reader.close();
+
+                Gson gson = new Gson();
+                JsonArray suppliers = JsonParser.parseString(response.toString()).getAsJsonArray();
+
+                DefaultComboBoxModel<Supplier> model = new DefaultComboBoxModel<>();
+
+                for (JsonElement element : suppliers) {
+                    JsonObject supplier = element.getAsJsonObject();
+                    String id = supplier.get("id").getAsString();
+                    String name = supplier.get("name").getAsString();
+
+                    model.addElement(new Supplier(id, name));
+                }
+
+                jComboBoxSupplier.setModel(model);
+
+            } else {
+                JOptionPane.showMessageDialog(framePrincipal, "Erro ao carregar fornecedores: " + responseCode);
+            }
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(framePrincipal, e.getMessage());
+        }
+    }
+
+    private void getProductType() {
+        try {
+            String urlAPI = this.dotenv.get("API_HOST");
+            URL url = new URL(urlAPI + "/product_type");
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.setRequestMethod("GET");
+
+            int responseCode = connection.getResponseCode();
+            if (responseCode == HttpURLConnection.HTTP_OK) {
+                BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+                StringBuilder response = new StringBuilder();
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    response.append(line);
+                }
+                reader.close();
+
+                Gson gson = new Gson();
+                JsonArray productType = JsonParser.parseString(response.toString()).getAsJsonArray();
+
+                DefaultComboBoxModel<ProductType> model = new DefaultComboBoxModel<>();
+
+                for (JsonElement element : productType) {
+                    JsonObject type = element.getAsJsonObject();
+                    String id = type.get("id").getAsString();
+                    String name = type.get("name").getAsString();
+
+                    model.addElement(new ProductType(id, name));
+                }
+
+                this.jComboBoxProductType.setModel(model);
+
+            } else {
+                JOptionPane.showMessageDialog(framePrincipal, "Erro ao carregar os Tipos de Produto: " + responseCode);
+            }
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(framePrincipal, e.getMessage());
+        }
+
+    }
+
+    private void getProduct() {
+        try {
+            // making the request
+            String urlAPI = this.dotenv.get("API_HOST");
+            URL url = new URL(urlAPI + "/product/" + new BigInteger(this.id));
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.setRequestMethod("GET");
+
+            int responseCode = connection.getResponseCode();
+            if (responseCode == HttpURLConnection.HTTP_OK) {
+                BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+                StringBuilder response = new StringBuilder();
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    response.append(line);
+                }
+                reader.close();
+
+                Gson gson = new Gson();
+                JsonObject prod = JsonParser.parseString(response.toString()).getAsJsonObject();
+
+                String name = prod.get("name").getAsString();
+                int quantity = prod.get("quantity").getAsInt();
+                Double price = prod.get("price").getAsDouble();
+                String description = prod.get("description").getAsString();
+
+                JsonObject supplier = prod.get("supplier").getAsJsonObject();
+                Supplier sup = new Supplier(
+                        supplier.get("id").getAsString(),
+                        supplier.get("name").getAsString()
+                );
+
+                JsonObject prodType = prod.get("productType").getAsJsonObject();
+                ProductType productType = new ProductType(
+                        prodType.get("id").getAsString(),
+                        prodType.get("name").getAsString()
+                );
+
+                jTextFieldNome.setText(name);
+                jTextFieldDescricao.setText(description);
+                jSpinnerPrecoVenda.setValue(price);
+                jSpinnerQuantidade.setValue(quantity);
+
+                for (int i = 0; i < jComboBoxSupplier.getItemCount(); i++) {
+                    Supplier sup_in = jComboBoxSupplier.getItemAt(i);
+                    if (sup_in.getId().equals(sup.getId())) {
+                        jComboBoxSupplier.setSelectedIndex(i);
+                    }
+                }
+
+                for (int i = 0; i < jComboBoxProductType.getItemCount(); i++) {
+                    ProductType prodType_in = jComboBoxProductType.getItemAt(i);
+                    if (prodType_in.getId().contains(productType.getId())) {
+                        jComboBoxProductType.setSelectedIndex(i);
+                    }
+                }
+
+                connection.disconnect();
+
+            } else {
+                JOptionPane.showMessageDialog(framePrincipal, "Erro ao carregar o produto: " + responseCode);
+                connection.disconnect();
+            }
+
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(framePrincipal, e.getMessage());
+        }
+    }
+
+    private void cadastrarProduto(){
+        try {
+            String name = jTextFieldNome.getText();
+            Integer quantity = (Integer) jSpinnerQuantidade.getValue();
+            Double price = (Double)jSpinnerPrecoVenda.getValue();
+            System.out.println(quantity);
+
+            String description = jTextFieldDescricao.getText();
+            Supplier id_supplier = (Supplier) Objects.requireNonNull(jComboBoxSupplier.getSelectedItem());
+            ProductType id_product_type = (ProductType) Objects.requireNonNull(jComboBoxProductType.getSelectedItem());
+
+
+            JsonObject jsonData = new JsonObject();
+            jsonData.addProperty("name", name);
+            jsonData.addProperty("quantity", quantity);
+            jsonData.addProperty("price", price);
+            jsonData.addProperty("description", description);
+            jsonData.addProperty("id_supplier", id_supplier.getId());
+            jsonData.addProperty("id_product_type", id_product_type.getId());
+
+            // making the request
+            String urlAPI = this.dotenv.get("API_HOST");
+            URL url = new URL(urlAPI + "/product");
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.setRequestMethod("POST");
+            connection.setRequestProperty("Content-Type", "application/json");
+            connection.setDoOutput(true);
+
+            // send the request with json
+            try (OutputStream os = connection.getOutputStream()) {
+                byte[] input = jsonData.toString().getBytes(StandardCharsets.UTF_8);
+                os.write(input, 0, input.length);
+            }
+
+            int statusCode = connection.getResponseCode();
+            StringBuilder response = new StringBuilder();
+
+            if (statusCode >= 200 && statusCode <= 300) {
+                this.reset();
+                JOptionPane.showOptionDialog(this.framePrincipal,
+                        "O Produto foi cadastrado com sucesso!",
+                        "Produto Cadastrado",
+                        JOptionPane.DEFAULT_OPTION,
+                        JOptionPane.INFORMATION_MESSAGE,
+                        null,null,null);
+                connection.disconnect();
+
+
+            } else {
+                try (BufferedReader br = new BufferedReader(new InputStreamReader(connection.getErrorStream(), "utf-8"))) {
+                    String responseLine;
+                    while ((responseLine = br.readLine()) != null) {
+                        response.append(responseLine.trim());
+                    }
+                }
+                connection.disconnect();
+                JOptionPane.showOptionDialog(this.framePrincipal,
+                        "Não foi possível cadastrar o produto, verifique as informações dos campos e tente novamente!\n" + response.toString(),
+                        "Produto Não Cadastrado",
+                        JOptionPane.DEFAULT_OPTION,
+                        JOptionPane.ERROR_MESSAGE,
+                        null,null,null);
+            }
+
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this.framePrincipal, e.getMessage());
+        }
     }
 
     // componentes que vão ser usados na tela, só o essencial e com os nomes certinhos

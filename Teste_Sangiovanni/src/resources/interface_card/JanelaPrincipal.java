@@ -27,14 +27,14 @@ public class JanelaPrincipal extends javax.swing.JFrame {
             jButton4 = new JButton();
 
             // Paineis dos cards
-            card1 = new ListarProduto(this.rootPane,cardPanel);
-            card2 = new ListarFornecedor(this.rootPane,cardPanel);
             cardCadastroProdutos = new CadastrarProduto(cardPanel,this.rootPane);
-            cardCadastroFornecedores = new CadastrarFornecedor(cardPanel);
+            cardCadastroFornecedores = new CadastrarFornecedor(cardPanel,this.rootPane);
+            cardCadastrarClientes = new CadastrarCliente(cardPanel,this.rootPane);
+            cardRegistrarVenda = new RegistrarVenda(cardPanel);
+            card1 = new ListarProduto(this.rootPane,cardPanel,cardCadastroProdutos);
+            card2 = new ListarFornecedor(this.rootPane,cardPanel,cardCadastroFornecedores);
             cardListarVendas = new ListarVendas(this.rootPane,cardPanel);
-            cardListarClientes = new ListarCliente(this.rootPane,cardPanel);
-            cardCadastrarClientes = new CadastrarCliente(cardPanel);
-            cardRegistrarVenda = new RegistrarVenda(cardPanel);;
+            cardListarClientes = new ListarCliente(this.rootPane,cardPanel,cardCadastrarClientes);
 
             // Labels
             jLabel1 = new javax.swing.JLabel();
@@ -176,7 +176,15 @@ public class JanelaPrincipal extends javax.swing.JFrame {
         // Método para alternar o card visível
         private void showCard(String cardName) {
             CardLayout cl = (CardLayout) cardPanel.getLayout();
-            cl.show(cardPanel, cardName);
+            switch (cardName){
+                case "cadastrar_fornecedor":
+                    cl.show(cardPanel, cardName);
+                case "cadastrar_produto":
+                    cl.show(cardPanel, cardName);
+                default:
+                    cl.show(cardPanel, cardName);
+            }
+
         }
 
         private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {
@@ -229,11 +237,11 @@ public class JanelaPrincipal extends javax.swing.JFrame {
         private javax.swing.JPanel cardPanel;
         private javax.swing.JPanel card1;
         private javax.swing.JPanel card2;
-        private javax.swing.JPanel cardCadastroProdutos;
-        private javax.swing.JPanel cardCadastroFornecedores;
+        private CadastrarProduto cardCadastroProdutos;
+        private CadastrarFornecedor cardCadastroFornecedores;
         private javax.swing.JPanel cardListarVendas;
         private javax.swing.JPanel cardListarClientes;
-        private javax.swing.JPanel cardCadastrarClientes;
+        private CadastrarCliente cardCadastrarClientes;
         private javax.swing.JPanel cardRegistrarVenda;
     }
 

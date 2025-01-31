@@ -1,18 +1,29 @@
 package resources.interface_card;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonParser;
 import resources.interfaces.EditarProduto;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
-import javax.swing.table.DefaultTableCellRenderer;
-import javax.swing.table.JTableHeader;
-import javax.swing.table.TableCellEditor;
-import javax.swing.table.TableCellRenderer;
+import javax.swing.table.*;
 import java.awt.*;
+import java.math.BigInteger;
 import java.util.Objects;
+import com.google.gson.JsonObject;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.io.InputStreamReader;
+import java.io.BufferedReader;
+import io.github.cdimascio.dotenv.Dotenv;
 
 public class ListarProduto extends JPanel {
-    public ListarProduto(JRootPane rootPane,JPanel mainPanel){
+    private final Dotenv dotenv;
+    public ListarProduto(JRootPane rootPane,JPanel mainPanel, CadastrarProduto cardProduto){
+        // lendo .env
+        this.dotenv = Dotenv.load();
+
         // iniciar Componentes
         jPanelTopoTabela = new javax.swing.JPanel();
         jPanelTabela = new javax.swing.JPanel();
@@ -129,7 +140,7 @@ public class ListarProduto extends JPanel {
         }
 
         jtable.getColumn("Ações").setCellRenderer(new ButtonRendererProduct_());
-        jtable.getColumn("Ações").setCellEditor(new ButtonEditorProduct_(jtable, rootPane,"ssss"));
+        jtable.getColumn("Ações").setCellEditor(new ButtonEditorProduct_(jtable, rootPane,this.dotenv.get("API_HOST"),cardProduto,mainPanel));
 
         jScrollPane.setViewportView(jtable);
         jScrollPane.setBorder(javax.swing.BorderFactory.createMatteBorder(2, 2, 2, 2, new java.awt.Color(128, 0, 32)));
@@ -141,6 +152,56 @@ public class ListarProduto extends JPanel {
         jPanel4.add(jPanelTabela);
         setBorder(new EmptyBorder(20, 20, 20, 20));
 
+        getProduct(rootPane);
+    }
+
+    public void getProduct(JRootPane rootPane){
+        try {
+            String urlAPI = this.dotenv.get("API_HOST");
+            URL url = new URL(urlAPI + "/product");
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.setRequestMethod("GET");
+
+            int responseCode = connection.getResponseCode();
+            if (responseCode == HttpURLConnection.HTTP_OK) {
+                BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+                StringBuilder response = new StringBuilder();
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    response.append(line);
+                }
+                reader.close();
+
+                Gson gson = new Gson();
+                JsonArray products = JsonParser.parseString(response.toString()).getAsJsonArray();
+
+                DefaultTableModel tableModel = (DefaultTableModel) jtable.getModel();
+                tableModel.setRowCount(0);
+
+                for (int i = 0; i < products.size(); i++) {
+                    JsonObject product = products.get(i).getAsJsonObject();
+                    BigInteger id = product.get("id").getAsBigInteger();
+                    String name = product.get("name").getAsString();
+                    JsonObject supplier = product.get("supplier").getAsJsonObject();
+                    String supplierName = supplier.get("name").getAsString();
+                    String quantity = product.get("quantity").getAsString();
+                    String price = product.get("price").getAsString();
+
+                    tableModel.addRow(new Object[]{id, name, supplierName, price,quantity});
+                    connection.disconnect();
+                }
+            } else {
+                JOptionPane.showOptionDialog(rootPane,
+                        "Ocorreu um erro ao carregar os produtos",
+                        "Problema no Servidor",
+                        JOptionPane.DEFAULT_OPTION,
+                        JOptionPane.ERROR_MESSAGE,
+                        null,null,null);
+                connection.disconnect();
+            }
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(rootPane, e.getMessage());
+        }
     }
 
     private javax.swing.JTextField pesquisaProduto;
@@ -198,7 +259,7 @@ class ButtonEditorProduct_ extends AbstractCellEditor implements TableCellEditor
     private final JFrame frame;
     private final String APIURL;
 
-    public ButtonEditorProduct_(JTable table,JRootPane rootPane,String APIURL) {
+    public ButtonEditorProduct_(JTable table,JRootPane rootPane,String APIURL,CadastrarProduto card,JPanel mainPanel) {
         this.table = table;
         this.frame = (JFrame) SwingUtilities.getWindowAncestor(rootPane);
         this.APIURL = APIURL;
@@ -233,11 +294,9 @@ class ButtonEditorProduct_ extends AbstractCellEditor implements TableCellEditor
         editButton.addActionListener(evt -> {
             int cellIndex = table.getSelectedRow();
             Object cellValue = table.getValueAt(cellIndex,0);
-            JFrame tela = new EditarProduto(cellValue.toString());
-            SwingUtilities.invokeLater(() -> {
-                this.frame.setVisible(false);
-                tela.setVisible(true);
-            });
+            card.setId(cellValue.toString());
+            CardLayout cl = (CardLayout) mainPanel.getLayout();
+            cl.show(mainPanel, "cadastrar_produto");
             stopCellEditing();
         });
 

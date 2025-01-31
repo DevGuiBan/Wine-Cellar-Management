@@ -1,7 +1,9 @@
 package resources.interface_card;
 
-import resources.interfaces.ProductType;
-import resources.interfaces.Supplier;
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+import io.github.cdimascio.dotenv.Dotenv;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -10,11 +12,27 @@ import javax.swing.text.MaskFormatter;
 import java.awt.*;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 
 public class CadastrarFornecedor extends JPanel {
-    public CadastrarFornecedor(JPanel mainPanel) {
+    private JPanel mainPanel;
+    private String id;
+    private Dotenv dotenv;
+    private JRootPane rootPane;
+
+    public CadastrarFornecedor(JPanel mainPanel,JRootPane rootPane) {
+        this.mainPanel = mainPanel;
+        this.rootPane = rootPane;
+        this.dotenv = Dotenv.load();
+        this.initComponentes();
+    }
+
+    private void initComponentes(){
         // inicialização de variáveis
         jLabelTelefone = new JLabel();
         jLabelCNPJ = new JLabel();
@@ -104,7 +122,7 @@ public class CadastrarFornecedor extends JPanel {
         jTextFieldNome.addFocusListener(new FocusAdapter() { // adicionar um evento ao clicar no campo
             @Override
             public void focusGained(FocusEvent e) { // clicou
-                if (jTextFieldNome.getText().equals("Nome do Produto")) {
+                if (jTextFieldNome.getText().equals("Nome do Fornecedor")) {
                     jTextFieldNome.setText("");
                     jTextFieldNome.setForeground(Color.GRAY);
                 }
@@ -113,7 +131,7 @@ public class CadastrarFornecedor extends JPanel {
             @Override
             public void focusLost(FocusEvent e) { // clicou em outra coisa
                 if (jTextFieldNome.getText().isEmpty()) {
-                    jTextFieldNome.setText("Nome do Produto");
+                    jTextFieldNome.setText("Nome do Fornecedor");
                     jTextFieldNome.setForeground(Color.GRAY);
                 }
             }
@@ -202,26 +220,6 @@ public class CadastrarFornecedor extends JPanel {
         jTextFieldEndereco.setFont(new Font("Cormorant Garamond", 1, 18));
         jTextFieldEndereco.setBorder(new MatteBorder(2, 2, 2, 2, new Color(128, 0, 32)));
         jTextFieldEndereco.setPreferredSize(fieldSize);
-        String regex = "^(.+?) - (.+?) - (\\d+) - ([A-Z]{2})$";
-        Pattern pattern = Pattern.compile(regex);
-        jTextFieldEndereco.setInputVerifier(new InputVerifier() {
-            @Override
-            public boolean verify(JComponent input) {
-                String text = ((JFormattedTextField) input).getText();
-                Matcher matcher = pattern.matcher(text);
-                if (matcher.matches()) {
-                    input.setBackground(Color.WHITE);
-                    return true;
-                } else {
-                    input.setBackground(Color.PINK);
-                    JOptionPane.showMessageDialog(mainPanel.getRootPane(),
-                            "O formato deve ser: rua - bairro - numero - UF",
-                            "Formato Inválido",
-                            JOptionPane.ERROR_MESSAGE);
-                    return false;
-                }
-            }
-        });
         jTextFieldEndereco.setText("Rua - Bairro - Número - UF");
         jTextFieldEndereco.addFocusListener(new java.awt.event.FocusListener() {
             @Override
@@ -253,6 +251,7 @@ public class CadastrarFornecedor extends JPanel {
         jTextFieldObservacoes.setBackground(new Color(255, 255, 255));
         jTextFieldObservacoes.setBorder(new MatteBorder(2, 2, 2, 2, new Color(128, 0, 32)));
         jTextFieldObservacoes.setPreferredSize(fieldSize);
+        jTextFieldObservacoes.setFont(new Font("Cormorant Garamond", 1, 18));
         gbc.gridx = 1;
         gbc.gridy = 5;
         gbc.insets = new Insets(0, 0, 20, 0);
@@ -266,6 +265,7 @@ public class CadastrarFornecedor extends JPanel {
         jButtonCancelar.setBorder(new EmptyBorder(5,20,5,20));
         jButtonCancelar.addActionListener(e -> {
             // Redireciona para "listar_produtos"
+            this.reset();
             CardLayout cl = (CardLayout) mainPanel.getLayout();
             cl.show(mainPanel, "card2");
         });
@@ -289,7 +289,67 @@ public class CadastrarFornecedor extends JPanel {
         jPanel.add(jPanelButtons);
 
         add(jPanel);
+    }
 
+    private void getSupplier(){
+        try {
+            String urlAPI = this.dotenv.get("API_HOST");
+            String encodedId = URLEncoder.encode(this.id, StandardCharsets.UTF_8.toString());
+            URL url = new URL(urlAPI + "/supplier/"+this.id);
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.setRequestMethod("GET");
+
+            int responseCode = connection.getResponseCode();
+            if (responseCode == HttpURLConnection.HTTP_OK) {
+                BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+                StringBuilder response = new StringBuilder();
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    response.append(line);
+                }
+                reader.close();
+
+                Gson gson = new Gson();
+                JsonObject suppliers = JsonParser.parseString(response.toString()).getAsJsonObject();
+
+                jTextFieldNome.setText(suppliers.get("name").getAsString());
+                jTextFieldTelefone.setText(suppliers.get("phone_number").getAsString());
+                jTextFieldEmail.setText(suppliers.get("email").getAsString());
+                jTextFieldCPNJ.setText(suppliers.get("cnpj").getAsString());
+                jTextFieldEndereco.setText(suppliers.get("address").getAsString());
+                if(suppliers.has("observation") && !suppliers.get("observation").isJsonNull()){
+                    jTextFieldObservacoes.setText(suppliers.get("observation").getAsString());
+                }
+
+                connection.disconnect();
+            }
+        }
+        catch (Exception e) {
+            JOptionPane.showOptionDialog(rootPane,
+                    "Não foi possivel carregar os dados do fornecedor!\n"+e.getMessage(),
+                    "Fornecedor Não Encontrado",
+                    JOptionPane.DEFAULT_OPTION,
+                    JOptionPane.ERROR_MESSAGE,
+                    null,null,null);
+        }
+    }
+
+    public void setId(String id) {
+        this.id = id;
+        this.getSupplier();
+        this.jButtonCadastrar.setText("Atualizar");
+        this.jLabelCadastro.setText("Editar Fornecedor");
+    }
+
+    public void reset(){
+        jTextFieldNome.setText("Nome do Fornecedor");
+        jTextFieldTelefone.setText("");
+        jTextFieldEmail.setText("email@gmail.com");
+        jTextFieldCPNJ.setText("");
+        jTextFieldEndereco.setText("Rua - Bairro - Número - UF");
+        jTextFieldObservacoes.setText("");
+        this.jButtonCadastrar.setText("Cadastrar");
+        this.jLabelCadastro.setText("CadastrarFornecedor Fornecedor");
     }
 
     // componentes que vão ser usados na tela, só o essencial e com os nomes certinhos

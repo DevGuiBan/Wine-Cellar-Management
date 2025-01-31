@@ -1,18 +1,28 @@
 package resources.interface_card;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import resources.interfaces.EditarProduto;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
-import javax.swing.table.DefaultTableCellRenderer;
-import javax.swing.table.JTableHeader;
-import javax.swing.table.TableCellEditor;
-import javax.swing.table.TableCellRenderer;
+import javax.swing.table.*;
 import java.awt.*;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.Objects;
+import io.github.cdimascio.dotenv.Dotenv;
 
 public class ListarFornecedor extends JPanel {
-    public ListarFornecedor(JRootPane rootPane,JPanel mainPanel){
+    private final Dotenv dotenv;
+
+    public ListarFornecedor(JRootPane rootPane,JPanel mainPanel,CadastrarFornecedor cardCadastroEdicao){
+        this.dotenv = Dotenv.load();
+
         // iniciando componentes
         jPanel4 = new javax.swing.JPanel();
         jPanelTopoTabela = new javax.swing.JPanel();
@@ -69,7 +79,6 @@ public class ListarFornecedor extends JPanel {
         jButtonCadastrar.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         jButtonCadastrar.setPreferredSize(new java.awt.Dimension(230, 40));
         jButtonCadastrar.addActionListener(e -> {
-            // Redireciona para "listar_produtos"
             CardLayout cl = (CardLayout) mainPanel.getLayout();
             cl.show(mainPanel, "cadastrar_fornecedor");
         });
@@ -92,7 +101,7 @@ public class ListarFornecedor extends JPanel {
         jtable.setModel(new javax.swing.table.DefaultTableModel(
                 new Object[][]{},
                 new String[]{
-                        "Código", "Nome", "E-mail", "CPNJ", "Observações", "Endereço","Telefone","N°Pedidos","Ações"
+                        "Código", "Nome", "E-mail", "CPNJ", "Observações", "Endereço","Telefone","Ações"
                 }
         ));
 
@@ -128,7 +137,7 @@ public class ListarFornecedor extends JPanel {
         }
 
         jtable.getColumn("Ações").setCellRenderer(new ButtonRendererSupplier());
-        jtable.getColumn("Ações").setCellEditor(new ButtonEditorSupplier(jtable, rootPane,"ssss"));
+        jtable.getColumn("Ações").setCellEditor(new ButtonEditorSupplier(jtable, rootPane,this.dotenv.get("API_HOST"),mainPanel,cardCadastroEdicao));
 
         jScrollPane.setViewportView(jtable);
         jScrollPane.setBorder(javax.swing.BorderFactory.createMatteBorder(2, 2, 2, 2, new java.awt.Color(128, 0, 32)));
@@ -140,6 +149,57 @@ public class ListarFornecedor extends JPanel {
         jPanel4.add(jPanelTabela);
         setBorder(new EmptyBorder(20, 20, 20, 20));
         add(jPanel4);
+
+        getSupplier(rootPane);
+    }
+
+    private void getSupplier(JRootPane rootPane) {
+        try {
+            String urlAPI = this.dotenv.get("API_HOST");
+            URL url = new URL(urlAPI + "/supplier");
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.setRequestMethod("GET");
+
+            int responseCode = connection.getResponseCode();
+            if (responseCode == HttpURLConnection.HTTP_OK) {
+                BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+                StringBuilder response = new StringBuilder();
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    response.append(line);
+                }
+                reader.close();
+
+                JsonArray suppliers = JsonParser.parseString(response.toString()).getAsJsonArray();
+
+                DefaultTableModel tableModel = (DefaultTableModel) jtable.getModel();
+                tableModel.setRowCount(0);
+
+                for (int i = 0; i < suppliers.size(); i++) {
+                    JsonObject supplier = suppliers.get(i).getAsJsonObject();
+                    String id = supplier.get("id").getAsString();
+                    String name = supplier.get("name").getAsString();
+                    String email = supplier.get("email").getAsString();
+                    String cnpj = supplier.get("cnpj").getAsString();
+                    String address = supplier.get("address").getAsString();
+                    String phone = supplier.get("phone_number").getAsString();
+                    String observation = supplier.get("observation").getAsString();
+
+                    tableModel.addRow(new Object[]{id, name, email, cnpj,observation, address, phone});
+                    connection.disconnect();
+                }
+            } else {
+                JOptionPane.showOptionDialog(rootPane,
+                        "Ocorreu um erro ao carregar os fornecedores",
+                        "Problema no Servidor",
+                        JOptionPane.DEFAULT_OPTION,
+                        JOptionPane.ERROR_MESSAGE,
+                        null,null,null);
+                connection.disconnect();
+            }
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(rootPane, e.getMessage());
+        }
     }
 
     // Declaração de variáveis
@@ -198,7 +258,7 @@ class ButtonEditorSupplier extends AbstractCellEditor implements TableCellEditor
     private final JFrame frame;
     private final String APIURL;
 
-    public ButtonEditorSupplier(JTable table,JRootPane rootPane,String APIURL) {
+    public ButtonEditorSupplier(JTable table,JRootPane rootPane,String APIURL,JPanel mainPanel,CadastrarFornecedor cardF) {
         this.table = table;
         this.frame = (JFrame) SwingUtilities.getWindowAncestor(rootPane);
         this.APIURL = APIURL;
@@ -207,24 +267,24 @@ class ButtonEditorSupplier extends AbstractCellEditor implements TableCellEditor
 
                 FlowLayout(FlowLayout.CENTER, 5, 0));
 
-        this.editButton.setIcon(new javax.swing.ImageIcon(Objects.requireNonNull(
+        this.editButton.setIcon(new ImageIcon(Objects.requireNonNull(
                 getClass().getResource("/resources/images/editar.png"))));
         this.editButton.setOpaque(true);
-        this.editButton.setBackground(new java.awt.Color(255, 255, 255));
-        this.editButton.setForeground(new java.awt.Color(128, 0, 32));
+        this.editButton.setBackground(new Color(255, 255, 255));
+        this.editButton.setForeground(new Color(128, 0, 32));
         this.editButton.setFocusPainted(false);
         this.editButton.setBorder(null);
         this.editButton.setContentAreaFilled(false);
-        this.editButton.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        this.editButton.setCursor(new Cursor(Cursor.HAND_CURSOR));
 
-        this.deleteButton.setIcon(new javax.swing.ImageIcon(Objects.requireNonNull(
+        this.deleteButton.setIcon(new ImageIcon(Objects.requireNonNull(
                 getClass().getResource("/resources/images/excluir.png"))));
-        this.deleteButton.setBackground(new java.awt.Color(255, 255, 255));
-        this.deleteButton.setForeground(new java.awt.Color(128, 0, 32));
+        this.deleteButton.setBackground(new Color(255, 255, 255));
+        this.deleteButton.setForeground(new Color(128, 0, 32));
         this.deleteButton.setFocusPainted(false);
         this.deleteButton.setBorder(null);
         this.deleteButton.setContentAreaFilled(false);
-        this.deleteButton.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        this.deleteButton.setCursor(new Cursor(Cursor.HAND_CURSOR));
 
         panel.add(editButton);
         panel.add(deleteButton);
@@ -234,10 +294,9 @@ class ButtonEditorSupplier extends AbstractCellEditor implements TableCellEditor
             int cellIndex = table.getSelectedRow();
             Object cellValue = table.getValueAt(cellIndex,0);
             JFrame tela = new EditarProduto(cellValue.toString());
-            SwingUtilities.invokeLater(() -> {
-                this.frame.setVisible(false);
-                tela.setVisible(true);
-            });
+            cardF.setId(cellValue.toString());
+            CardLayout cl = (CardLayout) mainPanel.getLayout();
+            cl.show(mainPanel, "cadastrar_fornecedor");
             stopCellEditing();
         });
 

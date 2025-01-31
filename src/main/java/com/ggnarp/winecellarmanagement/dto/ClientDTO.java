@@ -2,9 +2,11 @@ package com.ggnarp.winecellarmanagement.dto;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import lombok.Data;
 
+import java.util.Date;
 import java.util.UUID;
 
 @Data
@@ -26,4 +28,11 @@ public class ClientDTO {
     @NotBlank(message = "O endereço é necessário!")
     @Pattern(regexp = "^(.+?) - (.+?) - (\\d+) - ([A-Z]{2})$",message = "O Endereço deve ser no formato Rua - Bairro - N° - UF")
     private String address;
+
+    @NotNull
+    private String date_brith;
+
+    @NotBlank
+    @Pattern(regexp = "^\\d{3}\\.\\d{3}\\.\\d{3}-\\d{2}$")
+    private String cpf;
 }
