@@ -316,7 +316,7 @@ public class CadastrarCliente extends JPanel {
             JsonObject jsonData = new JsonObject();
             jsonData.addProperty("name", name);
             jsonData.addProperty("email", email);
-            jsonData.addProperty("phone_number", phone_number);
+            jsonData.addProperty("phoneNumber", phone_number);
             jsonData.addProperty("address", address);
             jsonData.addProperty("cpf", cpf);
             jsonData.addProperty("date_brith", dataString);
@@ -338,7 +338,7 @@ public class CadastrarCliente extends JPanel {
             int statusCode = connection.getResponseCode();
             StringBuilder response = new StringBuilder();
 
-            if (statusCode >= 200 && statusCode <= 300) {
+            if (statusCode >= 200 && statusCode < 300) {
                 this.reset();
                 frame.showCard("listar_clientes");
                 JOptionPane.showOptionDialog(this.framePrincipal,
@@ -348,7 +348,6 @@ public class CadastrarCliente extends JPanel {
                         JOptionPane.INFORMATION_MESSAGE,
                         null,null,null);
                 connection.disconnect();
-
 
             } else {
                 try (BufferedReader br = new BufferedReader(new InputStreamReader(connection.getErrorStream(), "utf-8"))) {
@@ -383,7 +382,7 @@ public class CadastrarCliente extends JPanel {
             JsonObject jsonData = new JsonObject();
             jsonData.addProperty("name", name);
             jsonData.addProperty("email", email);
-            jsonData.addProperty("phone_number", phone_number);
+            jsonData.addProperty("phoneNumber", phone_number);
             jsonData.addProperty("address", address);
             jsonData.addProperty("cpf", cpf);
             jsonData.addProperty("date_brith", dataString);
@@ -405,7 +404,7 @@ public class CadastrarCliente extends JPanel {
             int statusCode = connection.getResponseCode();
             StringBuilder response = new StringBuilder();
 
-            if (statusCode >= 200 && statusCode <= 300) {
+            if (statusCode >= 200 && statusCode < 300) {
                 this.reset();
                 this.id = null;
                 frame.showCard("listar_clientes");
@@ -471,7 +470,7 @@ public class CadastrarCliente extends JPanel {
                     String cpf = prod.get("cpf").getAsString();
                     String email = prod.get("email").getAsString();
                     String address = prod.get("address").getAsString();
-                    String phone_number = prod.get("phone_number").getAsString();
+                    String phone_number = prod.get("phoneNumber").getAsString();
                     String data = prod.get("date_brith").getAsString();
 
                     DateTimeFormatter formatoEntrada = DateTimeFormatter.ofPattern("yyyy-MM-dd");

@@ -69,7 +69,7 @@ public class CadastrarProduto extends JPanel {
         jLabelNome = new JLabel();
         jLabelFornecedor = new JLabel();
 
-        jSpinnerPrecoVenda = new JSpinner(new SpinnerNumberModel(0.0, 0.0, Double.MAX_VALUE, 0.1));
+        jSpinnerPrecoVenda = new JSpinner(new SpinnerNumberModel(0.0, 0.0, Double.MAX_VALUE, 0.10));
         jSpinnerQuantidade = new JSpinner(new SpinnerNumberModel(0, 0, Integer.MAX_VALUE, 1));
 
         jTextFieldNome = new JTextField();
@@ -264,6 +264,22 @@ public class CadastrarProduto extends JPanel {
         jComboBoxProductType.setBackground(new Color(255, 255, 255));
         jComboBoxProductType.setBorder(new MatteBorder(2, 2, 2, 2, new Color(128, 0, 32)));
         jComboBoxProductType.setPreferredSize(fieldSize);
+        jComboBoxProductType.addItemListener(new ItemListener() {
+            @Override
+            public void itemStateChanged(ItemEvent e) {
+
+                if (e.getStateChange() == ItemEvent.SELECTED) {
+                    String selectedItem = e.getItem().toString();
+
+                    if ("Outros".equalsIgnoreCase(selectedItem)) {
+                        String novoNome = JOptionPane.showInputDialog(framePrincipal, "Digite o novo tipo de produto:");
+                        if (novoNome != null && !novoNome.trim().isEmpty()) {
+                            adicionarTipoProdutoComboBox(novoNome);
+                        }
+                    }
+                }
+            }
+        });
         gbc.gridx = 1;
         gbc.gridy = 5;
         gbc.insets = new Insets(0, 0, 0, 0);
@@ -308,7 +324,7 @@ public class CadastrarProduto extends JPanel {
             public void actionPerformed(ActionEvent e) {
                 if (id == null) {
                     cadastrarProduto();
-                } else  {
+                } else {
                     editarProduto();
                 }
             }
@@ -359,7 +375,7 @@ public class CadastrarProduto extends JPanel {
         JScrollPane scrollPane = new JScrollPane(list);
         scrollPane.setBorder(new EmptyBorder(5, 10, 5, 10));
 
-        JPanel bottomPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        JPanel bottomPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
         bottomPanel.setBackground(Color.WHITE);
 
         JButton novoButton = new JButton();
@@ -544,6 +560,66 @@ public class CadastrarProduto extends JPanel {
         }
     }
 
+    private void adicionarTipoProdutoComboBox(String nome){
+            try {
+                JsonObject jsonData = new JsonObject();
+                jsonData.addProperty("name", nome);
+
+                String urlAPI = this.dotenv.get("API_HOST");
+                URL url = new URL(urlAPI + "/product_type");
+                HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+                connection.setRequestMethod("POST");
+                connection.setRequestProperty("Content-Type", "application/json");
+                connection.setDoOutput(true);
+
+                try (OutputStream os = connection.getOutputStream()) {
+                    byte[] input = jsonData.toString().getBytes(StandardCharsets.UTF_8);
+                    os.write(input, 0, input.length);
+                }
+
+                int statusCode = connection.getResponseCode();
+                StringBuilder response = new StringBuilder();
+
+                if (statusCode >= 200 && statusCode < 300) {
+                    try (BufferedReader br = new BufferedReader(new InputStreamReader(connection.getInputStream(), StandardCharsets.UTF_8))) {
+                        String responseLine;
+                        while ((responseLine = br.readLine()) != null) {
+                            response.append(responseLine.trim());
+                        }
+                    }
+
+                    this.getProductType();
+
+                    JOptionPane.showOptionDialog(this.framePrincipal,
+                            "O tipo de Produto foi cadastrado com sucesso!",
+                            "Tipo de Produto Cadastrado",
+                            JOptionPane.DEFAULT_OPTION,
+                            JOptionPane.INFORMATION_MESSAGE,
+                            null, null, null);
+
+                    connection.disconnect();
+                } else {
+                    try (BufferedReader br = new BufferedReader(new InputStreamReader(connection.getErrorStream(), "utf-8"))) {
+                        String responseLine;
+                        while ((responseLine = br.readLine()) != null) {
+                            response.append(responseLine.trim());
+                        }
+                    }
+                    connection.disconnect();
+                    JOptionPane.showOptionDialog(this.framePrincipal,
+                            "Não foi possível cadastrar o tipo de produto, verifique as informações dos campos!\n" + response.toString(),
+                            "Tipo de Produto Não Cadastrado",
+                            JOptionPane.DEFAULT_OPTION,
+                            JOptionPane.ERROR_MESSAGE,
+                            null, null, null);
+                }
+
+
+            } catch (Exception e) {
+                JOptionPane.showMessageDialog(this.framePrincipal, e.getMessage());
+            }
+    }
+
     private void editarTipoProduto(String id, String novoNome, DefaultListModel<ProductType> model, int index) {
         try {
             // creating the json to send
@@ -709,6 +785,8 @@ public class CadastrarProduto extends JPanel {
 
                     model.addElement(new ProductType(id, name));
                 }
+                ProductType outros = new ProductType("0", "Outros");
+                model.addElement(outros);
 
                 this.jComboBoxProductType.setModel(model);
 
@@ -790,11 +868,11 @@ public class CadastrarProduto extends JPanel {
         }
     }
 
-    private void cadastrarProduto(){
+    private void cadastrarProduto() {
         try {
             String name = jTextFieldNome.getText();
             Integer quantity = (Integer) jSpinnerQuantidade.getValue();
-            Double price = (Double)jSpinnerPrecoVenda.getValue();
+            Double price = (Double) jSpinnerPrecoVenda.getValue();
             String description = jTextFieldDescricao.getText();
             Supplier id_supplier = (Supplier) Objects.requireNonNull(jComboBoxSupplier.getSelectedItem());
             ProductType id_product_type = (ProductType) Objects.requireNonNull(jComboBoxProductType.getSelectedItem());
@@ -825,7 +903,7 @@ public class CadastrarProduto extends JPanel {
             int statusCode = connection.getResponseCode();
             StringBuilder response = new StringBuilder();
 
-            if (statusCode >= 200 && statusCode <= 300) {
+            if (statusCode >= 200 && statusCode < 300) {
                 this.reset();
                 this.janelaPrincipal.showCard("listar_produtos");
                 JOptionPane.showOptionDialog(this.framePrincipal,
@@ -833,7 +911,7 @@ public class CadastrarProduto extends JPanel {
                         "Produto Cadastrado",
                         JOptionPane.DEFAULT_OPTION,
                         JOptionPane.INFORMATION_MESSAGE,
-                        null,null,null);
+                        null, null, null);
                 connection.disconnect();
 
 
@@ -850,7 +928,7 @@ public class CadastrarProduto extends JPanel {
                         "Produto Não Cadastrado",
                         JOptionPane.DEFAULT_OPTION,
                         JOptionPane.ERROR_MESSAGE,
-                        null,null,null);
+                        null, null, null);
             }
 
         } catch (Exception e) {
@@ -858,11 +936,11 @@ public class CadastrarProduto extends JPanel {
         }
     }
 
-    private void editarProduto(){
+    private void editarProduto() {
         try {
             String name = jTextFieldNome.getText();
             Integer quantity = (Integer) jSpinnerQuantidade.getValue();
-            Double price = (Double)jSpinnerPrecoVenda.getValue();
+            Double price = (Double) jSpinnerPrecoVenda.getValue();
             String description = jTextFieldDescricao.getText();
             Supplier id_supplier = (Supplier) Objects.requireNonNull(jComboBoxSupplier.getSelectedItem());
             ProductType id_product_type = (ProductType) Objects.requireNonNull(jComboBoxProductType.getSelectedItem());
@@ -877,7 +955,7 @@ public class CadastrarProduto extends JPanel {
 
             // making the request
             String urlAPI = this.dotenv.get("API_HOST");
-            URL url = new URL(urlAPI + "/product/"+this.id);
+            URL url = new URL(urlAPI + "/product/" + this.id);
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
             connection.setRequestMethod("PUT");
             connection.setRequestProperty("Content-Type", "application/json");
@@ -892,7 +970,7 @@ public class CadastrarProduto extends JPanel {
             int statusCode = connection.getResponseCode();
             StringBuilder response = new StringBuilder();
 
-            if (statusCode >= 200 && statusCode <= 300) {
+            if (statusCode >= 200 && statusCode < 300) {
                 this.reset();
                 this.id = null;
                 janelaPrincipal.showCard("listar_produtos");
@@ -901,7 +979,7 @@ public class CadastrarProduto extends JPanel {
                         "Produto Atualizado",
                         JOptionPane.DEFAULT_OPTION,
                         JOptionPane.INFORMATION_MESSAGE,
-                        null,null,null);
+                        null, null, null);
                 connection.disconnect();
 
 
@@ -918,7 +996,7 @@ public class CadastrarProduto extends JPanel {
                         "Produto Não atualizado",
                         JOptionPane.DEFAULT_OPTION,
                         JOptionPane.ERROR_MESSAGE,
-                        null,null,null);
+                        null, null, null);
             }
 
         } catch (Exception e) {

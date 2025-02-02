@@ -27,6 +27,9 @@ public class ProductTypeService {
 
     public ProductType save(ProductTypeDTO productTypeDTO) {
         ProductType productType = new ProductType();
+        if(productTypeDTO.getName().length() <=4){
+            throw new IllegalArgumentException("O nome do tipo de produto deve ter mais do que 4 letras!");
+        }
         productType.setName(productTypeDTO.getName());
 
         return productTypeRepository.save(productType);
@@ -34,7 +37,7 @@ public class ProductTypeService {
 
     public List<ProductTypeDTO> listAll() {
         try{
-            return productTypeRepository.findAll()
+            return productTypeRepository.findAllByOrderByNameAsc()
                     .stream()
                     .map(this::mapToDTO)
                     .collect(Collectors.toList());

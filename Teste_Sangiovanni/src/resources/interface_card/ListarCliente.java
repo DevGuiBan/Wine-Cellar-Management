@@ -192,7 +192,7 @@ public class ListarCliente extends JPanel {
                     String name = product.get("name").getAsString();
                     String cpf = product.get("cpf").getAsString();
                     String address = product.get("address").getAsString();
-                    String phone_number = product.get("phone_number").getAsString();
+                    String phone_number = product.get("phoneNumber").getAsString();
                     String email = product.get("email").getAsString();
                     String data = product.get("date_brith").getAsString();
                     tableModel.addRow(new Object[]{id, name,address,cpf,data,phone_number,email});

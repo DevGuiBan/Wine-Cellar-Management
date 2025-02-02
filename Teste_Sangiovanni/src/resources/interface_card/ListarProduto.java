@@ -116,7 +116,7 @@ public class ListarProduto extends JPanel {
         jtable.setModel(new javax.swing.table.DefaultTableModel(
                 new Object[][]{},
                 new String[]{
-                        "Código", "Nome", "Fornecedor", "Preço Unitário", "Qtd. em Estoque", "Ações"
+                        "Código", "Nome", "Fornecedor","Tipo de Produto", "Preço Unitário", "Qtd. em Estoque", "Ações"
                 }
         ));
 
@@ -195,11 +195,13 @@ public class ListarProduto extends JPanel {
                     BigInteger id = product.get("id").getAsBigInteger();
                     String name = product.get("name").getAsString();
                     JsonObject supplier = product.get("supplier").getAsJsonObject();
+                    JsonObject prodT = product.get("productType").getAsJsonObject();
+                    String product_type = prodT.get("name").getAsString();
                     String supplierName = supplier.get("name").getAsString();
                     String quantity = product.get("quantity").getAsString();
                     String price = product.get("price").getAsString();
 
-                    tableModel.addRow(new Object[]{id, name, supplierName, price,quantity});
+                    tableModel.addRow(new Object[]{id, name, supplierName,product_type, price,quantity});
                     connection.disconnect();
                 }
             } else {

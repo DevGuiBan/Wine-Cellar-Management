@@ -5,7 +5,7 @@ import javax.swing.border.EmptyBorder;
 import java.awt.*;
 
 public class RegistrarVenda extends JPanel {
-    public RegistrarVenda(JPanel mainPanel) {
+    public RegistrarVenda(JPanel mainPanel, JanelaPrincipal janelaPrincipal) {
         // inicialização de variáveis
         jLabelCadastro = new JLabel();
 
@@ -80,7 +80,7 @@ public class RegistrarVenda extends JPanel {
         jPanelButtonsCard.setBorder(BorderFactory.createEmptyBorder(10, 60, 10, 10));
 
         jButtonProdutoCard.setBackground(Color.WHITE);
-        jButtonProdutoCard.setFont(new Font("Cormorant Garamond Bold", 1, 20));
+        jButtonProdutoCard.setFont(new Font("Cormorant Garamond Bold", 1, 24));
         jButtonProdutoCard.setForeground(new Color(128, 0, 32));
         jButtonProdutoCard.setText("Produto");
         jButtonProdutoCard.setFocusPainted(false);
@@ -95,7 +95,7 @@ public class RegistrarVenda extends JPanel {
         jPanelButtonsCard.add(jButtonProdutoCard);
 
         jButtonClienteCard.setBackground(Color.WHITE);
-        jButtonClienteCard.setFont(new Font("Cormorant Garamond Bold", 1, 20));
+        jButtonClienteCard.setFont(new Font("Cormorant Garamond Bold", 1, 24));
         jButtonClienteCard.setForeground(new Color(0, 0, 0));
         jButtonClienteCard.setText("Cliente");
         jButtonClienteCard.setFocusPainted(false);
@@ -110,7 +110,7 @@ public class RegistrarVenda extends JPanel {
         jPanelButtonsCard.add(jButtonClienteCard);
 
         jButtonFinalizarVendaCard.setBackground(Color.WHITE);
-        jButtonFinalizarVendaCard.setFont(new Font("Cormorant Garamond Bold", 1, 20));
+        jButtonFinalizarVendaCard.setFont(new Font("Cormorant Garamond Bold", 1, 24));
         jButtonFinalizarVendaCard.setForeground(new Color(0, 0, 0));
         jButtonFinalizarVendaCard.setText("Finalizar Venda");
         jButtonFinalizarVendaCard.setFocusPainted(false);
@@ -127,41 +127,48 @@ public class RegistrarVenda extends JPanel {
         jPanelButtons.setLayout(new BorderLayout());
         jPanelButtons.setBackground(Color.WHITE);
         jPanelButtons.setPreferredSize(new Dimension(1200, 50));
-        jPanelButtons.setBorder(new EmptyBorder(5,30,5,20));
+        jButtonCancelar.setMargin(new Insets(0, 30, 0, 20));
 
-        JPanel leftPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 10));
-        JPanel rightPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 10));
+        JPanel leftPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 5, 5));
+        JPanel rightPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 5, 5));
 
         leftPanel.setBackground(Color.WHITE);
+        leftPanel.setBorder(new EmptyBorder(0,50,0,0));
         rightPanel.setBackground(Color.WHITE);
+        rightPanel.setBorder(new EmptyBorder(0,0,0,50));
 
         leftPanel.add(jButtonCancelar);
         rightPanel.add(jButtonAdicionarCarrinho);
         rightPanel.add(jButtonCadastrar);
 
         jButtonCancelar.setBackground(new Color(225, 225, 200));
-        jButtonCancelar.setFont(new Font("Cormorant Garamond SemiBold", 1, 18));
+        jButtonCancelar.setFont(new Font("Cormorant Garamond SemiBold", 1, 22));
         jButtonCancelar.setText("Cancelar");
+        jButtonCancelar.setForeground(Color.BLACK);
         jButtonCancelar.setFocusPainted(false);
-        jButtonCancelar.setBorder(new EmptyBorder(5,20,5,20));
+        jButtonCancelar.setPreferredSize(new Dimension(150, 40));
+        jButtonCancelar.setBorder(null);
         jButtonCancelar.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        jButtonCancelar.setMargin(new Insets(10, 20, 10, 20));
         jButtonCancelar.addActionListener(e -> {
-            // Redireciona para "listar_produtos"
-            CardLayout cl = (CardLayout) mainPanel.getLayout();
-            cl.show(mainPanel, "listar_vendas");
+            janelaPrincipal.showCard("listar_vendas");
         });
 
         jButtonCadastrar.setBackground(new Color(0, 128, 17));
-        jButtonCadastrar.setFont(new Font("Cormorant Garamond SemiBold", 1, 18));
+        jButtonCadastrar.setFont(new Font("Cormorant Garamond SemiBold", 1, 22));
         jButtonCadastrar.setForeground(new Color(255, 255, 200));
+        jButtonCadastrar.setPreferredSize(new Dimension(150, 40));
         jButtonCadastrar.setText("Próximo");
+        jButtonCadastrar.setFocusPainted(false);
         jButtonCadastrar.setCursor(new Cursor(Cursor.HAND_CURSOR));
         jButtonCadastrar.setFocusPainted(false);
 
-        jButtonAdicionarCarrinho.setBackground(new Color(28, 128, 67));
-        jButtonAdicionarCarrinho.setFont(new Font("Cormorant Garamond SemiBold", 1, 18));
+        jButtonAdicionarCarrinho.setBackground(new Color(28, 128, 120));
+        jButtonAdicionarCarrinho.setFont(new Font("Cormorant Garamond SemiBold", 1, 22));
         jButtonAdicionarCarrinho.setForeground(new Color(255, 255, 200));
+        jButtonAdicionarCarrinho.setPreferredSize(new Dimension(300, 40));
         jButtonAdicionarCarrinho.setText("Adicionar ao Carrinho");
+        jButtonAdicionarCarrinho.setFocusPainted(false);
         jButtonAdicionarCarrinho.setCursor(new Cursor(Cursor.HAND_CURSOR));
         jButtonAdicionarCarrinho.setFocusPainted(false);
 
@@ -176,8 +183,14 @@ public class RegistrarVenda extends JPanel {
 
     }
 
-    private void showCard(String cardName) {
+    public void showCard(String cardName) {
         CardLayout cl = (CardLayout) jPanelContent.getLayout();
+        if(cardName.equals("produtos")){
+            jButtonProdutoCard.setForeground(new Color(128, 0, 32));
+            jButtonClienteCard.setForeground(new Color(0, 0, 0));
+            jButtonFinalizarVendaCard.setForeground(new Color(0, 0, 0));
+            jButtonAdicionarCarrinho.setText("Adicionar ao Carrinho");
+        }
         cl.show(jPanelContent, cardName);
     }
 
@@ -185,6 +198,7 @@ public class RegistrarVenda extends JPanel {
         jButtonProdutoCard.setForeground(new Color(128, 0, 32));
         jButtonClienteCard.setForeground(new Color(0, 0, 0));
         jButtonFinalizarVendaCard.setForeground(new Color(0, 0, 0));
+        jButtonAdicionarCarrinho.setText("Adicionar ao Carrinho");
         this.showCard("produtos");
     }
 
@@ -192,6 +206,7 @@ public class RegistrarVenda extends JPanel {
         jButtonProdutoCard.setForeground(new Color(0, 0, 0));
         jButtonClienteCard.setForeground(new Color(128, 0, 32));
         jButtonFinalizarVendaCard.setForeground(new Color(0, 0, 0));
+        jButtonAdicionarCarrinho.setText("Adicionar Novo Cliente");
         this.showCard("clientes");
     }
 
@@ -199,6 +214,7 @@ public class RegistrarVenda extends JPanel {
         jButtonProdutoCard.setForeground(new Color(0, 0, 0));
         jButtonClienteCard.setForeground(new Color(0, 0, 0));
         jButtonFinalizarVendaCard.setForeground(new Color(128, 0, 32));
+        jButtonAdicionarCarrinho.setText("Aplicar Desconto");
         this.showCard("finalizar_venda");
     }
 

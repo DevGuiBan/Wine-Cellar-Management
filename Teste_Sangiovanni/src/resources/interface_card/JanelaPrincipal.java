@@ -30,7 +30,7 @@ public class JanelaPrincipal extends javax.swing.JFrame {
             cardCadastroProdutos = new CadastrarProduto(cardPanel,this.rootPane);
             cardCadastroFornecedores = new CadastrarFornecedor(cardPanel,this.rootPane);
             cardCadastrarClientes = new CadastrarCliente(cardPanel,this.rootPane);
-            cardRegistrarVenda = new RegistrarVenda(cardPanel);
+            cardRegistrarVenda = new RegistrarVenda(cardPanel,this);
             cardListarProdutos = new ListarProduto(this.rootPane,cardPanel,cardCadastroProdutos);
             cardListarFornecedores = new ListarFornecedor(this.rootPane,cardPanel,cardCadastroFornecedores);
             cardListarVendas = new ListarVendas(this.rootPane,cardPanel);
@@ -183,6 +183,10 @@ public class JanelaPrincipal extends javax.swing.JFrame {
                     cardListarFornecedores.atualizarDados();
                     cl.show(cardPanel, cardName);
                     break;
+                case "registrar_venda":
+                    cardRegistrarVenda.showCard("produtos");
+                    cl.show(cardPanel, cardName);
+                    break;
                 default:
                     cl.show(cardPanel, cardName);
                     break;
@@ -245,6 +249,6 @@ public class JanelaPrincipal extends javax.swing.JFrame {
         private ListarVendas cardListarVendas;
         private ListarCliente cardListarClientes;
         private CadastrarCliente cardCadastrarClientes;
-        private javax.swing.JPanel cardRegistrarVenda;
+        private RegistrarVenda cardRegistrarVenda;
     }
 

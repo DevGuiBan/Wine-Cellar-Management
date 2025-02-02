@@ -3,16 +3,11 @@ package com.ggnarp.winecellarmanagement.service;
 import com.ggnarp.winecellarmanagement.dto.ClientDTO;
 import com.ggnarp.winecellarmanagement.entity.Client;
 import com.ggnarp.winecellarmanagement.repository.ClientRepository;
-import org.springframework.expression.ParseException;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.ResourceAccessException;
 
-import java.text.SimpleDateFormat;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -27,10 +22,20 @@ public class ClientService {
     }
 
     public Client save(ClientDTO clientDTO) {
+        if(this.clientRepository.existsByEmail(clientDTO.getEmail())) {
+            throw new IllegalArgumentException("Já existe um cliente cadastrado com esse e-mail");
+        }
+        if(this.clientRepository.existsByCpf(clientDTO.getCpf())) {
+            throw new IllegalArgumentException("Já existe um cliente cadastrado com esse cpf");
+        }
+        if(this.clientRepository.existsClientByPhoneNumber(clientDTO.getPhoneNumber())) {
+            throw new IllegalArgumentException("Já existe um cliente cadastrado com esse número de telefone");
+        }
+
         Client client = new Client();
         client.setName(clientDTO.getName());
         client.setEmail(clientDTO.getEmail());
-        client.setPhone_number(clientDTO.getPhone_number());
+        client.setPhoneNumber(clientDTO.getPhoneNumber());
         client.setAddress(clientDTO.getAddress());
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
         LocalDate data = LocalDate.parse(clientDTO.getDate_brith(), formatter);
@@ -40,11 +45,11 @@ public class ClientService {
     }
 
     public List<ClientDTO> listAll() {
-        return clientRepository.findAll().stream().map(client -> {
+        return clientRepository.findAllByOrderByNameAsc().stream().map(client -> {
             ClientDTO dto = new ClientDTO();
             dto.setName(client.getName());
             dto.setEmail(client.getEmail());
-            dto.setPhone_number(client.getPhone_number());
+            dto.setPhoneNumber(client.getPhoneNumber());
             dto.setAddress(client.getAddress());
             dto.setId(client.getId());
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
@@ -71,11 +76,17 @@ public class ClientService {
                     if (clientDTO.getAddress() != null) {
                         existingClient.setAddress(clientDTO.getAddress());
                     }
-                    if (clientDTO.getPhone_number() != null && !clientDTO.getPhone_number().isBlank()) {
-                        existingClient.setPhone_number(clientDTO.getPhone_number());
+                    if (clientDTO.getPhoneNumber() != null && !clientDTO.getPhoneNumber().isBlank()) {
+                        if(!clientDTO.getPhoneNumber().equals(existingClient.getPhoneNumber())) {
+                            existingClient.setPhoneNumber(clientDTO.getPhoneNumber());
+                        }
+
                     }
                     if (clientDTO.getEmail() != null && !clientDTO.getEmail().isBlank()) {
-                        existingClient.setEmail(clientDTO.getEmail());
+                        if(!clientDTO.getEmail().equals(existingClient.getEmail())){
+                            existingClient.setEmail(clientDTO.getEmail());
+                        }
+
                     }
                     if(clientDTO.getDate_brith()!= null && !clientDTO.getDate_brith().isBlank()){
                         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
@@ -83,7 +94,9 @@ public class ClientService {
                         existingClient.setDate_brith(data);
                     }
                     if(clientDTO.getCpf() != null && !clientDTO.getCpf().isBlank()){
-                        existingClient.setCpf(clientDTO.getCpf());
+                        if(!clientDTO.getCpf().equals(existingClient.getCpf())) {
+                            existingClient.setCpf(clientDTO.getCpf());
+                        }
                     }
 
                     return clientRepository.save(existingClient);

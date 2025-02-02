@@ -26,8 +26,8 @@ public class Client {
     @Column(nullable = false, unique = true)
     private String email;
 
-    @Column(nullable = false)
-    private String phone_number;
+    @Column(nullable = false,unique = true,name = "phone_number")
+    private String phoneNumber;
 
     @Column(nullable = false)
     private String address;

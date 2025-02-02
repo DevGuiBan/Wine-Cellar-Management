@@ -14,6 +14,7 @@ import java.util.Objects;
 public class ListarVendas extends JPanel {
     public ListarVendas(JRootPane rootPane,JPanel mainPanel){
         // iniciar Componentes
+        JanelaPrincipal frame = (JanelaPrincipal) SwingUtilities.getWindowAncestor(rootPane);
         jPanelTopoTabela = new javax.swing.JPanel();
         jPanelTabela = new javax.swing.JPanel();
         jButtonCadastrar = new javax.swing.JButton();
@@ -68,9 +69,7 @@ public class ListarVendas extends JPanel {
         jButtonCadastrar.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         jButtonCadastrar.setPreferredSize(new java.awt.Dimension(200, 40));
         jButtonCadastrar.addActionListener(e -> {
-            // Redireciona para "listar_produtos"
-            CardLayout cl = (CardLayout) mainPanel.getLayout();
-            cl.show(mainPanel, "registrar_venda");
+            frame.showCard("registrar_venda");
         });
 
         jPanelTopoTabela.add(jButtonCadastrar);

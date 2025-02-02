@@ -404,7 +404,7 @@ public class CadastrarFornecedor extends JPanel {
             int statusCode = connection.getResponseCode();
             StringBuilder response = new StringBuilder();
 
-            if (statusCode >= 200 && statusCode <= 300) {
+            if (statusCode >= 200 && statusCode < 300) {
                 this.reset();
                 this.frame.showCard("listar_fonecedores");
                 JOptionPane.showOptionDialog(this.rootPane,
@@ -472,7 +472,7 @@ public class CadastrarFornecedor extends JPanel {
             int statusCode = connection.getResponseCode();
             StringBuilder response = new StringBuilder();
 
-            if (statusCode >= 200 && statusCode <= 300) {
+            if (statusCode >= 200 && statusCode < 300) {
                 this.reset();
                 this.id = null;
                 this.frame.showCard("listar_fonecedores");
