@@ -4,30 +4,38 @@ import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import io.github.cdimascio.dotenv.Dotenv;
+import resources.interfaces.ProductType;
+import resources.interfaces.Supplier;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.MatteBorder;
 import javax.swing.text.MaskFormatter;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.util.Objects;
 
 public class CadastrarFornecedor extends JPanel {
     private JPanel mainPanel;
     private String id;
     private Dotenv dotenv;
     private JRootPane rootPane;
+    private JanelaPrincipal frame;
 
     public CadastrarFornecedor(JPanel mainPanel,JRootPane rootPane) {
         this.mainPanel = mainPanel;
         this.rootPane = rootPane;
+        this.frame = (JanelaPrincipal) SwingUtilities.getWindowAncestor(rootPane);
         this.dotenv = Dotenv.load();
         this.initComponentes();
     }
@@ -264,10 +272,9 @@ public class CadastrarFornecedor extends JPanel {
         jButtonCancelar.setFocusPainted(false);
         jButtonCancelar.setBorder(new EmptyBorder(5,20,5,20));
         jButtonCancelar.addActionListener(e -> {
-            // Redireciona para "listar_produtos"
             this.reset();
             CardLayout cl = (CardLayout) mainPanel.getLayout();
-            cl.show(mainPanel, "card2");
+            cl.show(mainPanel, "listar_fonecedores");
         });
 
         jButtonCadastrar.setBackground(new Color(0, 128, 17));
@@ -275,6 +282,16 @@ public class CadastrarFornecedor extends JPanel {
         jButtonCadastrar.setForeground(new Color(255, 255, 200));
         jButtonCadastrar.setText("Cadastrar");
         jButtonCadastrar.setFocusPainted(false);
+        jButtonCadastrar.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (id == null) {
+                    cadastrarFornecedor();
+                } else  {
+                    editarFornecedor();
+                }
+            }
+        });
 
 
         jPanel.add(jPanelContent);
@@ -350,6 +367,143 @@ public class CadastrarFornecedor extends JPanel {
         jTextFieldObservacoes.setText("");
         this.jButtonCadastrar.setText("Cadastrar");
         this.jLabelCadastro.setText("CadastrarFornecedor Fornecedor");
+    }
+
+    private void cadastrarFornecedor(){
+        try {
+            String name = jTextFieldNome.getText();
+            String cnpj = jTextFieldCPNJ.getText();
+            String email = jTextFieldEmail.getText();
+            String observation = jTextFieldObservacoes.getText();
+            String address = jTextFieldEndereco.getText();
+            String phone_number = jTextFieldTelefone.getText();
+
+
+            JsonObject jsonData = new JsonObject();
+            jsonData.addProperty("name", name);
+            jsonData.addProperty("cnpj", cnpj);
+            jsonData.addProperty("email", email);
+            jsonData.addProperty("observation", observation);
+            jsonData.addProperty("address", address);
+            jsonData.addProperty("phone_number", phone_number);
+
+            // making the request
+            String urlAPI = this.dotenv.get("API_HOST");
+            URL url = new URL(urlAPI + "/supplier");
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.setRequestMethod("POST");
+            connection.setRequestProperty("Content-Type", "application/json");
+            connection.setDoOutput(true);
+
+            // send the request with json
+            try (OutputStream os = connection.getOutputStream()) {
+                byte[] input = jsonData.toString().getBytes(StandardCharsets.UTF_8);
+                os.write(input, 0, input.length);
+            }
+
+            int statusCode = connection.getResponseCode();
+            StringBuilder response = new StringBuilder();
+
+            if (statusCode >= 200 && statusCode <= 300) {
+                this.reset();
+                this.frame.showCard("listar_fonecedores");
+                JOptionPane.showOptionDialog(this.rootPane,
+                        "O Fornecedor foi cadastrado com sucesso!",
+                        "Fornecedor Cadastrado",
+                        JOptionPane.DEFAULT_OPTION,
+                        JOptionPane.INFORMATION_MESSAGE,
+                        null,null,null);
+                connection.disconnect();
+
+
+            } else {
+                try (BufferedReader br = new BufferedReader(new InputStreamReader(connection.getErrorStream(), "utf-8"))) {
+                    String responseLine;
+                    while ((responseLine = br.readLine()) != null) {
+                        response.append(responseLine.trim());
+                    }
+                }
+                connection.disconnect();
+                JOptionPane.showOptionDialog(this.rootPane,
+                        "Não foi possível cadastrar o fornecedor, verifique as informações dos campos e tente novamente!\n" + response.toString(),
+                        "Fornecedor Não Cadastrado",
+                        JOptionPane.DEFAULT_OPTION,
+                        JOptionPane.ERROR_MESSAGE,
+                        null,null,null);
+            }
+
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this.rootPane, e.getMessage());
+        }
+    }
+
+    private void editarFornecedor(){
+        try {
+            String name = jTextFieldNome.getText();
+            String cnpj = jTextFieldCPNJ.getText();
+            String email = jTextFieldEmail.getText();
+            String observation = jTextFieldObservacoes.getText();
+            String address = jTextFieldEndereco.getText();
+            String phone_number = jTextFieldTelefone.getText();
+
+
+            JsonObject jsonData = new JsonObject();
+            jsonData.addProperty("name", name);
+            jsonData.addProperty("cnpj", cnpj);
+            jsonData.addProperty("email", email);
+            jsonData.addProperty("observation", observation);
+            jsonData.addProperty("address", address);
+            jsonData.addProperty("phone_number", phone_number);
+
+            // making the request
+            String urlAPI = this.dotenv.get("API_HOST");
+            URL url = new URL(urlAPI + "/supplier/"+this.id);
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.setRequestMethod("PUT");
+            connection.setRequestProperty("Content-Type", "application/json");
+            connection.setDoOutput(true);
+
+            // send the request with json
+            try (OutputStream os = connection.getOutputStream()) {
+                byte[] input = jsonData.toString().getBytes(StandardCharsets.UTF_8);
+                os.write(input, 0, input.length);
+            }
+
+            int statusCode = connection.getResponseCode();
+            StringBuilder response = new StringBuilder();
+
+            if (statusCode >= 200 && statusCode <= 300) {
+                this.reset();
+                this.id = null;
+                this.frame.showCard("listar_fonecedores");
+                JOptionPane.showOptionDialog(this.rootPane,
+                        "O Fornecedor foi atualizado com sucesso!",
+                        "Fornecedor Atualizado",
+                        JOptionPane.DEFAULT_OPTION,
+                        JOptionPane.INFORMATION_MESSAGE,
+                        null,null,null);
+                connection.disconnect();
+
+
+            } else {
+                try (BufferedReader br = new BufferedReader(new InputStreamReader(connection.getErrorStream(), "utf-8"))) {
+                    String responseLine;
+                    while ((responseLine = br.readLine()) != null) {
+                        response.append(responseLine.trim());
+                    }
+                }
+                connection.disconnect();
+                JOptionPane.showOptionDialog(this.rootPane,
+                        "Não foi possível atualizar o fornecedor, verifique as informações dos campos e tente novamente!\n" + response.toString(),
+                        "Fornecedor Não Atualizado",
+                        JOptionPane.DEFAULT_OPTION,
+                        JOptionPane.ERROR_MESSAGE,
+                        null,null,null);
+            }
+
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this.rootPane, e.getMessage());
+        }
     }
 
     // componentes que vão ser usados na tela, só o essencial e com os nomes certinhos

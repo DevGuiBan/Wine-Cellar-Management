@@ -20,9 +20,21 @@ import io.github.cdimascio.dotenv.Dotenv;
 
 public class ListarProduto extends JPanel {
     private final Dotenv dotenv;
+    private final JRootPane rootPane;
+    private final JPanel mainPanel;
+    private final CadastrarProduto cadastrarProduto;
+
     public ListarProduto(JRootPane rootPane,JPanel mainPanel, CadastrarProduto cardProduto){
-        // lendo .env
         this.dotenv = Dotenv.load();
+        this.rootPane = rootPane;
+        this.mainPanel = mainPanel;
+        this.cadastrarProduto = cardProduto;
+
+        initComponents();
+        getProduct();
+    }
+
+    private void initComponents() {
 
         // iniciar Componentes
         jPanelTopoTabela = new javax.swing.JPanel();
@@ -140,7 +152,7 @@ public class ListarProduto extends JPanel {
         }
 
         jtable.getColumn("Ações").setCellRenderer(new ButtonRendererProduct_());
-        jtable.getColumn("Ações").setCellEditor(new ButtonEditorProduct_(jtable, rootPane,this.dotenv.get("API_HOST"),cardProduto,mainPanel));
+        jtable.getColumn("Ações").setCellEditor(new ButtonEditorProduct_(jtable, rootPane,this.dotenv.get("API_HOST"),cadastrarProduto,mainPanel));
 
         jScrollPane.setViewportView(jtable);
         jScrollPane.setBorder(javax.swing.BorderFactory.createMatteBorder(2, 2, 2, 2, new java.awt.Color(128, 0, 32)));
@@ -152,10 +164,10 @@ public class ListarProduto extends JPanel {
         jPanel4.add(jPanelTabela);
         setBorder(new EmptyBorder(20, 20, 20, 20));
 
-        getProduct(rootPane);
+        getProduct();
     }
 
-    public void getProduct(JRootPane rootPane){
+    private void getProduct(){
         try {
             String urlAPI = this.dotenv.get("API_HOST");
             URL url = new URL(urlAPI + "/product");
@@ -202,6 +214,10 @@ public class ListarProduto extends JPanel {
         } catch (Exception e) {
             JOptionPane.showMessageDialog(rootPane, e.getMessage());
         }
+    }
+
+    public void atualizarDados(){
+        this.getProduct();
     }
 
     private javax.swing.JTextField pesquisaProduto;
@@ -290,7 +306,6 @@ class ButtonEditorProduct_ extends AbstractCellEditor implements TableCellEditor
         panel.add(editButton);
         panel.add(deleteButton);
 
-        // Action for edit button
         editButton.addActionListener(evt -> {
             int cellIndex = table.getSelectedRow();
             Object cellValue = table.getValueAt(cellIndex,0);
@@ -300,7 +315,6 @@ class ButtonEditorProduct_ extends AbstractCellEditor implements TableCellEditor
             stopCellEditing();
         });
 
-        // Action for delete button
         deleteButton.addActionListener(e -> {
             String[] options = {"Cancelar","Excluir"};
             int confirmation = JOptionPane.showOptionDialog(table,
@@ -311,12 +325,54 @@ class ButtonEditorProduct_ extends AbstractCellEditor implements TableCellEditor
                     null,
                     options,
                     options[0]);
+            if (confirmation == 1) {
+                try{
+                    int cellIndex = table.getSelectedRow();
+                    if (table.isEditing()) {
+                        table.getCellEditor().stopCellEditing();
+                    }
+                    Object cellValue = table.getValueAt(cellIndex,0);
+                    BigInteger id_product = new BigInteger(cellValue.toString());
+                    URL url = new URL(this.APIURL + "/product/" + id_product);
+                    HttpURLConnection connection = (HttpURLConnection) url.openConnection();
 
-            stopCellEditing();
+                    connection.setRequestMethod("DELETE");
+
+                    int responseCode = connection.getResponseCode();
+                    if(responseCode==HttpURLConnection.HTTP_NO_CONTENT || responseCode == HttpURLConnection.HTTP_OK){
+                        ((DefaultTableModel) table.getModel()).removeRow(currentRow);
+                        JOptionPane.showOptionDialog(this.frame,
+                                "O produto foi deletado com sucesso",
+                                "Produto Deletado",
+                                JOptionPane.DEFAULT_OPTION,
+                                JOptionPane.INFORMATION_MESSAGE,
+                                null,
+                                null,
+                                null);
+                    }
+                    else{
+                        JOptionPane.showOptionDialog(this.frame,
+                                "Ocorreu um erro no servidor ao deletar o produto",
+                                "Erro ao deletar produto",
+                                JOptionPane.DEFAULT_OPTION,
+                                JOptionPane.ERROR_MESSAGE,
+                                null,
+                                null,
+                                null);
+                    }
+                } catch (Exception ex) {
+                    JOptionPane.showMessageDialog(this.frame,ex.getMessage());
+                }
+            }
+            else{
+                stopCellEditing();
+            }
+
         });
     }
 
-    @Override
+
+        @Override
     public Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected, int row, int column) {
         currentRow = row;
         return panel;

@@ -4,39 +4,33 @@ import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import io.github.cdimascio.dotenv.Dotenv;
-import resources.interfaces.ProductType;
-import resources.interfaces.Supplier;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.MatteBorder;
 import javax.swing.text.MaskFormatter;
 import java.awt.*;
-import java.awt.event.FocusAdapter;
-import java.awt.event.FocusEvent;
-import java.awt.event.FocusListener;
+import java.awt.event.*;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
-import java.math.BigInteger;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.Date;
-import java.text.SimpleDateFormat;
-
 
 public class CadastrarCliente extends JPanel {
     private JPanel mainPanel;
     private String id;
     private Dotenv dotenv;
     private JRootPane framePrincipal;
+    private JanelaPrincipal frame;
 
     public CadastrarCliente(JPanel mainPanel,JRootPane framePrincipal) {
         this.mainPanel = mainPanel;
         this.framePrincipal = framePrincipal;
+        this.frame = (JanelaPrincipal) SwingUtilities.getWindowAncestor(framePrincipal);
         this.dotenv = Dotenv.load();
         this.initComponentes();
     }
@@ -273,7 +267,6 @@ public class CadastrarCliente extends JPanel {
         this.jButtonCancelar.setFocusPainted(false);
         this.jButtonCancelar.setBorder(new EmptyBorder(5,20,5,20));
         this.jButtonCancelar.addActionListener(e -> {
-            // Redireciona para "listar_produtos"
             reset();
             CardLayout cl = (CardLayout) mainPanel.getLayout();
             cl.show(mainPanel, "listar_clientes");
@@ -284,7 +277,17 @@ public class CadastrarCliente extends JPanel {
         this.jButtonCadastrar.setForeground(new Color(255, 255, 200));
         this.jButtonCadastrar.setText("Cadastrar");
         this.jButtonCadastrar.setFocusPainted(false);
-        this.jButtonCadastrar.addActionListener(evt->cadastrarCliente());
+        this.jButtonCadastrar.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (id == null) {
+                    cadastrarCliente();
+                } else  {
+                    editarCliente();
+                }
+            }
+        });
+
 
 
         this.jPanel.add(this.jPanelContent);
@@ -308,7 +311,6 @@ public class CadastrarCliente extends JPanel {
             String email = jTextFieldEmail.getText();
             String address = jTextFieldEndereco.getText();
             String cpf = jTextFieldCPF.getText();
-            SimpleDateFormat formato = new SimpleDateFormat("dd/MM/yyyy");
             String dataString = jTextFieldDataNascimento.getText();
 
             JsonObject jsonData = new JsonObject();
@@ -338,8 +340,7 @@ public class CadastrarCliente extends JPanel {
 
             if (statusCode >= 200 && statusCode <= 300) {
                 this.reset();
-                CardLayout cl = (CardLayout) mainPanel.getLayout();
-                cl.show(mainPanel, "card_vendas");
+                frame.showCard("listar_clientes");
                 JOptionPane.showOptionDialog(this.framePrincipal,
                         "O Cliente foi cadastrado com sucesso!",
                         "Cleinte Cadastrado",
@@ -377,7 +378,6 @@ public class CadastrarCliente extends JPanel {
             String email = jTextFieldEmail.getText();
             String address = jTextFieldEndereco.getText();
             String cpf = jTextFieldCPF.getText();
-            SimpleDateFormat formato = new SimpleDateFormat("dd/MM/yyyy");
             String dataString = jTextFieldDataNascimento.getText();
 
             JsonObject jsonData = new JsonObject();
@@ -407,11 +407,11 @@ public class CadastrarCliente extends JPanel {
 
             if (statusCode >= 200 && statusCode <= 300) {
                 this.reset();
-                CardLayout cl = (CardLayout) mainPanel.getLayout();
-                cl.show(mainPanel, "card_vendas");
+                this.id = null;
+                frame.showCard("listar_clientes");
                 JOptionPane.showOptionDialog(this.framePrincipal,
                         "O Cliente foi atualizado com sucesso!",
-                        "Cleinte Atualizado",
+                        "Cliente Atualizado",
                         JOptionPane.DEFAULT_OPTION,
                         JOptionPane.INFORMATION_MESSAGE,
                         null,null,null);
@@ -443,7 +443,6 @@ public class CadastrarCliente extends JPanel {
         this.id = id;
         this.getCliente();
         this.jButtonCadastrar.setText("Atualizar");
-        this.jButtonCadastrar.addActionListener(evt->editarCliente());
         this.jLabelCadastro.setText("Editar Cliente");
     }
 

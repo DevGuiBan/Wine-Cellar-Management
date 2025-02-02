@@ -31,8 +31,8 @@ public class JanelaPrincipal extends javax.swing.JFrame {
             cardCadastroFornecedores = new CadastrarFornecedor(cardPanel,this.rootPane);
             cardCadastrarClientes = new CadastrarCliente(cardPanel,this.rootPane);
             cardRegistrarVenda = new RegistrarVenda(cardPanel);
-            card1 = new ListarProduto(this.rootPane,cardPanel,cardCadastroProdutos);
-            card2 = new ListarFornecedor(this.rootPane,cardPanel,cardCadastroFornecedores);
+            cardListarProdutos = new ListarProduto(this.rootPane,cardPanel,cardCadastroProdutos);
+            cardListarFornecedores = new ListarFornecedor(this.rootPane,cardPanel,cardCadastroFornecedores);
             cardListarVendas = new ListarVendas(this.rootPane,cardPanel);
             cardListarClientes = new ListarCliente(this.rootPane,cardPanel,cardCadastrarClientes);
 
@@ -128,9 +128,9 @@ public class JanelaPrincipal extends javax.swing.JFrame {
             });
 
             // Botões para alternar os cards
-            jButton1.addActionListener(evt -> showCard("card1"));
-            jButton2.addActionListener(evt -> showCard("card2"));
-            jButton3.addActionListener(evt -> showCard("card_vendas"));
+            jButton1.addActionListener(evt -> showCard("listar_produtos"));
+            jButton2.addActionListener(evt -> showCard("listar_fonecedores"));
+            jButton3.addActionListener(evt -> showCard("listar_vendas"));
             jButton4.addActionListener(evt -> showCard("listar_clientes"));
 
             jPanel3.add(jButton1);
@@ -144,20 +144,11 @@ public class JanelaPrincipal extends javax.swing.JFrame {
             // Configuração do CardLayout no cardPanel
             cardPanel.setLayout(new CardLayout());
 
-            // Card 1
-
-            card2.setBackground(new Color(243, 243, 223));
-
-            // Card 2
-            card2.setBackground(new Color(243, 243, 223));
-
-            // Card 3
-
 
             // Adicionar os painéis ao CardLayout
-            cardPanel.add(card1, "card1");
-            cardPanel.add(card2, "card2");
-            cardPanel.add(cardListarVendas, "card_vendas");
+            cardPanel.add(cardListarProdutos, "listar_produtos");
+            cardPanel.add(cardListarFornecedores, "listar_fonecedores");
+            cardPanel.add(cardListarVendas, "listar_vendas");
             cardPanel.add(cardCadastroProdutos,"cadastrar_produto");
             cardPanel.add(cardCadastroFornecedores,"cadastrar_fornecedor");
             cardPanel.add(cardListarClientes,"listar_clientes");
@@ -174,15 +165,27 @@ public class JanelaPrincipal extends javax.swing.JFrame {
         }
 
         // Método para alternar o card visível
-        private void showCard(String cardName) {
+        public void showCard(String cardName) {
             CardLayout cl = (CardLayout) cardPanel.getLayout();
             switch (cardName){
-                case "cadastrar_fornecedor":
+                case "listar_vendas":
                     cl.show(cardPanel, cardName);
-                case "cadastrar_produto":
+                    break;
+                case "listar_clientes":
+                    cardListarClientes.atualizarDados();
                     cl.show(cardPanel, cardName);
+                    break;
+                case "listar_produtos":
+                    cardListarProdutos.atualizarDados();
+                    cl.show(cardPanel, cardName);
+                    break;
+                case "listar_fonecedores":
+                    cardListarFornecedores.atualizarDados();
+                    cl.show(cardPanel, cardName);
+                    break;
                 default:
                     cl.show(cardPanel, cardName);
+                    break;
             }
 
         }
@@ -235,12 +238,12 @@ public class JanelaPrincipal extends javax.swing.JFrame {
         private javax.swing.JPanel jPanel2;
         private javax.swing.JPanel jPanel3;
         private javax.swing.JPanel cardPanel;
-        private javax.swing.JPanel card1;
-        private javax.swing.JPanel card2;
+        private ListarProduto cardListarProdutos;
+        private ListarFornecedor cardListarFornecedores;
         private CadastrarProduto cardCadastroProdutos;
         private CadastrarFornecedor cardCadastroFornecedores;
-        private javax.swing.JPanel cardListarVendas;
-        private javax.swing.JPanel cardListarClientes;
+        private ListarVendas cardListarVendas;
+        private ListarCliente cardListarClientes;
         private CadastrarCliente cardCadastrarClientes;
         private javax.swing.JPanel cardRegistrarVenda;
     }

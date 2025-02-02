@@ -148,7 +148,7 @@ public class RegistrarVenda extends JPanel {
         jButtonCancelar.addActionListener(e -> {
             // Redireciona para "listar_produtos"
             CardLayout cl = (CardLayout) mainPanel.getLayout();
-            cl.show(mainPanel, "card_vendas");
+            cl.show(mainPanel, "listar_vendas");
         });
 
         jButtonCadastrar.setBackground(new Color(0, 128, 17));

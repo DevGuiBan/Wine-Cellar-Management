@@ -19,9 +19,70 @@ import io.github.cdimascio.dotenv.Dotenv;
 
 public class ListarFornecedor extends JPanel {
     private final Dotenv dotenv;
+    private final JRootPane rootPane;
+    private final JPanel mainPanel;
+    private final CadastrarFornecedor cadastrarFornecedor;
 
     public ListarFornecedor(JRootPane rootPane,JPanel mainPanel,CadastrarFornecedor cardCadastroEdicao){
-        this.dotenv = Dotenv.load();
+       this.rootPane = rootPane;
+       this.mainPanel = mainPanel;
+       this.cadastrarFornecedor = cardCadastroEdicao;
+       this.dotenv = Dotenv.load();
+
+       initComponents();
+       getSupplier();
+    }
+
+    private void getSupplier() {
+        try {
+            String urlAPI = this.dotenv.get("API_HOST");
+            URL url = new URL(urlAPI + "/supplier");
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.setRequestMethod("GET");
+
+            int responseCode = connection.getResponseCode();
+            if (responseCode == HttpURLConnection.HTTP_OK) {
+                BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+                StringBuilder response = new StringBuilder();
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    response.append(line);
+                }
+                reader.close();
+
+                JsonArray suppliers = JsonParser.parseString(response.toString()).getAsJsonArray();
+
+                DefaultTableModel tableModel = (DefaultTableModel) jtable.getModel();
+                tableModel.setRowCount(0);
+
+                for (int i = 0; i < suppliers.size(); i++) {
+                    JsonObject supplier = suppliers.get(i).getAsJsonObject();
+                    String id = supplier.get("id").getAsString();
+                    String name = supplier.get("name").getAsString();
+                    String email = supplier.get("email").getAsString();
+                    String cnpj = supplier.get("cnpj").getAsString();
+                    String address = supplier.get("address").getAsString();
+                    String phone = supplier.get("phone_number").getAsString();
+                    String observation = supplier.get("observation").getAsString();
+
+                    tableModel.addRow(new Object[]{id, name, email, cnpj,observation, address, phone});
+                    connection.disconnect();
+                }
+            } else {
+                JOptionPane.showOptionDialog(rootPane,
+                        "Ocorreu um erro ao carregar os fornecedores",
+                        "Problema no Servidor",
+                        JOptionPane.DEFAULT_OPTION,
+                        JOptionPane.ERROR_MESSAGE,
+                        null,null,null);
+                connection.disconnect();
+            }
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(rootPane, e.getMessage());
+        }
+    }
+
+    private void initComponents() {
 
         // iniciando componentes
         jPanel4 = new javax.swing.JPanel();
@@ -137,7 +198,7 @@ public class ListarFornecedor extends JPanel {
         }
 
         jtable.getColumn("Ações").setCellRenderer(new ButtonRendererSupplier());
-        jtable.getColumn("Ações").setCellEditor(new ButtonEditorSupplier(jtable, rootPane,this.dotenv.get("API_HOST"),mainPanel,cardCadastroEdicao));
+        jtable.getColumn("Ações").setCellEditor(new ButtonEditorSupplier(jtable, rootPane,this.dotenv.get("API_HOST"),mainPanel,cadastrarFornecedor));
 
         jScrollPane.setViewportView(jtable);
         jScrollPane.setBorder(javax.swing.BorderFactory.createMatteBorder(2, 2, 2, 2, new java.awt.Color(128, 0, 32)));
@@ -150,56 +211,10 @@ public class ListarFornecedor extends JPanel {
         setBorder(new EmptyBorder(20, 20, 20, 20));
         add(jPanel4);
 
-        getSupplier(rootPane);
     }
 
-    private void getSupplier(JRootPane rootPane) {
-        try {
-            String urlAPI = this.dotenv.get("API_HOST");
-            URL url = new URL(urlAPI + "/supplier");
-            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-            connection.setRequestMethod("GET");
-
-            int responseCode = connection.getResponseCode();
-            if (responseCode == HttpURLConnection.HTTP_OK) {
-                BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-                StringBuilder response = new StringBuilder();
-                String line;
-                while ((line = reader.readLine()) != null) {
-                    response.append(line);
-                }
-                reader.close();
-
-                JsonArray suppliers = JsonParser.parseString(response.toString()).getAsJsonArray();
-
-                DefaultTableModel tableModel = (DefaultTableModel) jtable.getModel();
-                tableModel.setRowCount(0);
-
-                for (int i = 0; i < suppliers.size(); i++) {
-                    JsonObject supplier = suppliers.get(i).getAsJsonObject();
-                    String id = supplier.get("id").getAsString();
-                    String name = supplier.get("name").getAsString();
-                    String email = supplier.get("email").getAsString();
-                    String cnpj = supplier.get("cnpj").getAsString();
-                    String address = supplier.get("address").getAsString();
-                    String phone = supplier.get("phone_number").getAsString();
-                    String observation = supplier.get("observation").getAsString();
-
-                    tableModel.addRow(new Object[]{id, name, email, cnpj,observation, address, phone});
-                    connection.disconnect();
-                }
-            } else {
-                JOptionPane.showOptionDialog(rootPane,
-                        "Ocorreu um erro ao carregar os fornecedores",
-                        "Problema no Servidor",
-                        JOptionPane.DEFAULT_OPTION,
-                        JOptionPane.ERROR_MESSAGE,
-                        null,null,null);
-                connection.disconnect();
-            }
-        } catch (Exception e) {
-            JOptionPane.showMessageDialog(rootPane, e.getMessage());
-        }
+    public void atualizarDados(){
+        this.getSupplier();
     }
 
     // Declaração de variáveis
@@ -293,7 +308,6 @@ class ButtonEditorSupplier extends AbstractCellEditor implements TableCellEditor
         editButton.addActionListener(evt -> {
             int cellIndex = table.getSelectedRow();
             Object cellValue = table.getValueAt(cellIndex,0);
-            JFrame tela = new EditarProduto(cellValue.toString());
             cardF.setId(cellValue.toString());
             CardLayout cl = (CardLayout) mainPanel.getLayout();
             cl.show(mainPanel, "cadastrar_fornecedor");
@@ -304,15 +318,56 @@ class ButtonEditorSupplier extends AbstractCellEditor implements TableCellEditor
         deleteButton.addActionListener(e -> {
             String[] options = {"Cancelar","Excluir"};
             int confirmation = JOptionPane.showOptionDialog(table,
-                    "Deseja excluir o produto? Essa ação não poderá ser desfeita. ",
-                    "Deletar Produto",
+                    "Deseja excluir o fornecedor? Essa ação não poderá ser desfeita. ",
+                    "Deletar Fornecedor",
                     JOptionPane.YES_NO_OPTION,
                     JOptionPane.QUESTION_MESSAGE,
                     null,
                     options,
                     options[0]);
+            if (confirmation == 1) {
+                try{
+                    int cellIndex = table.getSelectedRow();
+                    if (table.isEditing()) {
+                        table.getCellEditor().stopCellEditing();
+                    }
+                    Object cellValue = table.getValueAt(cellIndex,0);
+                    String id_product = cellValue.toString();
+                    URL url = new URL(this.APIURL + "/supplier/" + id_product);
+                    HttpURLConnection connection = (HttpURLConnection) url.openConnection();
 
-            stopCellEditing();
+                    connection.setRequestMethod("DELETE");
+
+                    int responseCode = connection.getResponseCode();
+                    if(responseCode==HttpURLConnection.HTTP_NO_CONTENT || responseCode == HttpURLConnection.HTTP_OK){
+                        ((DefaultTableModel) table.getModel()).removeRow(currentRow);
+                        JOptionPane.showOptionDialog(this.frame,
+                                "O fornecedor foi deletado com sucesso",
+                                "Fornecedor Deletado",
+                                JOptionPane.DEFAULT_OPTION,
+                                JOptionPane.INFORMATION_MESSAGE,
+                                null,
+                                null,
+                                null);
+                    }
+                    else{
+                        JOptionPane.showOptionDialog(this.frame,
+                                "Ocorreu um erro no servidor ao deletar o fornecedor",
+                                "Erro ao deletar fornecedor",
+                                JOptionPane.DEFAULT_OPTION,
+                                JOptionPane.ERROR_MESSAGE,
+                                null,
+                                null,
+                                null);
+                    }
+                } catch (Exception ex) {
+                    JOptionPane.showMessageDialog(this.frame,ex.getMessage());
+                }
+            }
+            else{
+                stopCellEditing();
+            }
+
         });
     }
 

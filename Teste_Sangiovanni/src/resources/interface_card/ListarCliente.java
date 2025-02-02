@@ -22,16 +22,18 @@ public class ListarCliente extends JPanel {
     private JRootPane rootPane;
     private JPanel mainPanel;
     private Dotenv dotenv;
+    private CadastrarCliente card;
 
     public ListarCliente(JRootPane rootPane,JPanel mainPanel,CadastrarCliente cardCli){
       this.rootPane = rootPane;
       this.mainPanel = mainPanel;
       this.dotenv = Dotenv.load();
-      this.initComponents(cardCli);
+      this.card = cardCli;
+      this.initComponents();
       this.getClientes();
     }
 
-    private void initComponents(CadastrarCliente card){
+    private void initComponents(){
         // iniciar Componentes
         jPanelTopoTabela = new javax.swing.JPanel();
         jPanelTabela = new javax.swing.JPanel();
@@ -147,7 +149,7 @@ public class ListarCliente extends JPanel {
         }
 
         jtable.getColumn("Ações").setCellRenderer(new ButtonRendererProductClient());
-        jtable.getColumn("Ações").setCellEditor(new ButtonEditorProductClient(jtable, rootPane,this.dotenv.get("api_host"),card,this.mainPanel));
+        jtable.getColumn("Ações").setCellEditor(new ButtonEditorProductClient(jtable, rootPane,this.dotenv.get("API_HOST"),card,this.mainPanel));
 
         jScrollPane.setViewportView(jtable);
         jScrollPane.setBorder(javax.swing.BorderFactory.createMatteBorder(2, 2, 2, 2, new java.awt.Color(128, 0, 32)));
@@ -161,7 +163,7 @@ public class ListarCliente extends JPanel {
         add(jPanel4);
     }
 
-    public void getClientes(){
+    private void getClientes(){
         try {
             String urlAPI = this.dotenv.get("API_HOST");
             URL url = new URL(urlAPI + "/client");
@@ -208,6 +210,10 @@ public class ListarCliente extends JPanel {
         } catch (Exception e) {
             JOptionPane.showMessageDialog(rootPane, e.getMessage());
         }
+    }
+
+    public void atualizarDados(){
+        this.getClientes();
     }
 
     private javax.swing.JTextField pesquisaProduto;
@@ -310,15 +316,56 @@ class ButtonEditorProductClient extends AbstractCellEditor implements TableCellE
         deleteButton.addActionListener(e -> {
             String[] options = {"Cancelar","Excluir"};
             int confirmation = JOptionPane.showOptionDialog(table,
-                    "Deseja excluir o produto? Essa ação não poderá ser desfeita. ",
-                    "Deletar Produto",
+                    "Deseja excluir o cliente? Essa ação não poderá ser desfeita. ",
+                    "Deletar Cliente",
                     JOptionPane.YES_NO_OPTION,
                     JOptionPane.QUESTION_MESSAGE,
                     null,
                     options,
                     options[0]);
+            if (confirmation == 1) {
+                try{
+                    int cellIndex = table.getSelectedRow();
+                    if (table.isEditing()) {
+                        table.getCellEditor().stopCellEditing();
+                    }
+                    Object cellValue = table.getValueAt(cellIndex,0);
+                    String id_product = cellValue.toString();
+                    URL url = new URL(this.APIURL + "/client/" + id_product);
+                    HttpURLConnection connection = (HttpURLConnection) url.openConnection();
 
-            stopCellEditing();
+                    connection.setRequestMethod("DELETE");
+
+                    int responseCode = connection.getResponseCode();
+                    if(responseCode==HttpURLConnection.HTTP_NO_CONTENT || responseCode == HttpURLConnection.HTTP_OK){
+                        ((DefaultTableModel) table.getModel()).removeRow(currentRow);
+                        JOptionPane.showOptionDialog(this.frame,
+                                "O cliente foi deletado com sucesso",
+                                "Cliente Deletado",
+                                JOptionPane.DEFAULT_OPTION,
+                                JOptionPane.INFORMATION_MESSAGE,
+                                null,
+                                null,
+                                null);
+                    }
+                    else{
+                        JOptionPane.showOptionDialog(this.frame,
+                                "Ocorreu um erro no servidor ao deletar o cliente",
+                                "Erro ao deletar cliente",
+                                JOptionPane.DEFAULT_OPTION,
+                                JOptionPane.ERROR_MESSAGE,
+                                null,
+                                null,
+                                null);
+                    }
+                } catch (Exception ex) {
+                    JOptionPane.showMessageDialog(this.frame,ex.getMessage());
+                }
+            }
+            else{
+                stopCellEditing();
+            }
+
         });
     }
 

@@ -27,11 +27,13 @@ public class CadastrarProduto extends JPanel {
     private JRootPane framePrincipal;
     private JPanel mainPanel;
     private String id;
+    private JanelaPrincipal janelaPrincipal;
 
     public CadastrarProduto(JPanel mainPanel, JRootPane framePrincipal) {
         this.mainPanel = mainPanel;
         this.framePrincipal = framePrincipal;
         this.dotenv = Dotenv.load();
+        this.janelaPrincipal = (JanelaPrincipal) SwingUtilities.getWindowAncestor(framePrincipal);
         this.initComponentes();
         getSupplier();
         getProductType();
@@ -291,10 +293,9 @@ public class CadastrarProduto extends JPanel {
         jButtonCancelar.setFocusPainted(false);
         jButtonCancelar.setBorder(new EmptyBorder(5, 20, 5, 20));
         jButtonCancelar.addActionListener(e -> {
-            // Redireciona para "listar_produtos"
             this.reset();
             CardLayout cl = (CardLayout) mainPanel.getLayout();
-            cl.show(mainPanel, "card1");
+            cl.show(mainPanel, "listar_produtos");
         });
 
         jButtonCadastrar.setBackground(new Color(0, 128, 17));
@@ -302,8 +303,16 @@ public class CadastrarProduto extends JPanel {
         jButtonCadastrar.setForeground(new Color(255, 255, 200));
         jButtonCadastrar.setText("Cadastrar");
         jButtonCadastrar.setFocusPainted(false);
-        jButtonCadastrar.addActionListener(evt->cadastrarProduto());
-
+        jButtonCadastrar.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (id == null) {
+                    cadastrarProduto();
+                } else  {
+                    editarProduto();
+                }
+            }
+        });
 
         jPanel.add(jPanelContent);
 
@@ -786,8 +795,6 @@ public class CadastrarProduto extends JPanel {
             String name = jTextFieldNome.getText();
             Integer quantity = (Integer) jSpinnerQuantidade.getValue();
             Double price = (Double)jSpinnerPrecoVenda.getValue();
-            System.out.println(quantity);
-
             String description = jTextFieldDescricao.getText();
             Supplier id_supplier = (Supplier) Objects.requireNonNull(jComboBoxSupplier.getSelectedItem());
             ProductType id_product_type = (ProductType) Objects.requireNonNull(jComboBoxProductType.getSelectedItem());
@@ -820,6 +827,7 @@ public class CadastrarProduto extends JPanel {
 
             if (statusCode >= 200 && statusCode <= 300) {
                 this.reset();
+                this.janelaPrincipal.showCard("listar_produtos");
                 JOptionPane.showOptionDialog(this.framePrincipal,
                         "O Produto foi cadastrado com sucesso!",
                         "Produto Cadastrado",
@@ -840,6 +848,74 @@ public class CadastrarProduto extends JPanel {
                 JOptionPane.showOptionDialog(this.framePrincipal,
                         "Não foi possível cadastrar o produto, verifique as informações dos campos e tente novamente!\n" + response.toString(),
                         "Produto Não Cadastrado",
+                        JOptionPane.DEFAULT_OPTION,
+                        JOptionPane.ERROR_MESSAGE,
+                        null,null,null);
+            }
+
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this.framePrincipal, e.getMessage());
+        }
+    }
+
+    private void editarProduto(){
+        try {
+            String name = jTextFieldNome.getText();
+            Integer quantity = (Integer) jSpinnerQuantidade.getValue();
+            Double price = (Double)jSpinnerPrecoVenda.getValue();
+            String description = jTextFieldDescricao.getText();
+            Supplier id_supplier = (Supplier) Objects.requireNonNull(jComboBoxSupplier.getSelectedItem());
+            ProductType id_product_type = (ProductType) Objects.requireNonNull(jComboBoxProductType.getSelectedItem());
+
+            JsonObject jsonData = new JsonObject();
+            jsonData.addProperty("name", name);
+            jsonData.addProperty("quantity", quantity);
+            jsonData.addProperty("price", price);
+            jsonData.addProperty("description", description);
+            jsonData.addProperty("id_supplier", id_supplier.getId());
+            jsonData.addProperty("id_product_type", id_product_type.getId());
+
+            // making the request
+            String urlAPI = this.dotenv.get("API_HOST");
+            URL url = new URL(urlAPI + "/product/"+this.id);
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.setRequestMethod("PUT");
+            connection.setRequestProperty("Content-Type", "application/json");
+            connection.setDoOutput(true);
+
+            // send the request with json
+            try (OutputStream os = connection.getOutputStream()) {
+                byte[] input = jsonData.toString().getBytes(StandardCharsets.UTF_8);
+                os.write(input, 0, input.length);
+            }
+
+            int statusCode = connection.getResponseCode();
+            StringBuilder response = new StringBuilder();
+
+            if (statusCode >= 200 && statusCode <= 300) {
+                this.reset();
+                this.id = null;
+                janelaPrincipal.showCard("listar_produtos");
+                JOptionPane.showOptionDialog(this.framePrincipal,
+                        "O Produto foi atualizado com sucesso!",
+                        "Produto Atualizado",
+                        JOptionPane.DEFAULT_OPTION,
+                        JOptionPane.INFORMATION_MESSAGE,
+                        null,null,null);
+                connection.disconnect();
+
+
+            } else {
+                try (BufferedReader br = new BufferedReader(new InputStreamReader(connection.getErrorStream(), "utf-8"))) {
+                    String responseLine;
+                    while ((responseLine = br.readLine()) != null) {
+                        response.append(responseLine.trim());
+                    }
+                }
+                connection.disconnect();
+                JOptionPane.showOptionDialog(this.framePrincipal,
+                        "Não foi possível atualizar o produto, verifique as informações dos campos e tente novamente!\n" + response.toString(),
+                        "Produto Não atualizado",
                         JOptionPane.DEFAULT_OPTION,
                         JOptionPane.ERROR_MESSAGE,
                         null,null,null);
