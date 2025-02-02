@@ -16,7 +16,7 @@ public class SupplierDTO {
     private String name;
 
     @NotBlank(message = "O endereço é obrigatório")
-    @Pattern(regexp = "^(.+?) - (.+?) - (\\d+) - ([A-Z]{2})$",message = "O Endereço deve ser no formato Rua - Bairro - N° - UF")
+    @Pattern(regexp = "^(.+?), (.+?), (\\d+), (.+)-([A-Z]{2})$",message = "O Endereço deve ser no formato Rua, Bairro, Número, Cidade-UF")
     private String address;
 
     @NotBlank(message = "O número de telefone é necessário")

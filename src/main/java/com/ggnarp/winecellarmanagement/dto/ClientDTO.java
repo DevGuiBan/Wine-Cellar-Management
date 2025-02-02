@@ -26,7 +26,7 @@ public class ClientDTO {
     private String phoneNumber;
 
     @NotBlank(message = "O endereço é necessário!")
-    @Pattern(regexp = "^(.+?) - (.+?) - (\\d+) - ([A-Z]{2})$",message = "O Endereço deve ser no formato Rua - Bairro - N° - UF")
+    @Pattern(regexp = "^(.+?), (.+?), (\\d+), (.+)-([A-Z]{2})$",message = "O Endereço deve ser no formato Rua, Bairro, Número, Cidade-UF")
     private String address;
 
     @NotNull

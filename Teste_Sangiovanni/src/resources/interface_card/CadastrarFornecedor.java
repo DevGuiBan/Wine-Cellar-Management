@@ -228,11 +228,11 @@ public class CadastrarFornecedor extends JPanel {
         jTextFieldEndereco.setFont(new Font("Cormorant Garamond", 1, 18));
         jTextFieldEndereco.setBorder(new MatteBorder(2, 2, 2, 2, new Color(128, 0, 32)));
         jTextFieldEndereco.setPreferredSize(fieldSize);
-        jTextFieldEndereco.setText("Rua - Bairro - Número - UF");
+        jTextFieldEndereco.setText("Rua, Bairro, Número, Cidade-UF");
         jTextFieldEndereco.addFocusListener(new java.awt.event.FocusListener() {
             @Override
             public void focusGained(java.awt.event.FocusEvent evt) {
-                if (jTextFieldEndereco.getText().equals("Rua - Bairro - Número - UF")) {
+                if (jTextFieldEndereco.getText().equals("Rua, Bairro, Número, Cidade-UF")) {
                     jTextFieldEndereco.setText("");
                 }
             }
@@ -240,7 +240,7 @@ public class CadastrarFornecedor extends JPanel {
             @Override
             public void focusLost(java.awt.event.FocusEvent evt) {
                 if (jTextFieldEndereco.getText().isEmpty()) {
-                    jTextFieldEndereco.setText("Rua - Bairro - Número - UF");
+                    jTextFieldEndereco.setText("Rua, Bairro, Número, Cidade-UF");
                 }
             }
         });

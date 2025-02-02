@@ -223,11 +223,11 @@ public class CadastrarCliente extends JPanel {
         this.jTextFieldEndereco.setFont(new Font("Cormorant Garamond", 1, 18));
         this.jTextFieldEndereco.setBorder(new MatteBorder(2, 2, 2, 2, new Color(128, 0, 32)));
         this.jTextFieldEndereco.setPreferredSize(fieldSize);
-        this.jTextFieldEndereco.setText("Rua - Bairro - Número - UF");
+        this.jTextFieldEndereco.setText("Rua, Bairro, Número, Cidade-UF");
         this.jTextFieldEndereco.addFocusListener(new FocusListener() {
             @Override
             public void focusGained(FocusEvent evt) {
-                if (jTextFieldEndereco.getText().equals("Rua - Bairro - Número - UF")) {
+                if (jTextFieldEndereco.getText().equals("Rua, Bairro, Número, Cidade-UF")) {
                     jTextFieldEndereco.setText("");
                 }
             }
@@ -235,7 +235,7 @@ public class CadastrarCliente extends JPanel {
             @Override
             public void focusLost(FocusEvent evt) {
                 if (jTextFieldEndereco.getText().isEmpty()) {
-                    jTextFieldEndereco.setText("Rua - Bairro - Número - UF");
+                    jTextFieldEndereco.setText("Rua, Bairro, Número, Cidade-UF");
                 }
             }
         });
