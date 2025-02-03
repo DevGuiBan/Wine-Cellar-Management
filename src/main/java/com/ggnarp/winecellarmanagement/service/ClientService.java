@@ -10,6 +10,8 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.UUID;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 @Service
@@ -30,6 +32,9 @@ public class ClientService {
         }
         if(this.clientRepository.existsClientByPhoneNumber(clientDTO.getPhoneNumber())) {
             throw new IllegalArgumentException("Já existe um cliente cadastrado com esse número de telefone");
+        }
+        if(clientDTO.getDate_brith().equals(" / / ")){
+            throw new IllegalArgumentException("A data de nascimento não pode ser vázia!");
         }
 
         Client client = new Client();
@@ -74,24 +79,37 @@ public class ClientService {
                         existingClient.setName(clientDTO.getName());
                     }
                     if (clientDTO.getAddress() != null) {
-                        existingClient.setAddress(clientDTO.getAddress());
+                        String regex = "^(.+?), (.+?), (\\d+), (.+)-([A-Z]{2})$";
+                        Pattern pattern = Pattern.compile(regex);
+                        Matcher matcher = pattern.matcher(clientDTO.getAddress());
+                        if(matcher.matches()){
+                            existingClient.setAddress(clientDTO.getAddress());
+                        }else{
+                            throw new IllegalArgumentException("O Endereço deve ser no formato Rua, Bairro, Número, Cidade-UF");
+                        }
+
                     }
                     if (clientDTO.getPhoneNumber() != null && !clientDTO.getPhoneNumber().isBlank()) {
-                        if(!clientDTO.getPhoneNumber().equals(existingClient.getPhoneNumber())) {
+                        if(!this.clientRepository.existsClientByPhoneNumber(clientDTO.getPhoneNumber())) {
                             existingClient.setPhoneNumber(clientDTO.getPhoneNumber());
                         }
 
                     }
                     if (clientDTO.getEmail() != null && !clientDTO.getEmail().isBlank()) {
-                        if(!clientDTO.getEmail().equals(existingClient.getEmail())){
+                        if(!this.clientRepository.existsByEmail(clientDTO.getEmail())){
                             existingClient.setEmail(clientDTO.getEmail());
                         }
 
                     }
                     if(clientDTO.getDate_brith()!= null && !clientDTO.getDate_brith().isBlank()){
-                        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-                        LocalDate data = LocalDate.parse(clientDTO.getDate_brith(), formatter);
-                        existingClient.setDate_brith(data);
+                        if(" / / ".equals(clientDTO.getDate_brith())){
+                            throw new IllegalArgumentException("A data não pode ser vázia!");
+                        }else {
+                            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+                            LocalDate data = LocalDate.parse(clientDTO.getDate_brith(), formatter);
+                            existingClient.setDate_brith(data);
+                        }
+
                     }
                     if(clientDTO.getCpf() != null && !clientDTO.getCpf().isBlank()){
                         if(!clientDTO.getCpf().equals(existingClient.getCpf())) {

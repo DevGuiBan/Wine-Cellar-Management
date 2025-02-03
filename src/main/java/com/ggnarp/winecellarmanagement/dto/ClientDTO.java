@@ -29,7 +29,7 @@ public class ClientDTO {
     @Pattern(regexp = "^(.+?), (.+?), (\\d+), (.+)-([A-Z]{2})$",message = "O Endereço deve ser no formato Rua, Bairro, Número, Cidade-UF")
     private String address;
 
-    @NotNull
+    @NotBlank
     private String date_brith;
 
     @NotBlank

@@ -499,7 +499,6 @@ public class CadastrarCliente extends JPanel {
     public void reset(){
         this.jTextFieldDataNascimento.setText("");
         this.jButtonCadastrar.setText("Cadastrar");
-        this.jButtonCadastrar.addActionListener(evt->cadastrarCliente());
         this.jTextFieldCPF.setText("");
         this.jTextFieldEndereco.setText("");
         this.jTextFieldEmail.setText("");
