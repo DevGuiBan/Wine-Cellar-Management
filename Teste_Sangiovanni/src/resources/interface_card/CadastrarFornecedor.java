@@ -366,7 +366,7 @@ public class CadastrarFornecedor extends JPanel {
         jTextFieldEndereco.setText("Rua - Bairro - Número - UF");
         jTextFieldObservacoes.setText("");
         this.jButtonCadastrar.setText("Cadastrar");
-        this.jLabelCadastro.setText("CadastrarFornecedor Fornecedor");
+        this.jLabelCadastro.setText("Cadastrar Fornecedor");
     }
 
     private void cadastrarFornecedor(){

@@ -1004,6 +1004,11 @@ public class CadastrarProduto extends JPanel {
         }
     }
 
+    public void atualizarDados(){
+        this.getSupplier();
+        this.getProductType();
+    }
+
     // componentes que vão ser usados na tela, só o essencial e com os nomes certinhos
     private JLabel jLabelCadastro;
     private JLabel jLabelNome;

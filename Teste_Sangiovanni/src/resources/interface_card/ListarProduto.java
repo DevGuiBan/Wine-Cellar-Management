@@ -92,8 +92,8 @@ public class ListarProduto extends JPanel {
         jButtonCadastrar.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         jButtonCadastrar.setPreferredSize(new java.awt.Dimension(200, 40));
         jButtonCadastrar.addActionListener(e -> {
-            // Redireciona para "listar_produtos"
             CardLayout cl = (CardLayout) mainPanel.getLayout();
+            cadastrarProduto.atualizarDados();
             cl.show(mainPanel, "cadastrar_produto");
         });
 
