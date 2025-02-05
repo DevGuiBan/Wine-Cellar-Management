@@ -163,7 +163,7 @@ public class RegistrarVenda extends JPanel {
         jButtonCadastrar.setCursor(new Cursor(Cursor.HAND_CURSOR));
         jButtonCadastrar.setFocusPainted(false);
 
-        jButtonAdicionarCarrinho.setBackground(new Color(28, 128, 120));
+        jButtonAdicionarCarrinho.setBackground(new Color(0, 28, 128));
         jButtonAdicionarCarrinho.setFont(new Font("Cormorant Garamond SemiBold", 1, 22));
         jButtonAdicionarCarrinho.setForeground(new Color(255, 255, 200));
         jButtonAdicionarCarrinho.setPreferredSize(new Dimension(300, 40));
