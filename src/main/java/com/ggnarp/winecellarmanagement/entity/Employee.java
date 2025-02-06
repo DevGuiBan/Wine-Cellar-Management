@@ -9,12 +9,12 @@ import java.time.LocalDate;
 import java.util.UUID;
 
 @Entity
-@Table(name = "client")
+@Table(name = "employee")
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class Client {
 
+public class Employee {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
@@ -22,18 +22,18 @@ public class Client {
     @Column(nullable = false)
     private String name;
 
-    @Column(nullable = false, unique = true)
-    private String email;
+    @Column(nullable = false)
+    private LocalDate date_birth;
 
-    @Column(nullable = false,unique = true,name = "phone_number")
-    private String phoneNumber;
+    @Column(nullable = false,unique = true,length = 14)
+    private String cpf;
 
     @Column(nullable = false)
     private String address;
 
-    @Column(nullable = false)
-    private LocalDate date_brith;
-
     @Column(nullable = false,unique = true)
-    private String cpf;
+    private String email;
+
+    @Column(nullable = false,unique = false,length = 15,name = "phone_number")
+    private String phoneNumber;
 }
