@@ -117,6 +117,7 @@ public class CadastrarFornecedor extends JPanel {
 
         jLabelNome.setFont(new Font("Cormorant Garamond", 1, 18));
         jLabelNome.setText("Nome:");
+        jLabelNome.setForeground(Color.BLACK);
         gbc.gridx = 0; // coluna
         gbc.gridy = 0; // linha
         gbc.insets = new Insets(0, 0, 0, 100); // adicionar espaçamento por componente
@@ -126,13 +127,14 @@ public class CadastrarFornecedor extends JPanel {
         jTextFieldNome.setBorder(new MatteBorder(2, 2, 2, 2, new Color(128, 0, 32)));
         jTextFieldNome.setFont(new Font("Cormorant Garamond", 1, 18));
         jTextFieldNome.setPreferredSize(fieldSize);
+        jTextFieldNome.setForeground(Color.BLACK);
         jTextFieldNome.setText("Nome do Fornecedor");
         jTextFieldNome.addFocusListener(new FocusAdapter() { // adicionar um evento ao clicar no campo
             @Override
             public void focusGained(FocusEvent e) { // clicou
                 if (jTextFieldNome.getText().equals("Nome do Fornecedor")) {
                     jTextFieldNome.setText("");
-                    jTextFieldNome.setForeground(Color.GRAY);
+                    jTextFieldNome.setForeground(Color.BLACK);
                 }
             }
 
@@ -140,7 +142,7 @@ public class CadastrarFornecedor extends JPanel {
             public void focusLost(FocusEvent e) { // clicou em outra coisa
                 if (jTextFieldNome.getText().isEmpty()) {
                     jTextFieldNome.setText("Nome do Fornecedor");
-                    jTextFieldNome.setForeground(Color.GRAY);
+                    jTextFieldNome.setForeground(Color.BLACK);
                 }
             }
         });
@@ -151,6 +153,7 @@ public class CadastrarFornecedor extends JPanel {
 
         jLabelTelefone.setFont(new Font("Cormorant Garamond", 1, 18));
         jLabelTelefone.setText("Telefone:");
+        jLabelTelefone.setForeground(Color.BLACK);
         gbc.gridx = 1;
         gbc.gridy = 0;
         gbc.insets = new Insets(0, 0, 0, 0);
@@ -158,7 +161,8 @@ public class CadastrarFornecedor extends JPanel {
 
         jTextFieldTelefone.setBackground(new Color(255, 255, 255));
         jTextFieldTelefone.setBorder(new MatteBorder(2, 2, 2, 2, new Color(128, 0, 32)));
-        jTextFieldTelefone.setFont(new Font("Cormorant Garamond", 1, 18));
+        jTextFieldTelefone.setFont(new Font("Cormorant Infant", 1, 18));
+        jTextFieldTelefone.setForeground(Color.BLACK);
         jTextFieldTelefone.setPreferredSize(fieldSize);
         gbc.gridx = 1;
         gbc.gridy = 1;
@@ -166,6 +170,7 @@ public class CadastrarFornecedor extends JPanel {
         jPanelContent.add(jTextFieldTelefone, gbc);
 
         jLabelCNPJ.setFont(new Font("Cormorant Garamond", 1, 18));
+        jLabelCNPJ.setForeground(Color.BLACK);
         jLabelCNPJ.setText("CNPJ:");
         gbc.gridx = 0;
         gbc.gridy = 2;
@@ -174,7 +179,8 @@ public class CadastrarFornecedor extends JPanel {
 
         jTextFieldCPNJ.setBackground(new Color(255, 255, 255));
         jTextFieldCPNJ.setBackground(Color.WHITE);
-        jTextFieldCPNJ.setFont(new Font("Cormorant Garamond", Font.BOLD, 18));
+        jTextFieldCPNJ.setForeground(Color.BLACK);
+        jTextFieldCPNJ.setFont(new Font("Cormorant Infant", Font.BOLD, 18));
         jTextFieldCPNJ.setBorder(new MatteBorder(2, 2, 2, 2, new Color(128, 0, 32)));
         jTextFieldCPNJ.setPreferredSize(fieldSize);
         gbc.gridx = 0;
@@ -183,6 +189,7 @@ public class CadastrarFornecedor extends JPanel {
         jPanelContent.add(jTextFieldCPNJ, gbc);
 
         jLabelEmail.setText("E-mail:");
+        jLabelEmail.setForeground(Color.BLACK);
         jLabelEmail.setFont(new Font("Cormorant Garamond", 1, 18));
         gbc.gridx = 1;
         gbc.gridy = 2;
@@ -193,13 +200,14 @@ public class CadastrarFornecedor extends JPanel {
         jTextFieldEmail.setFont(new Font("Cormorant Garamond", 1, 18));
         jTextFieldEmail.setBorder(new MatteBorder(2, 2, 2, 2, new Color(128, 0, 32)));
         jTextFieldEmail.setPreferredSize(fieldSize);
+        jTextFieldEmail.setForeground(Color.BLACK);
         jTextFieldEmail.setText("email@gmail.com");
         jTextFieldEmail.addFocusListener(new FocusAdapter() {
             @Override
             public void focusGained(FocusEvent e) {
                 if (jTextFieldEmail.getText().equals("email@gmail.com")) {
                     jTextFieldEmail.setText("");
-                    jTextFieldEmail.setForeground(Color.GRAY);
+                    jTextFieldEmail.setForeground(Color.BLACK);
                 }
             }
 
@@ -207,7 +215,7 @@ public class CadastrarFornecedor extends JPanel {
             public void focusLost(FocusEvent e) {
                 if (jTextFieldEmail.getText().isEmpty()) {
                     jTextFieldEmail.setText("email@gmail.com");
-                    jTextFieldEmail.setForeground(Color.GRAY);
+                    jTextFieldEmail.setForeground(Color.BLACK);
                 }
             }
         });
@@ -218,6 +226,7 @@ public class CadastrarFornecedor extends JPanel {
 
         jLabelEndereco.setFont(new Font("Cormorant Garamond", 1, 18));
         jLabelEndereco.setText("Endereço:");
+        jLabelEndereco.setForeground(Color.BLACK);
         jLabelEndereco.setBackground(Color.WHITE);
         gbc.gridx = 0;
         gbc.gridy = 4;
@@ -225,9 +234,10 @@ public class CadastrarFornecedor extends JPanel {
         jPanelContent.add(jLabelEndereco, gbc);
 
         jTextFieldEndereco.setBackground(Color.WHITE);
-        jTextFieldEndereco.setFont(new Font("Cormorant Garamond", 1, 18));
+        jTextFieldEndereco.setFont(new Font("Cormorant Infant", 1, 18));
         jTextFieldEndereco.setBorder(new MatteBorder(2, 2, 2, 2, new Color(128, 0, 32)));
         jTextFieldEndereco.setPreferredSize(fieldSize);
+        jTextFieldEndereco.setForeground(Color.BLACK);
         jTextFieldEndereco.setText("Rua, Bairro, Número, Cidade-UF");
         jTextFieldEndereco.addFocusListener(new java.awt.event.FocusListener() {
             @Override
@@ -251,6 +261,7 @@ public class CadastrarFornecedor extends JPanel {
 
         jLabelObservacoes.setFont(new Font("Cormorant Garamond", 1, 18));
         jLabelObservacoes.setText("Observações:");
+        jLabelObservacoes.setForeground(Color.BLACK);
         gbc.gridx = 1;
         gbc.gridy = 4;
         gbc.insets = new Insets(0, 0, 0, 0);
@@ -259,6 +270,7 @@ public class CadastrarFornecedor extends JPanel {
         jTextFieldObservacoes.setBackground(new Color(255, 255, 255));
         jTextFieldObservacoes.setBorder(new MatteBorder(2, 2, 2, 2, new Color(128, 0, 32)));
         jTextFieldObservacoes.setPreferredSize(fieldSize);
+        jTextFieldObservacoes.setForeground(Color.BLACK);
         jTextFieldObservacoes.setFont(new Font("Cormorant Garamond", 1, 18));
         gbc.gridx = 1;
         gbc.gridy = 5;
@@ -267,7 +279,7 @@ public class CadastrarFornecedor extends JPanel {
 
 
         jButtonCancelar.setBackground(new Color(225, 225, 200));
-        jButtonCancelar.setFont(new Font("Cormorant Garamond SemiBold", 0, 18));
+        jButtonCancelar.setFont(new Font("Cormorant Garamond Bold", 1, 18));
         jButtonCancelar.setText("Cancelar");
         jButtonCancelar.setFocusPainted(false);
         jButtonCancelar.setBorder(new EmptyBorder(5,20,5,20));
@@ -278,7 +290,8 @@ public class CadastrarFornecedor extends JPanel {
         });
 
         jButtonCadastrar.setBackground(new Color(0, 128, 17));
-        jButtonCadastrar.setFont(new Font("Cormorant Garamond SemiBold", 0, 18));
+        jButtonCadastrar.setFont(new Font("Cormorant Garamond Bold", 1
+                , 18));
         jButtonCadastrar.setForeground(new Color(255, 255, 200));
         jButtonCadastrar.setText("Cadastrar");
         jButtonCadastrar.setFocusPainted(false);

@@ -135,6 +135,7 @@ public class CadastrarProduto extends JPanel {
 
         jLabelNome.setFont(new Font("Cormorant Garamond", 1, 18));
         jLabelNome.setText("Nome:");
+        jLabelNome.setForeground(Color.BLACK);
         gbc.gridx = 0; // coluna
         gbc.gridy = 0; // linha
         gbc.insets = new Insets(0, 0, 0, 100); // adicionar espaçamento por componente
@@ -144,13 +145,14 @@ public class CadastrarProduto extends JPanel {
         jTextFieldNome.setBorder(new MatteBorder(2, 2, 2, 2, new Color(128, 0, 32)));
         jTextFieldNome.setFont(new Font("Cormorant Garamond", 1, 18));
         jTextFieldNome.setPreferredSize(fieldSize);
+        jTextFieldNome.setForeground(Color.BLACK);
         jTextFieldNome.setText("Nome do Produto");
         jTextFieldNome.addFocusListener(new FocusAdapter() { // adicionar um evento ao clicar no campo
             @Override
             public void focusGained(FocusEvent e) { // clicou
                 if (jTextFieldNome.getText().equals("Nome do Produto")) {
                     jTextFieldNome.setText("");
-                    jTextFieldNome.setForeground(Color.GRAY);
+                    jTextFieldNome.setForeground(Color.BLACK);
                 }
             }
 
@@ -158,7 +160,7 @@ public class CadastrarProduto extends JPanel {
             public void focusLost(FocusEvent e) { // clicou em outra coisa
                 if (jTextFieldNome.getText().isEmpty()) {
                     jTextFieldNome.setText("Nome do Produto");
-                    jTextFieldNome.setForeground(Color.GRAY);
+                    jTextFieldNome.setForeground(Color.BLACK);
                 }
             }
         });
@@ -169,6 +171,7 @@ public class CadastrarProduto extends JPanel {
 
         jLabelDescricao.setFont(new Font("Cormorant Garamond", 1, 18));
         jLabelDescricao.setText("Descrição:");
+        jLabelDescricao.setForeground(Color.BLACK);
         gbc.gridx = 1;
         gbc.gridy = 0;
         gbc.insets = new Insets(0, 0, 0, 0);
@@ -178,6 +181,7 @@ public class CadastrarProduto extends JPanel {
         jTextFieldDescricao.setBorder(new MatteBorder(2, 2, 2, 2, new Color(128, 0, 32)));
         jTextFieldDescricao.setFont(new Font("Cormorant Garamond", 1, 18));
         jTextFieldDescricao.setPreferredSize(fieldSize);
+        jTextFieldDescricao.setForeground(Color.BLACK);
         jTextFieldDescricao.setText("Descrição do Produto");
         jTextFieldDescricao.addFocusListener(new FocusAdapter() {
             @Override
@@ -203,6 +207,7 @@ public class CadastrarProduto extends JPanel {
 
         jLabelFornecedor.setFont(new Font("Cormorant Garamond", 1, 18));
         jLabelFornecedor.setText("Fornecedor:");
+        jLabelFornecedor.setForeground(Color.BLACK);
         gbc.gridx = 0;
         gbc.gridy = 2;
         gbc.insets = new Insets(0, 0, 0, 100);
@@ -210,6 +215,7 @@ public class CadastrarProduto extends JPanel {
 
         jComboBoxSupplier.setBackground(new Color(255, 255, 255));
         jComboBoxSupplier.setBackground(Color.WHITE);
+        jComboBoxSupplier.setForeground(Color.BLACK);
         jComboBoxSupplier.setFont(new Font("Cormorant Garamond", Font.BOLD, 18));
         jComboBoxSupplier.setBorder(new MatteBorder(2, 2, 2, 2, new Color(128, 0, 32)));
         jComboBoxSupplier.setPreferredSize(fieldSize);
@@ -220,6 +226,7 @@ public class CadastrarProduto extends JPanel {
 
         jLabelQuantidade.setBackground(Color.WHITE);
         jLabelQuantidade.setText("Quantidade:");
+        jLabelQuantidade.setForeground(Color.BLACK);
         jLabelQuantidade.setFont(new Font("Cormorant Garamond", 1, 18));
         gbc.gridx = 1;
         gbc.gridy = 2;
@@ -227,8 +234,9 @@ public class CadastrarProduto extends JPanel {
         jPanelContent.add(jLabelQuantidade, gbc);
 
         jSpinnerQuantidade.setBackground(Color.WHITE);
-        jSpinnerQuantidade.setFont(new Font("Cormorant Garamond", 1, 18));
+        jSpinnerQuantidade.setFont(new Font("Cormorant Infant", 1, 18));
         jSpinnerQuantidade.setBorder(new MatteBorder(2, 2, 2, 2, new Color(128, 0, 32)));
+        jSpinnerQuantidade.setForeground(Color.BLACK);
         jSpinnerQuantidade.setPreferredSize(fieldSize);
         gbc.gridx = 1;
         gbc.gridy = 3;
@@ -237,6 +245,7 @@ public class CadastrarProduto extends JPanel {
 
         jLabelPrecoVenda.setFont(new Font("Cormorant Garamond", 1, 18));
         jLabelPrecoVenda.setText("Preço de Venda:");
+        jLabelPrecoVenda.setForeground(Color.BLACK);
         jLabelPrecoVenda.setBackground(Color.WHITE);
         gbc.gridx = 0;
         gbc.gridy = 4;
@@ -244,9 +253,10 @@ public class CadastrarProduto extends JPanel {
         jPanelContent.add(jLabelPrecoVenda, gbc);
 
         jSpinnerPrecoVenda.setBackground(Color.WHITE);
-        jSpinnerPrecoVenda.setFont(new Font("Cormorant Garamond", 1, 18));
+        jSpinnerPrecoVenda.setFont(new Font("Cormorant Infant", 1, 18));
         jSpinnerPrecoVenda.setBorder(new MatteBorder(2, 2, 2, 2, new Color(128, 0, 32)));
         jSpinnerPrecoVenda.setPreferredSize(fieldSize);
+        jSpinnerPrecoVenda.setForeground(Color.BLACK);
         JSpinner.NumberEditor editor = new JSpinner.NumberEditor(jSpinnerPrecoVenda, "0.00"); // máscara de preço pro spinner
         jSpinnerPrecoVenda.setEditor(editor);
         gbc.gridx = 0;
@@ -256,6 +266,7 @@ public class CadastrarProduto extends JPanel {
 
         jLabelTipoProduto.setFont(new Font("Cormorant Garamond", 1, 18));
         jLabelTipoProduto.setText("Tipo:");
+        jLabelTipoProduto.setForeground(Color.BLACK);
         gbc.gridx = 1;
         gbc.gridy = 4;
         gbc.insets = new Insets(0, 0, 0, 0);
@@ -264,6 +275,7 @@ public class CadastrarProduto extends JPanel {
         jComboBoxProductType.setBackground(new Color(255, 255, 255));
         jComboBoxProductType.setBorder(new MatteBorder(2, 2, 2, 2, new Color(128, 0, 32)));
         jComboBoxProductType.setPreferredSize(fieldSize);
+        jComboBoxProductType.setForeground(Color.BLACK);
         jComboBoxProductType.addItemListener(new ItemListener() {
             @Override
             public void itemStateChanged(ItemEvent e) {

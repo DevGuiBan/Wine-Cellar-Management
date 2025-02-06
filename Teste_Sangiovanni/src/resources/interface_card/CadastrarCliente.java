@@ -69,9 +69,9 @@ public class CadastrarCliente extends JPanel {
         jSeparator = new JSeparator();
 
         // configuração do card
-        setBackground(new Color(243, 243, 223));
-        setPreferredSize(new Dimension(1366, 650)); // tamanho do painel que tem tudo
-        setLayout(new FlowLayout(FlowLayout.CENTER,30,30));
+        this.setBackground(new Color(243, 243, 223));
+        this.setPreferredSize(new Dimension(1366, 650)); // tamanho do painel que tem tudo
+        this.setLayout(new FlowLayout(FlowLayout.CENTER,30,30));
 
         this.gbc.fill = GridBagConstraints.HORIZONTAL; // Permitir redimensionamento horizontal
         this.gbc.anchor = GridBagConstraints.WEST; // Alinhamento à esquerda
@@ -112,6 +112,7 @@ public class CadastrarCliente extends JPanel {
 
         this.jLabelNome.setFont(new Font("Cormorant Garamond", 1, 18));
         this.jLabelNome.setText("Nome:");
+        this.jLabelNome.setForeground(Color.BLACK);
         this.gbc.gridx = 0; // coluna
         this.gbc.gridy = 0; // linha
         this.gbc.insets = new Insets(0, 0, 0, 100); // adicionar espaçamento por componente
@@ -121,13 +122,14 @@ public class CadastrarCliente extends JPanel {
         this.jTextFieldNome.setBorder(new MatteBorder(2, 2, 2, 2, new Color(128, 0, 32)));
         this.jTextFieldNome.setFont(new Font("Cormorant Garamond", 1, 18));
         this.jTextFieldNome.setPreferredSize(fieldSize);
+        this.jTextFieldNome.setForeground(Color.BLACK);
         this.jTextFieldNome.setText("Nome Completo");
         this.jTextFieldNome.addFocusListener(new FocusAdapter() { // adicionar um evento ao clicar no campo
             @Override
             public void focusGained(FocusEvent e) { // clicou
                 if (jTextFieldNome.getText().equals("Nome Completo")) {
                     jTextFieldNome.setText("");
-                    jTextFieldNome.setForeground(Color.GRAY);
+                    jTextFieldNome.setForeground(Color.BLACK);
                 }
             }
 
@@ -135,7 +137,7 @@ public class CadastrarCliente extends JPanel {
             public void focusLost(FocusEvent e) { // clicou em outra coisa
                 if (jTextFieldNome.getText().isEmpty()) {
                     jTextFieldNome.setText("Nome Completo");
-                    jTextFieldNome.setForeground(Color.GRAY);
+                    jTextFieldNome.setForeground(Color.BLACK);
                 }
             }
         });
@@ -146,6 +148,7 @@ public class CadastrarCliente extends JPanel {
 
         this.jLabelTelefone.setFont(new Font("Cormorant Garamond", 1, 18));
         this.jLabelTelefone.setText("Telefone:");
+        this.jLabelTelefone.setForeground(Color.BLACK);
         this.gbc.gridx = 1;
         this.gbc.gridy = 0;
         this.gbc.insets = new Insets(0, 0, 0, 0);
@@ -153,7 +156,8 @@ public class CadastrarCliente extends JPanel {
 
         this.jTextFieldTelefone.setBackground(new Color(255, 255, 255));
         this.jTextFieldTelefone.setBorder(new MatteBorder(2, 2, 2, 2, new Color(128, 0, 32)));
-        this.jTextFieldTelefone.setFont(new Font("Cormorant Garamond", 1, 18));
+        this.jTextFieldTelefone.setFont(new Font("Cormorant Infant", 1, 18));
+        this.jTextFieldTelefone.setForeground(Color.BLACK);
         this.jTextFieldTelefone.setPreferredSize(fieldSize);
         this.gbc.gridx = 1;
         this.gbc.gridy = 1;
@@ -162,6 +166,7 @@ public class CadastrarCliente extends JPanel {
 
         this.jLabelCPF.setFont(new Font("Cormorant Garamond", 1, 18));
         this.jLabelCPF.setText("CPF:");
+        this.jLabelCPF.setForeground(Color.BLACK);
         this.gbc.gridx = 0;
         this.gbc.gridy = 2;
         this.gbc.insets = new Insets(0, 0, 0, 100);
@@ -169,7 +174,8 @@ public class CadastrarCliente extends JPanel {
 
         this.jTextFieldCPF.setBackground(new Color(255, 255, 255));
         this.jTextFieldCPF.setBackground(Color.WHITE);
-        this.jTextFieldCPF.setFont(new Font("Cormorant Garamond", Font.BOLD, 18));
+        this.jTextFieldCPF.setForeground(Color.BLACK);
+        this.jTextFieldCPF.setFont(new Font("Cormorant Infant", Font.BOLD, 18));
         this.jTextFieldCPF.setBorder(new MatteBorder(2, 2, 2, 2, new Color(128, 0, 32)));
         this.jTextFieldCPF.setPreferredSize(fieldSize);
         this.gbc.gridx = 0;
@@ -179,6 +185,7 @@ public class CadastrarCliente extends JPanel {
 
         this.jLabelEmail.setText("E-mail:");
         this.jLabelEmail.setFont(new Font("Cormorant Garamond", 1, 18));
+        this.jLabelEmail.setForeground(Color.BLACK);
         this.gbc.gridx = 1;
         this.gbc.gridy = 2;
         this.gbc.insets = new Insets(0, 0, 0, 0);
@@ -189,12 +196,13 @@ public class CadastrarCliente extends JPanel {
         this.jTextFieldEmail.setBorder(new MatteBorder(2, 2, 2, 2, new Color(128, 0, 32)));
         this.jTextFieldEmail.setPreferredSize(fieldSize);
         this.jTextFieldEmail.setText("email@gmail.com");
+        this.jTextFieldEmail.setForeground(Color.BLACK);
         this.jTextFieldEmail.addFocusListener(new FocusAdapter() {
             @Override
             public void focusGained(FocusEvent e) {
                 if (jTextFieldEmail.getText().equals("email@gmail.com")) {
                     jTextFieldEmail.setText("");
-                    jTextFieldEmail.setForeground(Color.GRAY);
+                    jTextFieldEmail.setForeground(Color.BLACK);
                 }
             }
 
@@ -202,7 +210,7 @@ public class CadastrarCliente extends JPanel {
             public void focusLost(FocusEvent e) {
                 if (jTextFieldEmail.getText().isEmpty()) {
                     jTextFieldEmail.setText("email@gmail.com");
-                    jTextFieldEmail.setForeground(Color.GRAY);
+                    jTextFieldEmail.setForeground(Color.BLACK);
                 }
             }
         });
@@ -213,6 +221,7 @@ public class CadastrarCliente extends JPanel {
 
         this.jLabelEndereco.setFont(new Font("Cormorant Garamond", 1, 18));
         this.jLabelEndereco.setText("Endereço:");
+        this.jLabelEndereco.setForeground(Color.BLACK);
         this.jLabelEndereco.setBackground(Color.WHITE);
         this.gbc.gridx = 0;
         this.gbc.gridy = 4;
@@ -220,9 +229,10 @@ public class CadastrarCliente extends JPanel {
         this.jPanelContent.add(this.jLabelEndereco, this.gbc);
 
         this.jTextFieldEndereco.setBackground(Color.WHITE);
-        this.jTextFieldEndereco.setFont(new Font("Cormorant Garamond", 1, 18));
+        this.jTextFieldEndereco.setFont(new Font("Cormorant Infant", 1, 18));
         this.jTextFieldEndereco.setBorder(new MatteBorder(2, 2, 2, 2, new Color(128, 0, 32)));
         this.jTextFieldEndereco.setPreferredSize(fieldSize);
+        this.jTextFieldEndereco.setForeground(Color.BLACK);
         this.jTextFieldEndereco.setText("Rua, Bairro, Número, Cidade-UF");
         this.jTextFieldEndereco.addFocusListener(new FocusListener() {
             @Override
@@ -246,6 +256,7 @@ public class CadastrarCliente extends JPanel {
 
         this.jLabelDataNascimento.setFont(new Font("Cormorant Garamond", 1, 18));
         this.jLabelDataNascimento.setText("Data de Nascimento:");
+        this.jLabelDataNascimento.setForeground(Color.BLACK);
         this.gbc.gridx = 1;
         this.gbc.gridy = 4;
         this.gbc.insets = new Insets(0, 0, 0, 0);
@@ -254,7 +265,8 @@ public class CadastrarCliente extends JPanel {
         this.jTextFieldDataNascimento.setBackground(new Color(255, 255, 255));
         this.jTextFieldDataNascimento.setBorder(new MatteBorder(2, 2, 2, 2, new Color(128, 0, 32)));
         this.jTextFieldDataNascimento.setPreferredSize(fieldSize);
-        this.jTextFieldDataNascimento.setFont(new Font("Cormorant Garamond", 1, 18));
+        this.jTextFieldDataNascimento.setForeground(Color.BLACK);
+        this.jTextFieldDataNascimento.setFont(new Font("Cormorant Infant", 1, 18));
         this.gbc.gridx = 1;
         this.gbc.gridy = 5;
         this.gbc.insets = new Insets(0, 0, 20, 0);
@@ -262,7 +274,7 @@ public class CadastrarCliente extends JPanel {
 
 
         this.jButtonCancelar.setBackground(new Color(225, 225, 200));
-        this.jButtonCancelar.setFont(new Font("Cormorant Garamond SemiBold", 0, 18));
+        this.jButtonCancelar.setFont(new Font("Cormorant Garamond Bold", 1, 18));
         this.jButtonCancelar.setText("Cancelar");
         this.jButtonCancelar.setFocusPainted(false);
         this.jButtonCancelar.setBorder(new EmptyBorder(5,20,5,20));
@@ -273,7 +285,7 @@ public class CadastrarCliente extends JPanel {
         });
 
         this.jButtonCadastrar.setBackground(new Color(0, 128, 17));
-        this.jButtonCadastrar.setFont(new Font("Cormorant Garamond SemiBold", 0, 18));
+        this.jButtonCadastrar.setFont(new Font("Cormorant Garamond Bold", 1, 18));
         this.jButtonCadastrar.setForeground(new Color(255, 255, 200));
         this.jButtonCadastrar.setText("Cadastrar");
         this.jButtonCadastrar.setFocusPainted(false);

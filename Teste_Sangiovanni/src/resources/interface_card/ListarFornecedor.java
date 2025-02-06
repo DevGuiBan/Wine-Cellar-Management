@@ -175,7 +175,7 @@ public class ListarFornecedor extends JPanel {
 
         jtable.getColumnModel().getColumn(0).setCellRenderer(centerRenderer);
 
-        jtable.setFont(new java.awt.Font("Cormorant Garamond",Font.BOLD,14));
+        jtable.setFont(new java.awt.Font("Cormorant Infant",Font.BOLD,14));
         jtable.setShowGrid(false);
         jtable.setIntercellSpacing(new Dimension(0, 0));
         jtable.setRowHeight(30);
