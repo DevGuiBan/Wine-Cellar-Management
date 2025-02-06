@@ -3,10 +3,15 @@ package resources.interface_card;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.Objects;
 
 public class RegistrarVenda extends JPanel {
     public RegistrarVenda(JPanel mainPanel, JanelaPrincipal janelaPrincipal) {
         // inicialização de variáveis
+        JFrame frame = (JFrame) SwingUtilities.getWindowAncestor(janelaPrincipal);
+
         jLabelCadastro = new JLabel();
 
         jButtonCadastrar = new JButton();
@@ -157,11 +162,23 @@ public class RegistrarVenda extends JPanel {
         jButtonCadastrar.setBackground(new Color(0, 128, 17));
         jButtonCadastrar.setFont(new Font("Cormorant Garamond SemiBold", 1, 22));
         jButtonCadastrar.setForeground(new Color(255, 255, 200));
-        jButtonCadastrar.setPreferredSize(new Dimension(150, 40));
+        jButtonCadastrar.setPreferredSize(new Dimension(200, 40));
         jButtonCadastrar.setText("Próximo");
         jButtonCadastrar.setFocusPainted(false);
         jButtonCadastrar.setCursor(new Cursor(Cursor.HAND_CURSOR));
         jButtonCadastrar.setFocusPainted(false);
+        jButtonCadastrar.addActionListener(evt -> {
+            if(cardProdutos.isVisible()){
+                jButtonCadastrar.setText("Próximo");
+                this.jButtonClienteCardActionEvent(evt);
+            }else if(cardClientes.isVisible()){
+                jButtonCadastrar.setText("Finalizar Venda");
+                this.jButtonFinalizarVendaCardActionEvent(evt);
+            } else if (cardFinalizarVenda.isVisible()) {
+                // continua a lógica final aqui
+            }
+
+        });
 
         jButtonAdicionarCarrinho.setBackground(new Color(0, 28, 128));
         jButtonAdicionarCarrinho.setFont(new Font("Cormorant Garamond SemiBold", 1, 22));
@@ -171,6 +188,11 @@ public class RegistrarVenda extends JPanel {
         jButtonAdicionarCarrinho.setFocusPainted(false);
         jButtonAdicionarCarrinho.setCursor(new Cursor(Cursor.HAND_CURSOR));
         jButtonAdicionarCarrinho.setFocusPainted(false);
+        jButtonAdicionarCarrinho.addActionListener(evt->{
+            if(cardFinalizarVenda.isVisible()) {
+                abrirModal(frame);
+            }
+        });
 
         jPanelButtons.add(leftPanel, BorderLayout.WEST);
         jPanelButtons.add(rightPanel, BorderLayout.EAST);
@@ -185,13 +207,95 @@ public class RegistrarVenda extends JPanel {
 
     public void showCard(String cardName) {
         CardLayout cl = (CardLayout) jPanelContent.getLayout();
-        if(cardName.equals("produtos")){
-            jButtonProdutoCard.setForeground(new Color(128, 0, 32));
-            jButtonClienteCard.setForeground(new Color(0, 0, 0));
-            jButtonFinalizarVendaCard.setForeground(new Color(0, 0, 0));
-            jButtonAdicionarCarrinho.setText("Adicionar ao Carrinho");
-        }
         cl.show(jPanelContent, cardName);
+    }
+
+    private static void abrirModal(JFrame parentFrame) {
+        Double totalVenda = 100.0;
+        JDialog modal = new JDialog(parentFrame, "Aplicar Desconto", true);
+        modal.setIconImage(new ImageIcon(Objects.requireNonNull(RegistrarVenda.class.getResource("/resources/images/icon.png"))).getImage());
+        modal.setSize(350, 200);
+        modal.setLayout(new GridLayout(4, 2, 10, 10));
+
+        JLabel lblTotalAtual = new JLabel("Valor inicial da venda: ");
+        lblTotalAtual.setFont(new Font("Cormorant Infant",1,14));
+        lblTotalAtual.setForeground(Color.BLACK);
+        JLabel lblValorAtual = new JLabel("R$ " + String.format("%.2f", totalVenda));
+        lblValorAtual.setFont(new Font("Cormorant Infant",1,14));
+        lblValorAtual.setForeground(Color.BLACK);
+
+        JLabel lblDesconto = new JLabel("Desconto: ");
+        lblDesconto.setFont(new Font("Cormorant Infant",1,14));
+        lblDesconto.setForeground(Color.BLACK);
+        JTextField txtDesconto = new JTextField();
+        txtDesconto.setFont(new Font("Cormorant Infant",1,14));
+        txtDesconto.setForeground(Color.BLACK);
+
+        JLabel lblTotalFinal = new JLabel("Valor final: ");
+        lblTotalFinal.setFont(new Font("Cormorant Infant",1,14));
+        lblTotalFinal.setForeground(Color.BLACK);
+        JLabel lblValorFinal = new JLabel("R$ " + String.format("%.2f", totalVenda));
+        lblValorFinal.setFont(new Font("Cormorant Infant",1,14));
+        lblValorFinal.setForeground(Color.BLACK);
+
+        JButton btnCancelar = new JButton("Cancelar");
+        btnCancelar.setFont(new Font("Cormorant Infant Bold",1,18));
+        JButton btnAplicar = new JButton("Aplicar Desconto");
+        btnAplicar.setFont(new Font("Cormorant Infant Bold",1,16));
+
+        btnAplicar.setBackground(new Color(0, 128, 17));
+        btnAplicar.setForeground(Color.WHITE);
+        btnCancelar.setBackground(Color.RED);
+        btnCancelar.setForeground(Color.WHITE);
+
+        modal.add(lblTotalAtual);
+        modal.add(lblValorAtual);
+        modal.add(lblDesconto);
+        modal.add(txtDesconto);
+        modal.add(lblTotalFinal);
+        modal.add(lblValorFinal);
+        modal.add(btnCancelar);
+        modal.add(btnAplicar);
+
+        txtDesconto.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    double desconto = Double.parseDouble(txtDesconto.getText());
+                    double novoTotal = totalVenda - desconto;
+                    if (novoTotal < 0) {
+                        JOptionPane.showMessageDialog(modal, "Desconto inválido!", "Erro", JOptionPane.ERROR_MESSAGE);
+                        txtDesconto.setText("");
+                    } else {
+                        lblValorFinal.setText("R$ " + String.format("%.2f", novoTotal));
+                    }
+                } catch (NumberFormatException ex) {
+                    JOptionPane.showMessageDialog(modal, "Digite um valor numérico!", "Erro", JOptionPane.ERROR_MESSAGE);
+                }
+            }
+        });
+
+        btnCancelar.addActionListener(e -> modal.dispose());
+
+        btnAplicar.addActionListener(e -> {
+            try {
+                double desconto = Double.parseDouble(txtDesconto.getText());
+                double novoTotal = totalVenda - desconto;
+                if (novoTotal < 0) {
+                    JOptionPane.showMessageDialog(modal, "Desconto inválido!", "Erro", JOptionPane.ERROR_MESSAGE);
+                } else {
+                    // Atualiza apenas o valor final, sem modificar o valor inicial
+                    lblValorFinal.setText("R$ " + String.format("%.2f", novoTotal));
+                    JOptionPane.showMessageDialog(modal, "Desconto aplicado com sucesso!", "Sucesso", JOptionPane.INFORMATION_MESSAGE);
+                    txtDesconto.setText(""); // Limpa o campo de desconto
+                }
+            } catch (NumberFormatException ex) {
+                JOptionPane.showMessageDialog(modal, "Digite um valor numérico!", "Erro", JOptionPane.ERROR_MESSAGE);
+            }
+        });
+
+        modal.setLocationRelativeTo(parentFrame);
+        modal.setVisible(true);
     }
 
     private void jButtonProdutoCardActionEvent(java.awt.event.ActionEvent evt){
@@ -199,6 +303,7 @@ public class RegistrarVenda extends JPanel {
         jButtonClienteCard.setForeground(new Color(0, 0, 0));
         jButtonFinalizarVendaCard.setForeground(new Color(0, 0, 0));
         jButtonAdicionarCarrinho.setText("Adicionar ao Carrinho");
+        jButtonCadastrar.setText("Próximo");
         this.showCard("produtos");
     }
 
@@ -207,6 +312,7 @@ public class RegistrarVenda extends JPanel {
         jButtonClienteCard.setForeground(new Color(128, 0, 32));
         jButtonFinalizarVendaCard.setForeground(new Color(0, 0, 0));
         jButtonAdicionarCarrinho.setText("Adicionar Novo Cliente");
+        jButtonCadastrar.setText("Próximo");
         this.showCard("clientes");
     }
 
@@ -215,6 +321,7 @@ public class RegistrarVenda extends JPanel {
         jButtonClienteCard.setForeground(new Color(0, 0, 0));
         jButtonFinalizarVendaCard.setForeground(new Color(128, 0, 32));
         jButtonAdicionarCarrinho.setText("Aplicar Desconto");
+        jButtonCadastrar.setText("Finalizar Venda");
         this.showCard("finalizar_venda");
     }
 

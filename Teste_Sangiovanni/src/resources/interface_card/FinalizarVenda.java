@@ -63,7 +63,7 @@ public class FinalizarVenda extends JPanel {
 
         jLabelCliente.setText("Cliente: ");
         jLabelCliente.setForeground(Color.BLACK);
-        jLabelCliente.setFont(new Font("Cormorant Garamond", 1, 24));
+        jLabelCliente.setFont(new Font("Cormorant Garamond", 0, 24));
 
         jPanelTopTabela.add(jLabelCliente);
 
@@ -89,7 +89,7 @@ public class FinalizarVenda extends JPanel {
 
         jLabelProdutos.setText("Produtos:");
         jLabelProdutos.setForeground(Color.BLACK);
-        jLabelProdutos.setFont(new Font("Cormorant Garamond", Font.BOLD, 24));
+        jLabelProdutos.setFont(new Font("Cormorant Garamond", 0, 24));
 
         jPanelTabelaContentLeft.add(jLabelProdutos,BorderLayout.WEST);
 
@@ -116,7 +116,7 @@ public class FinalizarVenda extends JPanel {
         DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
         centerRenderer.setHorizontalAlignment(SwingConstants.CENTER);
 
-        jTable.setFont(new Font("Cormorant Garamond", Font.BOLD, 16));
+        jTable.setFont(new Font("Cormorant Infant", Font.BOLD, 16));
 
         JTableHeader header = jTable.getTableHeader();
         header.setFont(new Font("Cormorant Garamond", Font.BOLD, 16));
@@ -143,18 +143,18 @@ public class FinalizarVenda extends JPanel {
 
         jLabelDescontoTabela.setText("-Desconto");
         jLabelDescontoTabela.setForeground(Color.RED);
-        jLabelDescontoTabela.setFont(new Font("Cormorant Garamond", Font.BOLD, 20));
+        jLabelDescontoTabela.setFont(new Font("Cormorant Infant Bold", Font.BOLD, 20));
         jLabelDescontoTabela.setBorder(new EmptyBorder(0,0,0,400));
 
         jPanelTabelaContentRight.add(jLabelDescontoTabela);
 
         jLabelTotal.setText("Total: ");
         jLabelTotal.setForeground(Color.BLACK);
-        jLabelTotal.setFont(new Font("Cormorant Garamond", Font.BOLD, 24));
+        jLabelTotal.setFont(new Font("Cormorant Garamond", Font.PLAIN, 24));
 
         jLabelValorTotal.setText("R$ 00,00");
         jLabelValorTotal.setForeground(Color.BLACK);
-        jLabelValorTotal.setFont(new Font("Cormorant Garamond", Font.BOLD, 24));
+        jLabelValorTotal.setFont(new Font("Cormorant Infant Bold", Font.BOLD, 24));
 
         jPanelTabelaContentRight.add(jLabelTotal);
         jPanelTabelaContentRight.add(jLabelValorTotal);
@@ -172,7 +172,7 @@ public class FinalizarVenda extends JPanel {
 
         jLabelFormaPagamento.setText("Forma de Pagamento: ");
         jLabelFormaPagamento.setForeground(Color.BLACK);
-        jLabelFormaPagamento.setFont(new Font("Cormorant Garamond", Font.BOLD, 20));
+        jLabelFormaPagamento.setFont(new Font("Cormorant Garamond", Font.PLAIN, 20));
         gbc.gridx = 0;
         gbc.gridy = 0;
         gbc.insets = new Insets(0, 0, 10, 0);
@@ -180,7 +180,7 @@ public class FinalizarVenda extends JPanel {
 
         jLabelPagamento.setText("Forma de Pagamento");
         jLabelPagamento.setForeground(Color.BLACK);
-        jLabelPagamento.setFont(new Font("Cormorant Garamond", Font.BOLD, 20));
+        jLabelPagamento.setFont(new Font("Cormorant Infant Bold", Font.BOLD, 20));
         gbc.gridx = 1;
         gbc.gridy = 0;
         gbc.insets = new Insets(0, 0, 10, 40);
@@ -188,7 +188,7 @@ public class FinalizarVenda extends JPanel {
 
         jLabelDescontoAniversario.setText("Desconto de Aniversário: ");
         jLabelDescontoAniversario.setForeground(Color.BLACK);
-        jLabelDescontoAniversario.setFont(new Font("Cormorant Garamond", Font.BOLD, 20));
+        jLabelDescontoAniversario.setFont(new Font("Cormorant Garamond", Font.PLAIN, 20));
         gbc.gridx = 2;
         gbc.gridy = 0;
         gbc.insets = new Insets(0, 0, 10, 0);
@@ -196,7 +196,7 @@ public class FinalizarVenda extends JPanel {
 
         jLabelDesconto.setText("Não aplicado");
         jLabelDesconto.setForeground(Color.BLACK);
-        jLabelDesconto.setFont(new Font("Cormorant Garamond", Font.BOLD, 20));
+        jLabelDesconto.setFont(new Font("Cormorant Infant Bold", Font.BOLD, 20));
         gbc.gridx = 3;
         gbc.gridy = 0;
         gbc.insets = new Insets(0, 0, 10, 0);
@@ -204,16 +204,16 @@ public class FinalizarVenda extends JPanel {
 
         jLabelData.setText("Data:");
         jLabelData.setForeground(Color.BLACK);
-        jLabelData.setFont(new Font("Cormorant Garamond", Font.BOLD, 20));
+        jLabelData.setFont(new Font("Cormorant Garamond", Font.PLAIN, 20));
         gbc.gridx = 0;
         gbc.gridy = 3;
         gbc.insets = new Insets(0, 0, 0, 0);
         jPanelInformacoes.add(jLabelData, gbc);
 
         jTextFieldData.setForeground(Color.BLACK);
-        jTextFieldData.setFont(new Font("Cormorant Garamond", Font.BOLD, 20));
+        jTextFieldData.setFont(new Font("Cormorant Infant Bold", Font.BOLD, 20));
         jTextFieldData.setBackground(new Color(217,217,217));
-        jTextFieldData.setPreferredSize(new Dimension(20,25));
+        jTextFieldData.setPreferredSize(new Dimension(40,25));
         jTextFieldData.setOpaque(true);
         jTextFieldData.setBorder(new MatteBorder(1,1,1,1,Color.GRAY));
         gbc.gridx = 1;

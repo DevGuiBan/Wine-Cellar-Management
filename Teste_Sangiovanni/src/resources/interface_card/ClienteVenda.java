@@ -41,6 +41,7 @@ public class ClienteVenda extends JPanel {
 
         jLabelNome.setFont(new Font("Cormorant Garamond", 1, 18));
         jLabelNome.setText("Nome:");
+        jLabelNome.setForeground(Color.BLACK);
         gbc.gridx = 0;
         gbc.gridy = 0;
         gbc.insets = new Insets(0, 0, 0, 100);
@@ -50,6 +51,7 @@ public class ClienteVenda extends JPanel {
         jComboBoxName.setBorder(new MatteBorder(2, 2, 2, 2, new Color(128, 0, 32)));
         jComboBoxName.setFont(new Font("Cormorant Garamond", 1, 18));
         jComboBoxName.setPreferredSize(fieldSize);
+        jComboBoxName.setForeground(Color.BLACK);
         gbc.gridx = 0;
         gbc.gridy = 1;
         gbc.insets = new Insets(0, 0, 20, 100);
@@ -57,6 +59,7 @@ public class ClienteVenda extends JPanel {
 
         jLabelDataNascimento.setFont(new Font("Cormorant Garamond", 1, 18));
         jLabelDataNascimento.setText("Data de Nascimento:");
+        jLabelDataNascimento.setForeground(Color.BLACK);
         gbc.gridx = 1;
         gbc.gridy = 0;
         gbc.insets = new Insets(0, 0, 0, 0);
@@ -64,8 +67,9 @@ public class ClienteVenda extends JPanel {
 
         jTextFieldDataNascimento.setBackground(new Color(255, 255, 255));
         jTextFieldDataNascimento.setBorder(new MatteBorder(2, 2, 2, 2, new Color(128, 0, 32)));
-        jTextFieldDataNascimento.setFont(new Font("Cormorant Garamond", 1, 18));
+        jTextFieldDataNascimento.setFont(new Font("Cormorant Infant", 1, 18));
         jTextFieldDataNascimento.setPreferredSize(fieldSize);
+        jTextFieldDataNascimento.setForeground(Color.BLACK);
         gbc.gridx = 1;
         gbc.gridy = 1;
         gbc.insets = new Insets(0, 0, 20, 0);
@@ -73,16 +77,17 @@ public class ClienteVenda extends JPanel {
 
         jLabelCPF.setFont(new Font("Cormorant Garamond", 1, 18));
         jLabelCPF.setText("CPF:");
+        jLabelCPF.setForeground(Color.BLACK);
         gbc.gridx = 0;
         gbc.gridy = 2;
         gbc.insets = new Insets(0, 0, 0, 100);
         jPanelContent.add(jLabelCPF, gbc);
 
-        jComboBoxCPF.setBackground(new Color(255, 255, 255));
         jComboBoxCPF.setBackground(Color.WHITE);
-        jComboBoxCPF.setFont(new Font("Cormorant Garamond", Font.BOLD, 18));
+        jComboBoxCPF.setFont(new Font("Cormorant Infant", Font.BOLD, 18));
         jComboBoxCPF.setBorder(new MatteBorder(2, 2, 2, 2, new Color(128, 0, 32)));
         jComboBoxCPF.setPreferredSize(fieldSize);
+        jComboBoxCPF.setForeground(Color.BLACK);
         gbc.gridx = 0;
         gbc.gridy = 3;
         gbc.insets = new Insets(0, 0, 20, 100);
@@ -90,13 +95,14 @@ public class ClienteVenda extends JPanel {
 
         jLabelFormaPagamento.setFont(new Font("Cormorant Garamond", 1, 18));
         jLabelFormaPagamento.setText("Forma de Pagamento:");
+        jLabelFormaPagamento.setForeground(Color.BLACK);
         gbc.gridx = 1;
         gbc.gridy = 2;
         gbc.insets = new Insets(0, 0, 0, 100);
         jPanelContent.add(jLabelFormaPagamento, gbc);
 
-        jComboBoxMetodoPagamento.setBackground(new Color(255, 255, 255));
         jComboBoxMetodoPagamento.setBackground(Color.WHITE);
+        jComboBoxMetodoPagamento.setForeground(Color.BLACK);
         jComboBoxMetodoPagamento.setFont(new Font("Cormorant Garamond", Font.BOLD, 18));
         jComboBoxMetodoPagamento.setBorder(new MatteBorder(2, 2, 2, 2, new Color(128, 0, 32)));
         jComboBoxMetodoPagamento.setPreferredSize(fieldSize);

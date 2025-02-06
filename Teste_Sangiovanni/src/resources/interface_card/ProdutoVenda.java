@@ -35,6 +35,7 @@ public class ProdutoVenda extends JPanel {
 
         jLabelNome.setFont(new Font("Cormorant Garamond", 1, 18));
         jLabelNome.setText("Nome:");
+        jLabelNome.setForeground(Color.BLACK);
         gbc.gridx = 0;
         gbc.gridy = 0;
         gbc.insets = new Insets(0, 0, 0, 100);
@@ -44,6 +45,7 @@ public class ProdutoVenda extends JPanel {
         jComboBoxProduct.setBorder(new MatteBorder(2, 2, 2, 2, new Color(128, 0, 32)));
         jComboBoxProduct.setFont(new Font("Cormorant Garamond", 1, 18));
         jComboBoxProduct.setPreferredSize(fieldSize);
+        jComboBoxProduct.setForeground(Color.BLACK);
         gbc.gridx = 0;
         gbc.gridy = 1;
         gbc.insets = new Insets(0, 0, 20, 100);
@@ -51,6 +53,7 @@ public class ProdutoVenda extends JPanel {
 
         jLabelQuantidade.setFont(new Font("Cormorant Garamond", 1, 18));
         jLabelQuantidade.setText("Quantidade:");
+        jLabelQuantidade.setForeground(Color.BLACK);
         gbc.gridx = 1;
         gbc.gridy = 0;
         gbc.insets = new Insets(0, 0, 0, 0);
@@ -58,8 +61,9 @@ public class ProdutoVenda extends JPanel {
 
         jSpinnerQuantidade.setBackground(new Color(255, 255, 255));
         jSpinnerQuantidade.setBorder(new MatteBorder(2, 2, 2, 2, new Color(128, 0, 32)));
-        jSpinnerQuantidade.setFont(new Font("Cormorant Garamond", 1, 18));
+        jSpinnerQuantidade.setFont(new Font("Cormorant Infant", 1, 18));
         jSpinnerQuantidade.setPreferredSize(fieldSize);
+        jSpinnerQuantidade.setForeground(Color.BLACK);
         gbc.gridx = 1;
         gbc.gridy = 1;
         gbc.insets = new Insets(0, 0, 20, 0);
@@ -67,6 +71,7 @@ public class ProdutoVenda extends JPanel {
 
         jLabelValorUnitario.setFont(new Font("Cormorant Garamond", 1, 18));
         jLabelValorUnitario.setText("Valor Unitário:");
+        jLabelValorUnitario.setForeground(Color.BLACK);
         gbc.gridx = 0;
         gbc.gridy = 2;
         gbc.insets = new Insets(0, 0, 0, 100);
@@ -74,7 +79,8 @@ public class ProdutoVenda extends JPanel {
 
         jSpinnerValorUnitario.setBackground(new Color(255, 255, 255));
         jSpinnerValorUnitario.setBackground(Color.WHITE);
-        jSpinnerValorUnitario.setFont(new Font("Cormorant Garamond", Font.BOLD, 18));
+        jSpinnerValorUnitario.setForeground(Color.BLACK);
+        jSpinnerValorUnitario.setFont(new Font("Cormorant Infant", Font.BOLD, 18));
         jSpinnerValorUnitario.setBorder(new MatteBorder(2, 2, 2, 2, new Color(128, 0, 32)));
         jSpinnerValorUnitario.setPreferredSize(fieldSize);
         JSpinner.NumberEditor editor = new JSpinner.NumberEditor(jSpinnerValorUnitario, "R$ #,##0.00"); // máscara de preço pro spinner
