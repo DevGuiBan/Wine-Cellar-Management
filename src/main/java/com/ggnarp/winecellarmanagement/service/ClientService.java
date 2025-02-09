@@ -24,9 +24,24 @@ public class ClientService {
     }
 
     public Client save(ClientDTO clientDTO) {
+        if(clientDTO.getName().isBlank()){
+            throw new IllegalArgumentException("O nome do cliente não pode ser vázio!");
+        }
+
         if(this.clientRepository.existsByEmail(clientDTO.getEmail())) {
             throw new IllegalArgumentException("Já existe um cliente cadastrado com esse e-mail");
         }
+        else if (clientDTO.getEmail().equals("email@gmail.com")){
+            throw new IllegalArgumentException("Insirá um endereço de e-mail válido!");
+        }
+        else{
+            String[] parts = clientDTO.getEmail().split("@");
+            boolean result = parts.length == 2 && !parts[1].isEmpty();
+            if(!result){
+                throw new IllegalArgumentException("Insirá um endereço de e-mail válido!");
+            }
+        }
+
         if(this.clientRepository.existsByCpf(clientDTO.getCpf())) {
             throw new IllegalArgumentException("Já existe um cliente cadastrado com esse cpf");
         }
@@ -98,6 +113,16 @@ public class ClientService {
                     if (clientDTO.getEmail() != null && !clientDTO.getEmail().isBlank()) {
                         if(!this.clientRepository.existsByEmail(clientDTO.getEmail())){
                             existingClient.setEmail(clientDTO.getEmail());
+                        }
+                        else if (clientDTO.getEmail().equals("email@gmail.com")){
+                            throw new IllegalArgumentException("Insirá um endereço de e-mail válido!");
+                        }
+                        else{
+                            String[] parts = clientDTO.getEmail().split("@");
+                            boolean result = parts.length == 2 && !parts[1].isEmpty();
+                            if(!result){
+                                throw new IllegalArgumentException("Insirá um endereço de e-mail válido!");
+                            }
                         }
 
                     }

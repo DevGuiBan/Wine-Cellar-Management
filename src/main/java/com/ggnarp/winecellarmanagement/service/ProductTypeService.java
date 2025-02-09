@@ -27,8 +27,8 @@ public class ProductTypeService {
 
     public ProductType save(ProductTypeDTO productTypeDTO) {
         ProductType productType = new ProductType();
-        if(productTypeDTO.getName().length() <=4){
-            throw new IllegalArgumentException("O nome do tipo de produto deve ter mais do que 4 letras!");
+        if(productTypeDTO.getName().length() <=3){
+            throw new IllegalArgumentException("O nome do tipo de produto deve ter pelo menos 4 letras!");
         }
         productType.setName(productTypeDTO.getName());
 
@@ -50,8 +50,11 @@ public class ProductTypeService {
     public ProductType update(Long id, ProductTypeDTO productTypeDTO) {
         return productTypeRepository.findById(id)
                 .map(existingProductType -> {
-                    if(!productTypeDTO.getName().isBlank()){
+                    if(!productTypeDTO.getName().isBlank() && productTypeDTO.getName().length() >=4){
                         existingProductType.setName(productTypeDTO.getName());
+                    }
+                    else{
+                        throw new IllegalArgumentException("O tipo de produto deve ter pelo menos 4 letras!");
                     }
 
                     return productTypeRepository.save(existingProductType);

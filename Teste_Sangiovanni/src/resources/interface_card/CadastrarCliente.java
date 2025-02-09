@@ -509,13 +509,13 @@ public class CadastrarCliente extends JPanel {
     }
 
     public void reset(){
-        this.jTextFieldDataNascimento.setText("");
+        this.jTextFieldDataNascimento.setText(null);
         this.jButtonCadastrar.setText("Cadastrar");
-        this.jTextFieldCPF.setText("");
-        this.jTextFieldEndereco.setText("");
-        this.jTextFieldEmail.setText("");
-        this.jTextFieldTelefone.setText("");
-        this.jTextFieldNome.setText("");
+        this.jTextFieldCPF.setText(null);
+        this.jTextFieldEndereco.setText(null);
+        this.jTextFieldEmail.setText("email@gmail.com");
+        this.jTextFieldTelefone.setText(null);
+        this.jTextFieldNome.setText("Nomde do fornecedor");
         this.jLabelCadastro.setText("Cadastrar Cliente");
     }
 
