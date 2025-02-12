@@ -68,7 +68,7 @@ public class SupplierController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<?> update(@PathVariable UUID id, @RequestBody SupplierDTO supplierDTO) {
+    public ResponseEntity<?> update(@PathVariable UUID id, @RequestBody @Valid SupplierDTO supplierDTO) {
         try{
             Supplier updatedSupplier = supplierService.update(id, supplierDTO);
             return ResponseEntity.status(HttpStatus.OK).body(updatedSupplier);
