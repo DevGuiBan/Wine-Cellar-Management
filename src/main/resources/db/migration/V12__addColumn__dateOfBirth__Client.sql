@@ -1,0 +1,2 @@
+ALTER TABLE client
+    ADD COLUMN date_brith DATE NOT NULL;

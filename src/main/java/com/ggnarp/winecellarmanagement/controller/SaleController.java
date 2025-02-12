@@ -66,7 +66,7 @@ public class SaleController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<?> update(@PathVariable UUID id, @RequestBody SaleDTO saleDTO) {
+    public ResponseEntity<?> update(@PathVariable UUID id, @RequestBody @Valid SaleDTO saleDTO) {
         try{
             Sale updatedSale = saleService.update(id, saleDTO);
             return ResponseEntity.status(HttpStatus.OK).body(updatedSale);

@@ -84,12 +84,12 @@ public class SupplierService {
 
                     return supplierRepository.save(existingSupplier);
                 })
-                .orElseThrow(() -> new ResourceAccessException("Supplier with id " + id + " not found"));
+                .orElseThrow(() -> new ResourceAccessException("Fornecedor com o " + id + " não encontrado"));
     }
 
     public Supplier getById(UUID id) {
         return supplierRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Supplier with ID " + id + " not found"));
+                .orElseThrow(() -> new RuntimeException("Fornecedor com o " + id + " não encontrado"));
     }
 
     public List<SupplierDTO> getSupplierByAddress(String address) {
