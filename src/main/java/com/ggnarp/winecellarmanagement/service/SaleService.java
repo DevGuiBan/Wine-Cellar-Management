@@ -64,8 +64,8 @@ public class SaleService {
 
         // Verifica se a data da compra é o aniversário do cliente e aplica 5% extra
         LocalDate today = LocalDate.now();
-        if (client.getDate_brith() != null && client.getDate_brith().getMonth() == today.getMonth() &&
-                client.getDate_brith().getDayOfMonth() == today.getDayOfMonth()) {
+        if (client.getDateBirth() != null && client.getDateBirth().getMonth() == today.getMonth() &&
+                client.getDateBirth().getDayOfMonth() == today.getDayOfMonth()) {
             BigDecimal birthdayDiscount = totalValue.multiply(BigDecimal.valueOf(5)).divide(BigDecimal.valueOf(100));
             discount = discount.add(birthdayDiscount);
         }

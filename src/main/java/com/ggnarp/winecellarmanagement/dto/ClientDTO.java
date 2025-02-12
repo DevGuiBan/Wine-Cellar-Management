@@ -30,7 +30,7 @@ public class ClientDTO {
     private String address;
 
     @NotBlank
-    private String date_brith;
+    private String dateBirth;
 
     @NotBlank
     @Pattern(regexp = "^\\d{3}\\.\\d{3}\\.\\d{3}-\\d{2}$")
