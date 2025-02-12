@@ -31,8 +31,9 @@ public class Client {
     @Column(nullable = false)
     private String address;
 
-    @Column(nullable = false)
-    private LocalDate date_brith;
+
+    @Column(nullable = false,name = "date_brith")
+    private LocalDate dateBirth;
 
     @Column(nullable = false,unique = true)
     private String cpf;

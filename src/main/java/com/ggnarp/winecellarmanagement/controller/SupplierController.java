@@ -37,6 +37,19 @@ public class SupplierController {
         }
     }
 
+    @GetMapping("/address/{address}")
+    public ResponseEntity<?> getSupplierByAddress(@PathVariable String address) {
+        try{
+            List<SupplierDTO> suppliers = supplierService.getSupplierByAddress(address);
+            return ResponseEntity.status(HttpStatus.OK).body(suppliers);
+        } catch (Exception e) {
+            Map<String, String> errorResponse = new HashMap<>();
+            errorResponse.put("error", "Erro ao pesquisar o fornecedores com este endereço!");
+            errorResponse.put("message", e.getMessage());
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
+        }
+    }
+
     @PostMapping
     public ResponseEntity<?> register(@RequestBody @Valid SupplierDTO supplierDTO) {
         try{
