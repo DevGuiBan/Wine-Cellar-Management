@@ -14,7 +14,9 @@ CREATE TABLE sale
     total_value    NUMERIC,
     discount       NUMERIC,
     payment_method payment_method_enum NOT NULL,
+    purchase_date  TIMESTAMP           NOT NULL DEFAULT now(),
 
     CONSTRAINT fk_id_client FOREIGN KEY (id_client) REFERENCES client (id) ON DELETE CASCADE,
     CONSTRAINT fk_id_product FOREIGN KEY (id_product) REFERENCES product (id) ON DELETE CASCADE
 );
+

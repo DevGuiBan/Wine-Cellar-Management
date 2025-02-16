@@ -437,8 +437,9 @@ public class CadastrarFornecedor extends JPanel {
                     }
                 }
                 connection.disconnect();
+                JsonObject err = JsonParser.parseString(response.toString()).getAsJsonObject();
                 JOptionPane.showOptionDialog(this.rootPane,
-                        "Não foi possível cadastrar o fornecedor, verifique as informações dos campos e tente novamente!\n" + response.toString(),
+                        "Não foi possível cadastrar o fornecedor, verifique as informações dos campos e tente novamente!\n" + err.get("message").toString(),
                         "Fornecedor Não Cadastrado",
                         JOptionPane.DEFAULT_OPTION,
                         JOptionPane.ERROR_MESSAGE,
@@ -506,8 +507,9 @@ public class CadastrarFornecedor extends JPanel {
                     }
                 }
                 connection.disconnect();
+                JsonObject err = JsonParser.parseString(response.toString()).getAsJsonObject();
                 JOptionPane.showOptionDialog(this.rootPane,
-                        "Não foi possível atualizar o fornecedor, verifique as informações dos campos e tente novamente!\n" + response.toString(),
+                        "Não foi possível atualizar o fornecedor, verifique as informações dos campos e tente novamente!\n" + err.get("message").toString(),
                         "Fornecedor Não Atualizado",
                         JOptionPane.DEFAULT_OPTION,
                         JOptionPane.ERROR_MESSAGE,

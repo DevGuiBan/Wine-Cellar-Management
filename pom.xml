@@ -104,7 +104,7 @@
                 <configuration>
                     <url>jdbc:postgresql://localhost:5432/winecellar</url>
                     <user>postgres</user>
-                    <password>161003</password>
+                    <password>andre</password>
                     <cleanDisabled>false</cleanDisabled>
                 </configuration>
             </plugin>
