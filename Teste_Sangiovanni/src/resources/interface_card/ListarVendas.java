@@ -1,19 +1,28 @@
 package resources.interface_card;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+import io.github.cdimascio.dotenv.Dotenv;
 import resources.interfaces.EditarProduto;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
-import javax.swing.table.DefaultTableCellRenderer;
-import javax.swing.table.JTableHeader;
-import javax.swing.table.TableCellEditor;
-import javax.swing.table.TableCellRenderer;
+import javax.swing.table.*;
 import java.awt.*;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.Objects;
 
 public class ListarVendas extends JPanel {
-    public ListarVendas(JRootPane rootPane,JPanel mainPanel){
-        // iniciar Componentes
+
+    private Dotenv dotenv;
+    private JRootPane rootPane;
+
+    private void initComponents() {
         JanelaPrincipal frame = (JanelaPrincipal) SwingUtilities.getWindowAncestor(rootPane);
         jPanelTopoTabela = new javax.swing.JPanel();
         jPanelTabela = new javax.swing.JPanel();
@@ -141,6 +150,59 @@ public class ListarVendas extends JPanel {
         add(jPanel4);
     }
 
+    public ListarVendas(JRootPane rootPane,JPanel mainPanel){
+        this.rootPane = rootPane;
+        this.dotenv = Dotenv.load();
+        this.initComponents();
+        this.getVendas();
+    }
+
+    private void getVendas() {
+        try {
+            String urlAPI = this.dotenv.get("API_HOST");
+            URL url = new URL(urlAPI + "/sale");
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.setRequestMethod("GET");
+
+            int responseCode = connection.getResponseCode();
+            if (responseCode == HttpURLConnection.HTTP_OK) {
+                try (BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()))) {
+                    StringBuilder response = new StringBuilder();
+                    String line;
+                    while ((line = reader.readLine()) != null) {
+                        response.append(line);
+                    }
+
+                    Gson gson = new Gson();
+                    JsonArray sales = JsonParser.parseString(response.toString()).getAsJsonArray();
+
+                    DefaultTableModel tableModel = (DefaultTableModel) jtable.getModel();
+                    tableModel.setRowCount(0);
+
+                    for (int i = 0; i < sales.size(); i++) {
+                        JsonObject sale = sales.get(i).getAsJsonObject();
+                        String id = sale.get("id").getAsString();
+                        String product = sale.has("productName") ? sale.get("productName").getAsString() : sale.get("productId").getAsString();
+                        String client = sale.has("clientName") ? sale.get("clientName").getAsString() : sale.get("clientId").getAsString();
+                        String date = sale.get("saleDate").getAsString();
+                        String paymentMethod = sale.get("paymentMethod").getAsString();
+                        String totalValue = sale.get("totalValue").getAsString();
+
+                        tableModel.addRow(new Object[]{id, product, client, date, paymentMethod, totalValue, "Ações"});
+                    }
+                }
+            } else {
+                JOptionPane.showMessageDialog(rootPane,
+                        "Ocorreu um erro ao carregar as vendas",
+                        "Problema no Servidor",
+                        JOptionPane.ERROR_MESSAGE);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(rootPane, "Erro: " + e.getMessage());
+        }
+    }
+
     private javax.swing.JTextField pesquisaProduto;
     private javax.swing.JTable jtable;
     private javax.swing.JScrollPane jScrollPane;
@@ -243,8 +305,8 @@ class ButtonEditorProductVenda extends AbstractCellEditor implements TableCellEd
         deleteButton.addActionListener(e -> {
             String[] options = {"Cancelar","Excluir"};
             int confirmation = JOptionPane.showOptionDialog(table,
-                    "Deseja excluir o produto? Essa ação não poderá ser desfeita. ",
-                    "Deletar Produto",
+                    "Deseja excluir o Venda? Essa ação não poderá ser desfeita. ",
+                    "Deletar Venda",
                     JOptionPane.YES_NO_OPTION,
                     JOptionPane.QUESTION_MESSAGE,
                     null,
@@ -266,3 +328,4 @@ class ButtonEditorProductVenda extends AbstractCellEditor implements TableCellEd
         return null;
     }
 }
+
