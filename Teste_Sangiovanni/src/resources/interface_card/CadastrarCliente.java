@@ -331,7 +331,7 @@ public class CadastrarCliente extends JPanel {
             jsonData.addProperty("phoneNumber", phone_number);
             jsonData.addProperty("address", address);
             jsonData.addProperty("cpf", cpf);
-            jsonData.addProperty("date_brith", dataString);
+            jsonData.addProperty("dateBirth", dataString);
 
             // making the request
             String urlAPI = this.dotenv.get("API_HOST");
@@ -369,8 +369,9 @@ public class CadastrarCliente extends JPanel {
                     }
                 }
                 connection.disconnect();
+                JsonObject err = JsonParser.parseString(response.toString()).getAsJsonObject();
                 JOptionPane.showOptionDialog(this.framePrincipal,
-                        "Não foi possível cadastrar o cliente, verifique as informações dos campos e tente novamente!\n" + response.toString(),
+                        "Não foi possível cadastrar o cliente, verifique as informações dos campos e tente novamente!\n" + err.get("message").toString(),
                         "Cliente Não Cadastrado",
                         JOptionPane.DEFAULT_OPTION,
                         JOptionPane.ERROR_MESSAGE,
@@ -397,7 +398,7 @@ public class CadastrarCliente extends JPanel {
             jsonData.addProperty("phoneNumber", phone_number);
             jsonData.addProperty("address", address);
             jsonData.addProperty("cpf", cpf);
-            jsonData.addProperty("date_brith", dataString);
+            jsonData.addProperty("dateBirth", dataString);
 
             // making the request
             String urlAPI = this.dotenv.get("API_HOST");
@@ -437,8 +438,9 @@ public class CadastrarCliente extends JPanel {
                     }
                 }
                 connection.disconnect();
+                JsonObject err = JsonParser.parseString(response.toString()).getAsJsonObject();
                 JOptionPane.showOptionDialog(this.framePrincipal,
-                        "Não foi possível atualizar o cliente, verifique as informações dos campos e tente novamente!\n" + response.toString(),
+                        "Não foi possível atualizar o cliente, verifique as informações dos campos e tente novamente!\n" + err.get("message").toString(),
                         "Cliente Não atualizado",
                         JOptionPane.DEFAULT_OPTION,
                         JOptionPane.ERROR_MESSAGE,
@@ -483,7 +485,7 @@ public class CadastrarCliente extends JPanel {
                     String email = prod.get("email").getAsString();
                     String address = prod.get("address").getAsString();
                     String phone_number = prod.get("phoneNumber").getAsString();
-                    String data = prod.get("date_brith").getAsString();
+                    String data = prod.get("dateBirth").getAsString();
 
                     DateTimeFormatter formatoEntrada = DateTimeFormatter.ofPattern("yyyy-MM-dd");
                     DateTimeFormatter formatoSaida = DateTimeFormatter.ofPattern("dd/MM/yyyy");
