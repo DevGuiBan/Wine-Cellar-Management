@@ -29,7 +29,7 @@ public class RegistrarVenda extends JPanel {
 
         // cards
         cardProdutos = new ProdutoVenda(frame);
-        cardClientes = new ClienteVenda();
+        cardClientes = new ClienteVenda(frame);
         cardFinalizarVenda = new FinalizarVenda();
 
         jSeparator = new JSeparator();
@@ -191,6 +191,8 @@ public class RegistrarVenda extends JPanel {
         jButtonAdicionarCarrinho.addActionListener(evt->{
             if(cardFinalizarVenda.isVisible()) {
                 abrirModal(frame);
+            }else if(cardProdutos.isVisible()){
+
             }
         });
 
