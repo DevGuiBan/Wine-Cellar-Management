@@ -184,11 +184,13 @@ public class ListarVendas extends JPanel {
                         String id = sale.get("id").getAsString();
                         String product = sale.has("productName") ? sale.get("productName").getAsString() : sale.get("productId").getAsString();
                         String client = sale.has("clientName") ? sale.get("clientName").getAsString() : sale.get("clientId").getAsString();
-                        String date = sale.get("saleDate").getAsString();
+                        JsonObject clientDTO = sale.get("client").getAsJsonObject();
+                        String clientName = clientDTO.get("name").getAsString();
+                        String date = sale.get("purchaseDate").getAsString();
                         String paymentMethod = sale.get("paymentMethod").getAsString();
                         String totalValue = sale.get("totalValue").getAsString();
 
-                        tableModel.addRow(new Object[]{id, product, client, date, paymentMethod, totalValue, "Ações"});
+                        tableModel.addRow(new Object[]{id, product, clientName, date, paymentMethod, totalValue, "Ações"});
                     }
                 }
             } else {

@@ -28,7 +28,7 @@ public class RegistrarVenda extends JPanel {
         jPanel = new JPanel();
 
         // cards
-        cardProdutos = new ProdutoVenda();
+        cardProdutos = new ProdutoVenda(frame);
         cardClientes = new ClienteVenda();
         cardFinalizarVenda = new FinalizarVenda();
 

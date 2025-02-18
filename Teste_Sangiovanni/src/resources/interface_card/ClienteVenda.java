@@ -106,6 +106,11 @@ public class ClienteVenda extends JPanel {
         jComboBoxMetodoPagamento.setFont(new Font("Cormorant Garamond", Font.BOLD, 18));
         jComboBoxMetodoPagamento.setBorder(new MatteBorder(2, 2, 2, 2, new Color(128, 0, 32)));
         jComboBoxMetodoPagamento.setPreferredSize(fieldSize);
+        jComboBoxMetodoPagamento.addItem("CARTÃO_DE_CRÉDITO");
+        jComboBoxMetodoPagamento.addItem("CARTÃO_DE_DÉBITO,");
+        jComboBoxMetodoPagamento.addItem("DINHEIRO");
+        jComboBoxMetodoPagamento.addItem("PIX");
+        jComboBoxMetodoPagamento.addItem("TRANSFERÊNCIA_BANCÁRIA");
         gbc.gridx = 1;
         gbc.gridy = 3;
         gbc.insets = new Insets(0, 0, 20, 0);

@@ -1,5 +1,6 @@
 package com.ggnarp.winecellarmanagement.dto;
 
+import com.ggnarp.winecellarmanagement.entity.Client;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -7,6 +8,7 @@ import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.Optional;
 import java.util.UUID;
 
 @Data
@@ -18,6 +20,8 @@ public class SaleDTO {
 
     @NotNull
     private UUID clientId;
+
+    private Optional<Client> client;
 
     @NotNull
     private Long productId;

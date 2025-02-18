@@ -90,6 +90,7 @@ public class SaleService {
             SaleDTO dto = new SaleDTO();
             dto.setId(sale.getId());
             dto.setClientId(sale.getClient().getId());
+            dto.setClient(clientRepository.findById(sale.getClient().getId()));
             dto.setProductId(sale.getProduct().getId());
             dto.setQuantity(sale.getQuantity());
             dto.setTotalValue(sale.getTotalValue());
