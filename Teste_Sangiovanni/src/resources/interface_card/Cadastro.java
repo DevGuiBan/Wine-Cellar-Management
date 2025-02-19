@@ -1,9 +1,9 @@
 import javax.swing.*;
 import java.awt.*;
 
-public class Login {
+public class Cadastro {
     public static void main(String[] args) {
-        JFrame frame = new JFrame("LOGIN");
+        JFrame frame = new JFrame("CADASTRAR");
         frame.setSize(800, 600);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setLocationRelativeTo(null);
@@ -21,14 +21,28 @@ public class Login {
         JPanel rightPanel = new JPanel(new GridBagLayout());
         rightPanel.setBackground(new Color(128, 0, 32));
 
-        JLabel login = new JLabel("Login");
-        login.setFont(new Font("Cormorant Infant", Font.BOLD, 38));
-        login.setForeground(Color.WHITE);
+        JLabel cadastrar = new JLabel("Cadastrar-se");
+        cadastrar.setFont(new Font("Cormorant Infant", Font.BOLD, 38));
+        cadastrar.setForeground(Color.WHITE);
 
         JPanel formPanel = new JPanel(new GridBagLayout());
         formPanel.setOpaque(false);
 
         Dimension fieldSize = new Dimension(250, 30);
+
+        JLabel nome = new JLabel("Nome: ");
+        nome.setFont(new Font("Cormorant Infant", Font.PLAIN, 18));
+        nome.setForeground(Color.WHITE);
+        JTextField textoNome = new JTextField();
+        textoNome.setFont(new Font("Cormorant Infant", Font.PLAIN, 18));
+        textoNome.setPreferredSize(fieldSize);
+
+        JLabel cpf = new JLabel("CPF: ");
+        cpf.setFont(new Font("Cormorant Infant", Font.PLAIN, 18));
+        cpf.setForeground(Color.WHITE);
+        JTextField textoCPF = new JTextField();
+        textoCPF.setFont(new Font("Cormorant Infant", Font.PLAIN, 18));
+        textoCPF.setPreferredSize(fieldSize);
 
         JLabel email = new JLabel("Email: ");
         email.setFont(new Font("Cormorant Infant", Font.PLAIN, 18));
@@ -44,22 +58,25 @@ public class Login {
         textoSenha.setFont(new Font("Cormorant Infant", Font.PLAIN, 18));
         textoSenha.setPreferredSize(fieldSize);
 
-        JLabel esqueciSenha = new JLabel("Esqueci minha senha");
-        esqueciSenha.setFont(new Font("Cormorant Infant", Font.PLAIN, 14));
-        esqueciSenha.setForeground(new Color(255, 235, 43));
-
-        JButton btnEntrar = new JButton("Entrar");
-        btnEntrar.setFont(new Font("Cormorant Infant", Font.BOLD, 18));
-        btnEntrar.setForeground(Color.BLACK);
-        btnEntrar.setBackground(new Color(255, 235, 43));
-        btnEntrar.setPreferredSize(fieldSize);
+        JLabel confirmarSenha = new JLabel("Confirmar Senha: ");
+        confirmarSenha.setFont(new Font("Cormorant Infant", Font.PLAIN, 18));
+        confirmarSenha.setForeground(Color.WHITE);
+        JPasswordField textoConfirmarSenha = new JPasswordField();
+        textoConfirmarSenha.setFont(new Font("Cormorant Infant", Font.PLAIN, 18));
+        textoConfirmarSenha.setPreferredSize(fieldSize);
 
         JButton btnCadastrar = new JButton("Cadastrar-se");
         btnCadastrar.setFont(new Font("Cormorant Infant", Font.BOLD, 18));
-        btnCadastrar.setForeground(Color.WHITE);
-        btnCadastrar.setBackground(new Color(128, 0, 32));
-        btnCadastrar.setBorder(BorderFactory.createLineBorder(new Color(255, 235, 43), 2));
+        btnCadastrar.setForeground(Color.BLACK);
+        btnCadastrar.setBackground(new Color(255, 235, 43));
         btnCadastrar.setPreferredSize(fieldSize);
+
+        JButton btnJaTenhoConta = new JButton("Já tenho conta");
+        btnJaTenhoConta.setFont(new Font("Cormorant Infant", Font.BOLD, 18));
+        btnJaTenhoConta.setForeground(Color.BLACK);
+        btnJaTenhoConta.setBackground(new Color(128, 0, 32));
+        btnJaTenhoConta.setBorder(BorderFactory.createLineBorder(new Color(255, 235, 43), 2));
+        btnJaTenhoConta.setPreferredSize(fieldSize);
 
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.gridx = 0;
@@ -67,6 +84,14 @@ public class Login {
         gbc.anchor = GridBagConstraints.WEST;
         gbc.insets = new Insets(5, 10, 5, 10);
 
+        formPanel.add(nome, gbc);
+        gbc.gridy++;
+        formPanel.add(textoNome, gbc);
+        gbc.gridy++;
+        formPanel.add(cpf, gbc);
+        gbc.gridy++;
+        formPanel.add(textoCPF, gbc);
+        gbc.gridy++;
         formPanel.add(email, gbc);
         gbc.gridy++;
         formPanel.add(textoEmail, gbc);
@@ -75,18 +100,20 @@ public class Login {
         gbc.gridy++;
         formPanel.add(textoSenha, gbc);
         gbc.gridy++;
-        formPanel.add(esqueciSenha, gbc);
+        formPanel.add(confirmarSenha, gbc);
         gbc.gridy++;
-        formPanel.add(btnEntrar, gbc);
+        formPanel.add(textoConfirmarSenha, gbc);
         gbc.gridy++;
         formPanel.add(btnCadastrar, gbc);
+        gbc.gridy++;
+        formPanel.add(btnJaTenhoConta, gbc);
 
         GridBagConstraints gbcRight = new GridBagConstraints();
         gbcRight.gridx = 0;
         gbcRight.gridy = 0;
         gbcRight.anchor = GridBagConstraints.CENTER;
         gbcRight.insets = new Insets(10, 10, 10, 10);
-        rightPanel.add(login, gbcRight);
+        rightPanel.add(cadastrar, gbcRight);
 
         gbcRight.gridy++;
         gbcRight.anchor = GridBagConstraints.WEST;
