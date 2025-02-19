@@ -558,8 +558,9 @@ public class CadastrarProduto extends JPanel {
                     }
                 }
                 connection.disconnect();
+                JsonObject err = JsonParser.parseString(response.toString()).getAsJsonObject();
                 JOptionPane.showOptionDialog(this.framePrincipal,
-                        "Não foi possível cadastrar o tipo de produto, verifique as informações dos campos!\n" + response.toString(),
+                        "Não foi possível cadastrar o tipo de produto, verifique as informações dos campos!\n" + err.get("message").toString(),
                         "Tipo de Produto Não Cadastrado",
                         JOptionPane.DEFAULT_OPTION,
                         JOptionPane.ERROR_MESSAGE,
@@ -618,8 +619,9 @@ public class CadastrarProduto extends JPanel {
                         }
                     }
                     connection.disconnect();
+                    JsonObject err = JsonParser.parseString(response.toString()).getAsJsonObject();
                     JOptionPane.showOptionDialog(this.framePrincipal,
-                            "Não foi possível cadastrar o tipo de produto, verifique as informações dos campos!\n" + response.toString(),
+                            "Não foi possível cadastrar o tipo de produto, verifique as informações dos campos!\n" + err.get("message").toString(),
                             "Tipo de Produto Não Cadastrado",
                             JOptionPane.DEFAULT_OPTION,
                             JOptionPane.ERROR_MESSAGE,
@@ -679,8 +681,9 @@ public class CadastrarProduto extends JPanel {
                         response.append(responseLine.trim());
                     }
                 }
+                JsonObject err = JsonParser.parseString(response.toString()).getAsJsonObject();
                 JOptionPane.showOptionDialog(this.framePrincipal,
-                        "Não foi possível atualizar o tipo de produto, verifique as informações e tente novamente!\n" + response.toString(),
+                        "Não foi possível atualizar o tipo de produto, verifique as informações e tente novamente!\n" + err.get("message").toString(),
                         "Tipo de Produto Não Atualizado",
                         JOptionPane.DEFAULT_OPTION,
                         JOptionPane.ERROR_MESSAGE,
@@ -935,8 +938,9 @@ public class CadastrarProduto extends JPanel {
                     }
                 }
                 connection.disconnect();
+                JsonObject err = JsonParser.parseString(response.toString()).getAsJsonObject();
                 JOptionPane.showOptionDialog(this.framePrincipal,
-                        "Não foi possível cadastrar o produto, verifique as informações dos campos e tente novamente!\n" + response.toString(),
+                        "Não foi possível cadastrar o produto, verifique as informações dos campos e tente novamente!\n" + err.get("message").toString(),
                         "Produto Não Cadastrado",
                         JOptionPane.DEFAULT_OPTION,
                         JOptionPane.ERROR_MESSAGE,
@@ -1003,8 +1007,9 @@ public class CadastrarProduto extends JPanel {
                     }
                 }
                 connection.disconnect();
+                JsonObject err = JsonParser.parseString(response.toString()).getAsJsonObject();
                 JOptionPane.showOptionDialog(this.framePrincipal,
-                        "Não foi possível atualizar o produto, verifique as informações dos campos e tente novamente!\n" + response.toString(),
+                        "Não foi possível atualizar o produto, verifique as informações dos campos e tente novamente!\n" + err.get("message").toString(),
                         "Produto Não atualizado",
                         JOptionPane.DEFAULT_OPTION,
                         JOptionPane.ERROR_MESSAGE,

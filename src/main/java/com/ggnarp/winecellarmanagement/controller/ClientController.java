@@ -3,6 +3,7 @@ package com.ggnarp.winecellarmanagement.controller;
 import com.ggnarp.winecellarmanagement.dto.ClientDTO;
 import com.ggnarp.winecellarmanagement.entity.Client;
 import com.ggnarp.winecellarmanagement.service.ClientService;
+import com.ggnarp.winecellarmanagement.dto.DateRangeDTO;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -53,6 +54,19 @@ public class ClientController {
 
     }
 
+    @GetMapping("/date")
+    public ResponseEntity<?> date(@RequestBody DateRangeDTO rangeDTO) {
+        try {
+            List<ClientDTO> clientes = clientService.listAllByDate(rangeDTO.getStart_date(), rangeDTO.getEnd_date());
+            return ResponseEntity.status(HttpStatus.OK).body(clientes);
+        }catch (Exception e) {
+            Map<String, String> errorResponse = new HashMap<>();
+            errorResponse.put("error", "Erro ao procurar os clientes no servidor entre essas datas");
+            errorResponse.put("message", e.getMessage());
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
+        }
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<?> getSupplier(@PathVariable UUID id) {
         try{
@@ -68,7 +82,7 @@ public class ClientController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<?> update(@PathVariable UUID id, @RequestBody ClientDTO clientDTO) {
+    public ResponseEntity<?> update(@PathVariable UUID id, @RequestBody @Valid ClientDTO clientDTO) {
         try{
             Client updatedCLient = clientService.update(id, clientDTO);
             return ResponseEntity.status(HttpStatus.OK).body(updatedCLient);

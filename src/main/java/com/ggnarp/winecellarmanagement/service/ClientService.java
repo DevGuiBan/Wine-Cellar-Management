@@ -48,7 +48,7 @@ public class ClientService {
         if(this.clientRepository.existsClientByPhoneNumber(clientDTO.getPhoneNumber())) {
             throw new IllegalArgumentException("Já existe um cliente cadastrado com esse número de telefone");
         }
-        if(clientDTO.getDate_brith().equals(" / / ")){
+        if(clientDTO.getDateBirth().equals(" / / ")){
             throw new IllegalArgumentException("A data de nascimento não pode ser vázia!");
         }
 
@@ -58,8 +58,8 @@ public class ClientService {
         client.setPhoneNumber(clientDTO.getPhoneNumber());
         client.setAddress(clientDTO.getAddress());
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-        LocalDate data = LocalDate.parse(clientDTO.getDate_brith(), formatter);
-        client.setDate_brith(data);
+        LocalDate data = LocalDate.parse(clientDTO.getDateBirth(), formatter);
+        client.setDateBirth(data);
         client.setCpf(clientDTO.getCpf());
         return clientRepository.save(client);
     }
@@ -73,8 +73,8 @@ public class ClientService {
             dto.setAddress(client.getAddress());
             dto.setId(client.getId());
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-            String dataFormatada = client.getDate_brith().format(formatter);
-            dto.setDate_brith(dataFormatada);
+            String dataFormatada = client.getDateBirth().format(formatter);
+            dto.setDateBirth(dataFormatada);
             dto.setCpf(client.getCpf());
             return dto;
         }).collect(Collectors.toList());
@@ -126,13 +126,13 @@ public class ClientService {
                         }
 
                     }
-                    if(clientDTO.getDate_brith()!= null && !clientDTO.getDate_brith().isBlank()){
-                        if(" / / ".equals(clientDTO.getDate_brith())){
+                    if(clientDTO.getDateBirth()!= null && !clientDTO.getDateBirth().isBlank()){
+                        if(" / / ".equals(clientDTO.getDateBirth())){
                             throw new IllegalArgumentException("A data não pode ser vázia!");
                         }else {
                             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-                            LocalDate data = LocalDate.parse(clientDTO.getDate_brith(), formatter);
-                            existingClient.setDate_brith(data);
+                            LocalDate data = LocalDate.parse(clientDTO.getDateBirth(), formatter);
+                            existingClient.setDateBirth(data);
                         }
 
                     }
@@ -150,5 +150,24 @@ public class ClientService {
     public Client getById(UUID id) {
         return clientRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Cliente com o id " + id + " não encontrado"));
+    }
+
+    public List<ClientDTO> listAllByDate(String start_date, String end_date) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+        LocalDate date_in = LocalDate.parse(start_date, formatter);
+        LocalDate date_out = LocalDate.parse(end_date, formatter);
+
+        return clientRepository.findAllByDateBirthBetweenOrderByDateBirthAsc(date_in,date_out).stream().map(client -> {
+            ClientDTO dto = new ClientDTO();
+            dto.setName(client.getName());
+            dto.setEmail(client.getEmail());
+            dto.setPhoneNumber(client.getPhoneNumber());
+            dto.setAddress(client.getAddress());
+            dto.setId(client.getId());
+            String dataFormatada = client.getDateBirth().format(formatter);
+            dto.setDateBirth(dataFormatada);
+            dto.setCpf(client.getCpf());
+            return dto;
+        }).collect(Collectors.toList());
     }
 }

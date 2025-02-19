@@ -131,4 +131,24 @@ public class ProductService {
         }
     }
 
+    public List<ProductDTO> getProductByQuantity(int quantity){
+        return productRepository.findProductByQuantityOrderByQuantityAsc(quantity)
+                .stream()
+                .map(this::mapToDTO)
+                .collect(Collectors.toList());
+    }
+
+    public List<ProductDTO> getProductLessThan(){
+        return productRepository.findProductByQuantityLessThanOrderByQuantityAsc(5)
+                .stream()
+                .map(this::mapToDTO)
+                .collect(Collectors.toList());
+    }
+
+    public List<ProductDTO> getProductBySupplierName(String supplierName){
+        return productRepository.findProductBySupplier_NameOrderByNameAsc(supplierName)
+                .stream()
+                .map(this::mapToDTO)
+                .collect(Collectors.toList());
+    }
 }

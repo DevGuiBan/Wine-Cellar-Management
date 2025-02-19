@@ -10,6 +10,8 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import java.util.regex.*;
+
 @Service
 public class SupplierService {
 
@@ -82,12 +84,32 @@ public class SupplierService {
 
                     return supplierRepository.save(existingSupplier);
                 })
-                .orElseThrow(() -> new ResourceAccessException("Supplier with id " + id + " not found"));
+                .orElseThrow(() -> new ResourceAccessException("Fornecedor com o " + id + " não encontrado"));
     }
 
     public Supplier getById(UUID id) {
         return supplierRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Supplier with ID " + id + " not found"));
+                .orElseThrow(() -> new RuntimeException("Fornecedor com o " + id + " não encontrado"));
+    }
+
+    public List<SupplierDTO> getSupplierByAddress(String address) {
+        String regex = "^(.+?), (.+?), (\\d+), (.+)-([A-Z]{2})$";
+        boolean result = address.matches(regex);
+        if(!result){
+            throw new IllegalArgumentException("Insira um endereço válido!");
+        }
+
+        return supplierRepository.findSupplierByAddressOrderByAddressAsc(address).stream().map(supplier -> {
+            SupplierDTO dto = new SupplierDTO();
+            dto.setName(supplier.getName());
+            dto.setEmail(supplier.getEmail());
+            dto.setPhone_number(supplier.getPhone_number());
+            dto.setAddress(supplier.getAddress());
+            dto.setCnpj(supplier.getCnpj());
+            dto.setId(supplier.getId());
+            dto.setObservation(supplier.getObservation());
+            return dto;
+        }).collect(Collectors.toList());
     }
 
 }

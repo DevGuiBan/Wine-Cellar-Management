@@ -1,12 +1,42 @@
 package resources.interface_card;
 
+import com.google.gson.*;
+import io.github.cdimascio.dotenv.Dotenv;
+
 import javax.swing.*;
 import javax.swing.border.MatteBorder;
+import javax.swing.text.JTextComponent;
 import javax.swing.text.MaskFormatter;
 import java.awt.*;
+import java.awt.event.ItemEvent;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.HashMap;
 
 public class ClienteVenda extends JPanel {
-    public ClienteVenda() {
+    private final Dotenv dotenv;
+    private final ArrayList<String> cpfs = new ArrayList<>();
+    private final ArrayList<String> nomes = new ArrayList<>();
+    private final ArrayList<String> datas = new ArrayList<>();
+    private final HashMap<String, Integer> nomeIndexMap = new HashMap<>();
+    private final HashMap<String, Integer> cpfIndexMap = new HashMap<>();
+    private final HashMap<String, Integer> idIndexMap = new HashMap<>();
+    private final Frame framePrincipal;
+    private String clientIndex;
+
+    public ClienteVenda(Frame frame) {
+        this.dotenv = Dotenv.load();
+        this.framePrincipal = frame;
+        initComponents();
+        getClient();
+    }
+
+    private void initComponents() {
         // inicialização de variáveis
         jLabelCPF = new JLabel();
         jLabelDataNascimento = new JLabel();
@@ -52,6 +82,37 @@ public class ClienteVenda extends JPanel {
         jComboBoxName.setFont(new Font("Cormorant Garamond", 1, 18));
         jComboBoxName.setPreferredSize(fieldSize);
         jComboBoxName.setForeground(Color.BLACK);
+        jComboBoxName.setEditable(true);
+        JTextComponent editor = (JTextComponent) jComboBoxName.getEditor().getEditorComponent();
+
+        editor.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyReleased(java.awt.event.KeyEvent evt) {
+                String text = editor.getText().toLowerCase();
+                jComboBoxName.removeAllItems();
+
+                for (String nome : nomes) {
+                    if (nome.toLowerCase().contains(text)) {
+                        jComboBoxName.addItem(nome);
+                    }
+                }
+
+                editor.setText(text);
+                editor.setForeground(Color.BLACK);
+                jComboBoxName.showPopup();
+            }
+        });
+
+        jComboBoxName.addItemListener(evt -> {
+            if (evt.getStateChange() == ItemEvent.SELECTED) {
+                String nomeSelecionado = (String) jComboBoxName.getSelectedItem();
+                Integer index = nomeIndexMap.get(nomeSelecionado);
+
+                if (index != null) {
+                    jComboBoxCPF.setSelectedItem(cpfs.get(index));
+                    jTextFieldDataNascimento.setText(datas.get(index));
+                }
+            }
+        });
         gbc.gridx = 0;
         gbc.gridy = 1;
         gbc.insets = new Insets(0, 0, 20, 100);
@@ -88,6 +149,37 @@ public class ClienteVenda extends JPanel {
         jComboBoxCPF.setBorder(new MatteBorder(2, 2, 2, 2, new Color(128, 0, 32)));
         jComboBoxCPF.setPreferredSize(fieldSize);
         jComboBoxCPF.setForeground(Color.BLACK);
+        jComboBoxCPF.setEditable(true);
+        JTextComponent editorCpf = (JTextComponent) jComboBoxCPF.getEditor().getEditorComponent();
+
+        editorCpf.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyReleased(java.awt.event.KeyEvent evt) {
+                String text = editorCpf.getText();
+                jComboBoxCPF.removeAllItems();
+
+                for (String cpf : cpfs) {
+                    if (cpf.contains(text)) {
+                        jComboBoxCPF.addItem(cpf);
+                    }
+                }
+
+                editorCpf.setText(text);
+                editorCpf.setForeground(Color.BLACK);
+                jComboBoxCPF.showPopup();
+            }
+        });
+
+        jComboBoxCPF.addItemListener(evt -> {
+            if (evt.getStateChange() == ItemEvent.SELECTED) {
+                String cpfSelecionado = (String) jComboBoxCPF.getSelectedItem();
+                Integer index = cpfIndexMap.get(cpfSelecionado);
+
+                if (index != null) {
+                    jComboBoxName.setSelectedItem(nomes.get(index));
+                    jTextFieldDataNascimento.setText(datas.get(index));
+                }
+            }
+        });
         gbc.gridx = 0;
         gbc.gridy = 3;
         gbc.insets = new Insets(0, 0, 20, 100);
@@ -106,12 +198,80 @@ public class ClienteVenda extends JPanel {
         jComboBoxMetodoPagamento.setFont(new Font("Cormorant Garamond", Font.BOLD, 18));
         jComboBoxMetodoPagamento.setBorder(new MatteBorder(2, 2, 2, 2, new Color(128, 0, 32)));
         jComboBoxMetodoPagamento.setPreferredSize(fieldSize);
+        jComboBoxMetodoPagamento.addItem("CARTÃO_DE_CRÉDITO");
+        jComboBoxMetodoPagamento.addItem("CARTÃO_DE_DÉBITO,");
+        jComboBoxMetodoPagamento.addItem("DINHEIRO");
+        jComboBoxMetodoPagamento.addItem("PIX");
+        jComboBoxMetodoPagamento.addItem("TRANSFERÊNCIA_BANCÁRIA");
         gbc.gridx = 1;
         gbc.gridy = 3;
         gbc.insets = new Insets(0, 0, 20, 0);
         jPanelContent.add(jComboBoxMetodoPagamento, gbc);
 
         add(jPanelContent);
+    }
+
+    private void getClient() {
+        try {
+            String urlAPI = this.dotenv.get("API_HOST");
+            URL url = new URL(urlAPI + "/client");
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.setRequestMethod("GET");
+
+            int responseCode = connection.getResponseCode();
+            if (responseCode == HttpURLConnection.HTTP_OK) {
+                BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+                StringBuilder response = new StringBuilder();
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    response.append(line);
+                }
+                reader.close();
+
+                JsonArray arrClient = JsonParser.parseString(response.toString()).getAsJsonArray();
+                DefaultComboBoxModel<String> model_nome = new DefaultComboBoxModel<>();
+                DefaultComboBoxModel<String> model_cpf = new DefaultComboBoxModel<>();
+
+                nomes.clear();
+                cpfs.clear();
+                datas.clear();
+                nomeIndexMap.clear();
+                cpfIndexMap.clear();
+
+                int index = 0;
+                for (JsonElement arr : arrClient) {
+                    JsonObject arrNome = arr.getAsJsonObject();
+                    String nome = arrNome.get("name").getAsString();
+                    String cpf = arrNome.get("cpf").getAsString();
+                    String dataNascimento = arrNome.get("dateBirth").getAsString();
+                    String id = arrNome.get("id").getAsString();
+
+                    nomes.add(nome);
+                    cpfs.add(cpf);
+                    datas.add(dataNascimento);
+                    model_nome.addElement(nome);
+                    model_cpf.addElement(cpf);
+
+                    nomeIndexMap.put(nome, index);
+                    cpfIndexMap.put(cpf, index);
+                    idIndexMap.put(id,index);
+                    index++;
+                }
+
+                jComboBoxName.setModel(model_nome);
+                jComboBoxCPF.setModel(model_cpf);
+                connection.disconnect();
+            } else {
+                JOptionPane.showMessageDialog(framePrincipal, "Erro ao carregar o cliente: " + responseCode);
+                connection.disconnect();
+            }
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(framePrincipal, e.getMessage());
+        }
+    }
+
+    public ArrayList<String> clienteVenda(){
+        return null;
     }
 
     private JLabel jLabelCPF;

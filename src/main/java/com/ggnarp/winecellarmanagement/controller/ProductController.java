@@ -50,6 +50,45 @@ public class ProductController {
         }
     }
 
+    @GetMapping("/supplier/{s_name}")
+    public ResponseEntity<?> getProductBySupplierName(@PathVariable("s_name") String supplierName) {
+        try{
+            List<ProductDTO> product = productService.getProductBySupplierName(supplierName);
+            return ResponseEntity.status(HttpStatus.OK).body(product);
+        } catch (Exception e) {
+            Map<String, String> errorResponse = new HashMap<>();
+            errorResponse.put("error", "Produtos com este fornecedor:" + supplierName + ". Não foi encontrado!");
+            errorResponse.put("message", e.getMessage());
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
+        }
+    }
+
+    @GetMapping("/quantity/{quantity}")
+    public ResponseEntity<?> getProductByQuantity(@PathVariable String quantity) {
+        try{
+            List<ProductDTO> product = productService.getProductByQuantity(Integer.parseInt(quantity));
+            return ResponseEntity.status(HttpStatus.OK).body(product);
+        } catch (Exception e) {
+            Map<String, String> errorResponse = new HashMap<>();
+            errorResponse.put("error", "Produtos com essas quantidades: "+quantity+". Não foram encontrados!");
+            errorResponse.put("message", e.getMessage());
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
+        }
+    }
+
+    @GetMapping("/quantity")
+    public ResponseEntity<?> getProductQuantityLess() {
+        try{
+            List<ProductDTO> product = productService.getProductLessThan();
+            return ResponseEntity.status(HttpStatus.OK).body(product);
+        }catch (Exception e) {
+            Map<String, String> errorResponse = new HashMap<>();
+            errorResponse.put("error", "Ocorreu um erro ao tentar buscar os produtos com estoque baixo!");
+            errorResponse.put("message", e.getMessage());
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
+        }
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<?> getById(@PathVariable Long id) {
         try{
