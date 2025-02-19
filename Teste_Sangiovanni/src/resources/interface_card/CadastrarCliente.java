@@ -517,7 +517,7 @@ public class CadastrarCliente extends JPanel {
         this.jTextFieldEndereco.setText(null);
         this.jTextFieldEmail.setText("email@gmail.com");
         this.jTextFieldTelefone.setText(null);
-        this.jTextFieldNome.setText("Nomde do fornecedor");
+        this.jTextFieldNome.setText("Nome do cliente");
         this.jLabelCadastro.setText("Cadastrar Cliente");
     }
 
