@@ -13,7 +13,6 @@ import javax.swing.table.*;
 import java.awt.*;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
-import java.math.BigInteger;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.Objects;
@@ -87,7 +86,7 @@ public class ListarFuncionario extends JPanel {
         jButtonCadastrar.setBorder(null);
         jButtonCadastrar.setContentAreaFilled(false);
         jButtonCadastrar.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
-        jButtonCadastrar.setPreferredSize(new java.awt.Dimension(200, 40));
+        jButtonCadastrar.setPreferredSize(new java.awt.Dimension(250, 40));
         jButtonCadastrar.addActionListener(e -> {
             CardLayout cl = (CardLayout) mainPanel.getLayout();
             cl.show(mainPanel, "cadastrar_funcionario");
@@ -165,7 +164,7 @@ public class ListarFuncionario extends JPanel {
     private void getFuncionarios(){
         try {
             String urlAPI = this.dotenv.get("API_HOST");
-            URL url = new URL(urlAPI + "/funcionario");
+            URL url = new URL(urlAPI + "/employee");
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
             connection.setRequestMethod("GET");
 
@@ -193,7 +192,7 @@ public class ListarFuncionario extends JPanel {
                     String address = product.get("address").getAsString();
                     String phone_number = product.get("phoneNumber").getAsString();
                     String email = product.get("email").getAsString();
-                    String data = product.get("date_brith").getAsString();
+                    String data = product.get("date_birth").getAsString();
                     tableModel.addRow(new Object[]{id, name, cpf, address, phone_number, email, data});
                     connection.disconnect();
                 }
@@ -212,7 +211,7 @@ public class ListarFuncionario extends JPanel {
     }
 
     public void atualizarDados(){
-        this.getClientes();
+        this.getFuncionarios();
     }
 
     private javax.swing.JTextField pesquisaProduto;
@@ -305,7 +304,7 @@ class ButtonEditorEmployee extends AbstractCellEditor implements TableCellEditor
         editButton.addActionListener(evt -> {
             int cellIndex = table.getSelectedRow();
             Object cellValue = table.getValueAt(cellIndex,0);
-            cardCli.setId(cellValue.toString());
+            cardFuncionario.setId(cellValue.toString());
             CardLayout cl = (CardLayout) mainPanel.getLayout();
             cl.show(mainPanel, "cadastrar_funcionario");
             stopCellEditing();
@@ -329,8 +328,8 @@ class ButtonEditorEmployee extends AbstractCellEditor implements TableCellEditor
                         table.getCellEditor().stopCellEditing();
                     }
                     Object cellValue = table.getValueAt(cellIndex,0);
-                    String id_product = cellValue.toString();
-                    URL url = new URL(this.APIURL + "/funcionario/" + id_funcionario);
+                    String id_funcionario = cellValue.toString();
+                    URL url = new URL(this.APIURL + "/employee/" + id_funcionario);
                     HttpURLConnection connection = (HttpURLConnection) url.openConnection();
 
                     connection.setRequestMethod("DELETE");

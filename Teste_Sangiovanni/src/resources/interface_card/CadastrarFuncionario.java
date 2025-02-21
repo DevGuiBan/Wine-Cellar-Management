@@ -4,8 +4,6 @@ import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import io.github.cdimascio.dotenv.Dotenv;
-import resources.interfaces.ProductType;
-import resources.interfaces.Employee;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -23,7 +21,8 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
-import java.util.Objects;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 
 public class CadastrarFuncionario extends JPanel {
     private JPanel mainPanel;
@@ -52,16 +51,21 @@ public class CadastrarFuncionario extends JPanel {
         jLabelBairro = new JLabel();
         jLabelNumero = new JLabel();
         jLabelCidade = new JLabel();
+        jLabelUF = new JLabel();
 
         // Adicionar novas labels de endereço
 
         jTextFieldNome = new JTextField();
         jTextFieldEmail = new JTextField();
+        jTextFieldRua = new JTextField();
+        jTextFieldBairro = new JTextField();
+        jTextFieldNumero = new JTextField();
+        jTextFieldCidade = new JTextField();
+        jComboBoxUF = new JComboBox<UF>();
         try{
             jTextFieldTelefone = new javax.swing.JFormattedTextField(new MaskFormatter("(##) #####-####"));
             jTextFieldCPF = new javax.swing.JFormattedTextField(new MaskFormatter("###.###.###-##"));
             jTextFieldDataNascimento = new javax.swing.JFormattedTextField(new MaskFormatter("##/##/####"));
-            jTextFieldCidade = new javax.swing.JFormattedTextField(new MaskFormatter("-##"));
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -100,6 +104,7 @@ public class CadastrarFuncionario extends JPanel {
 
         jLabelCadastro.setFont(new Font("Cormorant Garamond SemiBold", 0, 30));
         jLabelCadastro.setText("Cadastrar Funcionário");
+        jLabelCadastro.setPreferredSize(new Dimension(250,30));
         jLabelCadastro.setAlignmentX(Component.CENTER_ALIGNMENT); // centralizar
 
         jSeparator.setBackground(new Color(128, 0, 32));
@@ -190,7 +195,7 @@ public class CadastrarFuncionario extends JPanel {
         jTextFieldTelefone.setPreferredSize(fieldSize);
         gbc.gridx = 0;
         gbc.gridy = 5;
-        gbc.insets = new Insets(0, 0, 20, 0);
+        gbc.insets = new Insets(0, 0, 20, 100);
         jPanelContent.add(jTextFieldTelefone, gbc);
 
         jLabelEmail.setText("E-mail:");
@@ -226,7 +231,7 @@ public class CadastrarFuncionario extends JPanel {
         });
         gbc.gridx = 0;
         gbc.gridy = 7;
-        gbc.insets = new Insets(0, 0, 20, 0);
+        gbc.insets = new Insets(0, 0, 20, 100);
         jPanelContent.add(jTextFieldEmail, gbc);
 
         jLabelDataNascimento.setFont(new Font("Cormorant Garamond", 1, 18));
@@ -310,7 +315,7 @@ public class CadastrarFuncionario extends JPanel {
         jPanelContent.add(jTextFieldNumero, gbc);
 
         jLabelCidade.setFont(new Font("Cormorant Garamond", 1, 18));
-        jLabelCidade.setText("Cidade-UF:");
+        jLabelCidade.setText("Cidade:");
         jLabelCidade.setForeground(Color.BLACK);
         jLabelCidade.setBackground(Color.WHITE);
         gbc.gridx = 1;
@@ -323,11 +328,33 @@ public class CadastrarFuncionario extends JPanel {
         jTextFieldCidade.setBorder(new MatteBorder(2, 2, 2, 2, new Color(128, 0, 32)));
         jTextFieldCidade.setPreferredSize(fieldSize);
         jTextFieldCidade.setForeground(Color.BLACK);
-        jTextFieldCidade.setText("Cidade-UF");
+        jTextFieldCidade.setText("Cidade:");
         gbc.gridx = 1;
         gbc.gridy = 7;
         gbc.insets = new Insets(0, 0, 20, 100);
         jPanelContent.add(jTextFieldCidade, gbc);
+
+        jLabelUF.setFont(new Font("Cormorant Garamond", 1, 18));
+        jLabelUF.setText("UF:");
+        jLabelUF.setForeground(Color.BLACK);
+        jLabelUF.setBackground(Color.WHITE);
+        gbc.gridx = 1;
+        gbc.gridy = 8;
+        gbc.insets = new Insets(0, 0, 0, 100);
+        jPanelContent.add(jLabelUF, gbc);
+
+        jComboBoxUF.setBackground(Color.WHITE);
+        jComboBoxUF.setFont(new Font("Cormorant Infant", 1, 18));
+        jComboBoxUF.setBorder(new MatteBorder(2, 2, 2, 2, new Color(128, 0, 32)));
+        jComboBoxUF.setPreferredSize(fieldSize);
+        jComboBoxUF.setForeground(Color.BLACK);
+        for (UF uf : UF.values()) {
+            jComboBoxUF.addItem(uf);
+        }
+        gbc.gridx = 1;
+        gbc.gridy = 9;
+        gbc.insets = new Insets(0, 0, 20, 100);
+        jPanelContent.add(jComboBoxUF, gbc);
 
         jButtonCancelar.setBackground(new Color(225, 225, 200));
         jButtonCancelar.setFont(new Font("Cormorant Garamond Bold", 1, 18));
@@ -337,7 +364,7 @@ public class CadastrarFuncionario extends JPanel {
         jButtonCancelar.addActionListener(e -> {
             this.reset();
             CardLayout cl = (CardLayout) mainPanel.getLayout();
-            cl.show(mainPanel, "listar_funcionario");
+            cl.show(mainPanel, "listar_Funcionario");
         });
 
         jButtonCadastrar.setBackground(new Color(0, 128, 17));
@@ -349,9 +376,9 @@ public class CadastrarFuncionario extends JPanel {
             @Override
             public void actionPerformed(ActionEvent e) {
                 if (id == null) {
-                    cadastrarFuncionario();
+                    createEmployee();
                 } else  {
-                    editarFuncionario();
+                    editEmployee();
                 }
             }
         });
@@ -369,6 +396,140 @@ public class CadastrarFuncionario extends JPanel {
         jPanel.add(jPanelButtons);
 
         add(jPanel);
+    }
+
+    private void createEmployee(){
+        try {
+            String name = jTextFieldNome.getText();
+            String phone_number = jTextFieldTelefone.getText();
+            String email = jTextFieldEmail.getText();
+            String address = jTextFieldRua.getText() + ", " + jTextFieldBairro.getText() + ", " + jTextFieldNumero.getText() + ", " + jTextFieldCidade.getText() + "-" + jComboBoxUF.getSelectedItem();
+            String cpf = jTextFieldCPF.getText();
+            String dataString = jTextFieldDataNascimento.getText();
+
+            JsonObject jsonData = new JsonObject();
+            jsonData.addProperty("name", name);
+            jsonData.addProperty("email", email);
+            jsonData.addProperty("phoneNumber", phone_number);
+            jsonData.addProperty("address", address);
+            jsonData.addProperty("cpf", cpf);
+            jsonData.addProperty("date_birth", dataString);
+
+            // making the request
+            String urlAPI = this.dotenv.get("API_HOST");
+            URL url = new URL(urlAPI + "/employee");
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.setRequestMethod("POST");
+            connection.setRequestProperty("Content-Type", "application/json");
+            connection.setDoOutput(true);
+
+            // send the request with json
+            try (OutputStream os = connection.getOutputStream()) {
+                byte[] input = jsonData.toString().getBytes(StandardCharsets.UTF_8);
+                os.write(input, 0, input.length);
+            }
+
+            int statusCode = connection.getResponseCode();
+            StringBuilder response = new StringBuilder();
+
+            if (statusCode >= 200 && statusCode < 300) {
+                this.reset();
+                frame.showCard("listar_Funcionario");
+                JOptionPane.showOptionDialog(this.rootPane,
+                        "O Funcionário foi cadastrado com sucesso!",
+                        "Funcionário Cadastrado",
+                        JOptionPane.DEFAULT_OPTION,
+                        JOptionPane.INFORMATION_MESSAGE,
+                        null,null,null);
+                connection.disconnect();
+
+            } else {
+                try (BufferedReader br = new BufferedReader(new InputStreamReader(connection.getErrorStream(), "utf-8"))) {
+                    String responseLine;
+                    while ((responseLine = br.readLine()) != null) {
+                        response.append(responseLine.trim());
+                    }
+                }
+                connection.disconnect();
+                JsonObject err = JsonParser.parseString(response.toString()).getAsJsonObject();
+                JOptionPane.showOptionDialog(this.rootPane,
+                        "Não foi possível cadastrar o funcionário, verifique as informações dos campos e tente novamente!\n" + err.get("message").toString(),
+                        "Funcionário Não Cadastrado",
+                        JOptionPane.DEFAULT_OPTION,
+                        JOptionPane.ERROR_MESSAGE,
+                        null,null,null);
+            }
+
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this.rootPane, e.getMessage());
+        }
+    }
+
+    private void editEmployee(){
+        try {
+            String name = jTextFieldNome.getText();
+            String phone_number = jTextFieldTelefone.getText();
+            String email = jTextFieldEmail.getText();
+            String address = jTextFieldRua.getText() + ", " + jTextFieldBairro.getText() + ", " + jTextFieldNumero.getText() + ", " + jTextFieldCidade.getText() + "-" + jComboBoxUF.getSelectedItem();
+            String cpf = jTextFieldCPF.getText();
+            String dataString = jTextFieldDataNascimento.getText();
+
+            JsonObject jsonData = new JsonObject();
+            jsonData.addProperty("name", name);
+            jsonData.addProperty("email", email);
+            jsonData.addProperty("phoneNumber", phone_number);
+            jsonData.addProperty("address", address);
+            jsonData.addProperty("cpf", cpf);
+            jsonData.addProperty("date_birth", dataString);
+
+            // making the request
+            String urlAPI = this.dotenv.get("API_HOST");
+            URL url = new URL(urlAPI + "/employee");
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.setRequestMethod("PUT");
+            connection.setRequestProperty("Content-Type", "application/json");
+            connection.setDoOutput(true);
+
+            // send the request with json
+            try (OutputStream os = connection.getOutputStream()) {
+                byte[] input = jsonData.toString().getBytes(StandardCharsets.UTF_8);
+                os.write(input, 0, input.length);
+            }
+
+            int statusCode = connection.getResponseCode();
+            StringBuilder response = new StringBuilder();
+
+            if (statusCode >= 200 && statusCode < 300) {
+                this.reset();
+                frame.showCard("listar_Funcionario");
+                JOptionPane.showOptionDialog(this.rootPane,
+                        "O Funcionário foi cadastrado com sucesso!",
+                        "Funcionário Cadastrado",
+                        JOptionPane.DEFAULT_OPTION,
+                        JOptionPane.INFORMATION_MESSAGE,
+                        null,null,null);
+                connection.disconnect();
+
+            } else {
+                try (BufferedReader br = new BufferedReader(new InputStreamReader(connection.getErrorStream(), "utf-8"))) {
+                    String responseLine;
+                    while ((responseLine = br.readLine()) != null) {
+                        response.append(responseLine.trim());
+                    }
+                }
+                connection.disconnect();
+                JsonObject err = JsonParser.parseString(response.toString()).getAsJsonObject();
+                JOptionPane.showOptionDialog(this.rootPane,
+                        "Não foi possível cadastrar o funcionário, verifique as informações dos campos e tente novamente!\n" + err.get("message").toString(),
+                        "Funcionário Não Cadastrado",
+                        JOptionPane.DEFAULT_OPTION,
+                        JOptionPane.ERROR_MESSAGE,
+                        null,null,null);
+            }
+
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this.rootPane, e.getMessage());
+        }
     }
 
     private void getEmployee(){
@@ -393,14 +554,30 @@ public class CadastrarFuncionario extends JPanel {
                 JsonObject employees = JsonParser.parseString(response.toString()).getAsJsonObject();
 
                 jTextFieldNome.setText(employees.get("name").getAsString());
-                jTextFieldTelefone.setText(employees.get("phone_number").getAsString());
+                jTextFieldTelefone.setText(employees.get("phoneNumber").getAsString());
                 jTextFieldEmail.setText(employees.get("email").getAsString());
-                jTextFieldDataNascimento.setText(employees.get("date_birth").getAsString());
+
+                String data = employees.get("date_birth").getAsString();
+
+                DateTimeFormatter formatoEntrada = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+                DateTimeFormatter formatoSaida = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+                String dataFormatada = LocalDate.parse(data, formatoEntrada).format(formatoSaida);
+
+                jTextFieldDataNascimento.setText(dataFormatada);
                 jTextFieldCPF.setText(employees.get("cpf").getAsString());
-                jTextFieldRua.setText(employees.get("street").getAsString());
-                jTextFieldBairro.setText(employees.get("district").getAsString());
-                jTextFieldNumero.setText(employees.get("number").getAsString());
-                jTextFieldCidade.setText(employees.get("city").getAsString());
+                String[] address = employees.get("address").getAsString().split(",");
+                jTextFieldRua.setText(address[0]);
+                jTextFieldBairro.setText(address[1]);
+                jTextFieldNumero.setText(address[2]);
+                String[] cityUF = address[3].split("-");
+                jTextFieldCidade.setText(cityUF[0]);
+
+                try {
+                    UF ufSelecionado = UF.valueOf(cityUF[1]);
+                    jComboBoxUF.setSelectedItem(ufSelecionado);
+                } catch (IllegalArgumentException e) {
+                    throw new Exception("O UF não foi encontrado!");
+                }
 
                 connection.disconnect();
             }
@@ -426,12 +603,13 @@ public class CadastrarFuncionario extends JPanel {
         jTextFieldNome.setText("Nome do Funcionário");
         jTextFieldTelefone.setText(null);
         jTextFieldEmail.setText("exemplo@email.com");
-        jTextFieldDataNascimento.setText("DD/MM/AAAA");
+        jTextFieldDataNascimento.setText(null);
         jTextFieldCPF.setText(null);
         jTextFieldRua.setText("Rua");
         jTextFieldBairro.setText("Bairro");
         jTextFieldNumero.setText("Nº");
-        jTextFieldCidade.setText("Cidade-UF");
+        jTextFieldCidade.setText("Cidade");
+        jComboBoxUF.setSelectedIndex(0);
         this.jButtonCadastrar.setText("Cadastrar");
         this.jLabelCadastro.setText("Cadastrar Funcionário");
     }
@@ -596,6 +774,7 @@ public class CadastrarFuncionario extends JPanel {
     private JLabel jLabelBairro;
     private JLabel jLabelNumero;
     private JLabel jLabelCidade;
+    private JLabel jLabelUF;
 
     private JTextField jTextFieldNome;
     private JTextField jTextFieldTelefone;
@@ -606,6 +785,7 @@ public class CadastrarFuncionario extends JPanel {
     private JTextField jTextFieldBairro;
     private JTextField jTextFieldNumero;
     private JTextField jTextFieldCidade;
+    private JComboBox<UF> jComboBoxUF;
 
     private JButton jButtonCancelar;
     private JButton jButtonCadastrar;

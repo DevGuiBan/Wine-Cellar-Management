@@ -25,6 +25,7 @@ public class JanelaPrincipal extends javax.swing.JFrame {
             jButton2 = new javax.swing.JButton();
             jButton3 = new javax.swing.JButton();
             jButton4 = new JButton();
+            jButton5 = new JButton();
 
             // Paineis dos cards
             cardCadastroProdutos = new CadastrarProduto(cardPanel,this.rootPane);
@@ -35,6 +36,8 @@ public class JanelaPrincipal extends javax.swing.JFrame {
             cardListarFornecedores = new ListarFornecedor(this.rootPane,cardPanel,cardCadastroFornecedores);
             cardListarVendas = new ListarVendas(this.rootPane,cardPanel);
             cardListarClientes = new ListarCliente(this.rootPane,cardPanel,cardCadastrarClientes);
+            cardCadastroFuncionario = new CadastrarFuncionario(cardPanel,this.rootPane);
+            cardListarFuncionario = new ListarFuncionario(this.rootPane,cardPanel, cardCadastroFuncionario);
 
             // Labels
             jLabel1 = new javax.swing.JLabel();
@@ -127,16 +130,34 @@ public class JanelaPrincipal extends javax.swing.JFrame {
                 }
             });
 
+            jButton5.setBackground(new java.awt.Color(128, 0, 32));
+            jButton5.setFont(new java.awt.Font("Cormorant Garamond SemiBold", 0, 18)); // NOI18N
+            jButton5.setForeground(new java.awt.Color(225, 255, 255));
+            jButton5.setIcon(new javax.swing.ImageIcon(Objects.requireNonNull(getClass().getResource("/resources/images/carteira-de-identidade.png")))); // NOI18N
+            jButton5.setText("Funcionarios");
+            jButton5.setBorder(null);
+            jButton5.setFocusable(false);
+            jButton5.setContentAreaFilled(false);
+            jButton5.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+            jButton5.setPreferredSize(new java.awt.Dimension(180, 35));
+            jButton5.addActionListener(new java.awt.event.ActionListener() {
+                public void actionPerformed(java.awt.event.ActionEvent evt) {
+                    jButton5ActionPerformed(evt);
+                }
+            });
+
             // Botões para alternar os cards
             jButton1.addActionListener(evt -> showCard("listar_produtos"));
             jButton2.addActionListener(evt -> showCard("listar_fonecedores"));
             jButton3.addActionListener(evt -> showCard("listar_vendas"));
             jButton4.addActionListener(evt -> showCard("listar_clientes"));
+            jButton5.addActionListener(evt-> showCard("listar_Funcionario"));
 
             jPanel3.add(jButton1);
             jPanel3.add(jButton2);
             jPanel3.add(jButton3);
             jPanel3.add(jButton4);
+            jPanel3.add(jButton5);
 
             // Adicionando jPanel3 ao centro do jPanel1
             jPanel1.add(jPanel3, BorderLayout.CENTER);
@@ -154,6 +175,8 @@ public class JanelaPrincipal extends javax.swing.JFrame {
             cardPanel.add(cardListarClientes,"listar_clientes");
             cardPanel.add(cardCadastrarClientes,"cadastrar_cliente");
             cardPanel.add(cardRegistrarVenda,"registrar_venda");
+            cardPanel.add(cardCadastroFuncionario,"cadastrar_funcionario");
+            cardPanel.add(cardListarFuncionario,"listar_Funcionario");
 
             // Adicionar cardPanel ao sul do jPanel1
             jPanel1.add(cardPanel, BorderLayout.SOUTH);
@@ -199,6 +222,7 @@ public class JanelaPrincipal extends javax.swing.JFrame {
             jButton2.setForeground(Color.WHITE);
             jButton3.setForeground(Color.WHITE);
             jButton4.setForeground(Color.WHITE);
+            jButton5.setForeground(Color.WHITE);
         }
 
         private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {
@@ -206,6 +230,7 @@ public class JanelaPrincipal extends javax.swing.JFrame {
             jButton2.setForeground(new java.awt.Color(225, 235, 43));
             jButton3.setForeground(Color.WHITE);
             jButton4.setForeground(Color.WHITE);
+            jButton5.setForeground(Color.WHITE);
         }
 
         private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {
@@ -213,6 +238,7 @@ public class JanelaPrincipal extends javax.swing.JFrame {
             jButton2.setForeground(Color.WHITE);
             jButton3.setForeground(new java.awt.Color(225, 235, 43));
             jButton4.setForeground(Color.WHITE);
+            jButton5.setForeground(Color.WHITE);
         }
 
         private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {
@@ -220,6 +246,15 @@ public class JanelaPrincipal extends javax.swing.JFrame {
             jButton2.setForeground(Color.WHITE);
             jButton3.setForeground(Color.WHITE);
             jButton4.setForeground(new java.awt.Color(225, 235, 43));
+            jButton5.setForeground(Color.WHITE);
+        }
+
+        private void jButton5ActionPerformed(java.awt.event.ActionEvent evt){
+            jButton1.setForeground(Color.WHITE);
+            jButton2.setForeground(Color.WHITE);
+            jButton3.setForeground(Color.WHITE);
+            jButton4.setForeground(Color.WHITE);
+            jButton5.setForeground(new java.awt.Color(225, 235, 43));
         }
 
         public static void main(String[] args) {
@@ -235,6 +270,7 @@ public class JanelaPrincipal extends javax.swing.JFrame {
         private javax.swing.JButton jButton2;
         private javax.swing.JButton jButton3;
         private javax.swing.JButton jButton4;
+        private javax.swing.JButton jButton5;
 
         private javax.swing.JLabel jLabel1;
 
@@ -250,5 +286,7 @@ public class JanelaPrincipal extends javax.swing.JFrame {
         private ListarCliente cardListarClientes;
         private CadastrarCliente cardCadastrarClientes;
         private RegistrarVenda cardRegistrarVenda;
+        private CadastrarFuncionario cardCadastroFuncionario;
+        private ListarFuncionario cardListarFuncionario;
     }
 
