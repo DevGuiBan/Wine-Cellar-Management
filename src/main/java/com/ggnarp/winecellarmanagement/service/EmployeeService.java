@@ -1,7 +1,6 @@
 package com.ggnarp.winecellarmanagement.service;
 
 import com.ggnarp.winecellarmanagement.dto.EmployeeDTO;
-import com.ggnarp.winecellarmanagement.entity.Client;
 import com.ggnarp.winecellarmanagement.entity.Employee;
 import com.ggnarp.winecellarmanagement.repository.EmployeeRepository;
 import org.springframework.stereotype.Service;
@@ -35,6 +34,13 @@ public class EmployeeService {
         }
         if(employerDTO.getDate_birth().equals(" / / ")){
             throw new IllegalArgumentException("A data de nascimento não pode ser vázia!");
+        }
+
+        if (employerDTO.getName().isBlank()){
+            throw new IllegalArgumentException("O nome do Funcionário não pode ser vázio");
+        }
+        if(employerDTO.getEmail().isBlank()){
+            throw new IllegalArgumentException("O e-mail do Funcionário não pode ser vázio");
         }
 
         Employee employee = new Employee();

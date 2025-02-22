@@ -27,6 +27,9 @@ public class ClientService {
         if(clientDTO.getName().isBlank()){
             throw new IllegalArgumentException("O nome do cliente não pode ser vázio!");
         }
+        else if (clientDTO.getName().equals("Nome do cliente")){
+            throw new IllegalArgumentException("O nome do cliente não pode ser vázio!");
+        }
 
         if(this.clientRepository.existsByEmail(clientDTO.getEmail())) {
             throw new IllegalArgumentException("Já existe um cliente cadastrado com esse e-mail");
@@ -90,6 +93,9 @@ public class ClientService {
     public Client update(UUID id, ClientDTO clientDTO) {
         return clientRepository.findById(id)
                 .map(existingClient -> {
+                    if(clientDTO.getName().equals("Nome do cliente")){
+                        throw new IllegalArgumentException("O nome do Cliente deve ser inserido da forma correta!");
+                    }
                     if (!clientDTO.getName().isBlank()) {
                         existingClient.setName(clientDTO.getName());
                     }

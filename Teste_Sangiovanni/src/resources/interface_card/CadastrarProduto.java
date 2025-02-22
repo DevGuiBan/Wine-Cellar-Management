@@ -921,30 +921,35 @@ public class CadastrarProduto extends JPanel {
             if (statusCode >= 200 && statusCode < 300) {
                 this.reset();
                 this.janelaPrincipal.showCard("listar_produtos");
-                JOptionPane.showOptionDialog(this.framePrincipal,
+                JOptionPane.showMessageDialog(this.framePrincipal,
                         "O Produto foi cadastrado com sucesso!",
                         "Produto Cadastrado",
-                        JOptionPane.DEFAULT_OPTION,
-                        JOptionPane.INFORMATION_MESSAGE,
-                        null, null, null);
-                connection.disconnect();
-
-
+                        JOptionPane.INFORMATION_MESSAGE);
             } else {
-                try (BufferedReader br = new BufferedReader(new InputStreamReader(connection.getErrorStream(), "utf-8"))) {
+                try (BufferedReader br = new BufferedReader(new InputStreamReader(connection.getErrorStream(), StandardCharsets.UTF_8))) {
                     String responseLine;
                     while ((responseLine = br.readLine()) != null) {
                         response.append(responseLine.trim());
                     }
                 }
-                connection.disconnect();
-                JsonObject err = JsonParser.parseString(response.toString()).getAsJsonObject();
-                JOptionPane.showOptionDialog(this.framePrincipal,
-                        "Não foi possível cadastrar o produto, verifique as informações dos campos e tente novamente!\n" + err.get("message").toString(),
-                        "Produto Não Cadastrado",
-                        JOptionPane.DEFAULT_OPTION,
-                        JOptionPane.ERROR_MESSAGE,
-                        null, null, null);
+
+                try {
+                    JsonObject err = JsonParser.parseString(response.toString()).getAsJsonObject();
+
+                    String errorMessage = (err.has("message") && !err.get("message").isJsonNull())
+                            ? err.get("message").getAsString()
+                            : response.toString();
+
+                    JOptionPane.showMessageDialog(this.framePrincipal,
+                            "Não foi possível cadastrar o produto. Verifique os dados e tente novamente!\n" + errorMessage,
+                            "Erro no Cadastro",
+                            JOptionPane.ERROR_MESSAGE);
+                } catch (Exception jsonException) {
+                    JOptionPane.showMessageDialog(this.framePrincipal,
+                            "Erro inesperado ao processar a resposta da API.\nCódigo: " + statusCode + "\nResposta: " + response,
+                            "Erro no Cadastro",
+                            JOptionPane.ERROR_MESSAGE);
+                }
             }
 
         } catch (Exception e) {
@@ -988,32 +993,36 @@ public class CadastrarProduto extends JPanel {
 
             if (statusCode >= 200 && statusCode < 300) {
                 this.reset();
-                this.id = null;
-                janelaPrincipal.showCard("listar_produtos");
-                JOptionPane.showOptionDialog(this.framePrincipal,
+                this.janelaPrincipal.showCard("listar_produtos");
+                JOptionPane.showMessageDialog(this.framePrincipal,
                         "O Produto foi atualizado com sucesso!",
                         "Produto Atualizado",
-                        JOptionPane.DEFAULT_OPTION,
-                        JOptionPane.INFORMATION_MESSAGE,
-                        null, null, null);
-                connection.disconnect();
-
-
+                        JOptionPane.INFORMATION_MESSAGE);
             } else {
-                try (BufferedReader br = new BufferedReader(new InputStreamReader(connection.getErrorStream(), "utf-8"))) {
+                try (BufferedReader br = new BufferedReader(new InputStreamReader(connection.getErrorStream(), StandardCharsets.UTF_8))) {
                     String responseLine;
                     while ((responseLine = br.readLine()) != null) {
                         response.append(responseLine.trim());
                     }
                 }
-                connection.disconnect();
-                JsonObject err = JsonParser.parseString(response.toString()).getAsJsonObject();
-                JOptionPane.showOptionDialog(this.framePrincipal,
-                        "Não foi possível atualizar o produto, verifique as informações dos campos e tente novamente!\n" + err.get("message").toString(),
-                        "Produto Não atualizado",
-                        JOptionPane.DEFAULT_OPTION,
-                        JOptionPane.ERROR_MESSAGE,
-                        null, null, null);
+
+                try {
+                    JsonObject err = JsonParser.parseString(response.toString()).getAsJsonObject();
+
+                    String errorMessage = (err.has("message") && !err.get("message").isJsonNull())
+                            ? err.get("message").getAsString()
+                            : response.toString();
+
+                    JOptionPane.showMessageDialog(this.framePrincipal,
+                            "Não foi possível cadastrar o produto. Verifique os dados e tente novamente!\n" + errorMessage,
+                            "Erro na Atualização",
+                            JOptionPane.ERROR_MESSAGE);
+                } catch (Exception jsonException) {
+                    JOptionPane.showMessageDialog(this.framePrincipal,
+                            "Erro inesperado ao processar a resposta da API.\nCódigo: " + statusCode + "\nResposta: " + response,
+                            "Erro na Atualização",
+                            JOptionPane.ERROR_MESSAGE);
+                }
             }
 
         } catch (Exception e) {

@@ -398,24 +398,47 @@ public class CadastrarFuncionario extends JPanel {
         add(jPanel);
     }
 
-    private void createEmployee(){
+    private void createEmployee() {
         try {
             String name = jTextFieldNome.getText();
-            String phone_number = jTextFieldTelefone.getText();
-            String email = jTextFieldEmail.getText();
-            String address = jTextFieldRua.getText() + ", " + jTextFieldBairro.getText() + ", " + jTextFieldNumero.getText() + ", " + jTextFieldCidade.getText() + "-" + jComboBoxUF.getSelectedItem();
-            String cpf = jTextFieldCPF.getText();
-            String dataString = jTextFieldDataNascimento.getText();
+            if (name == null || name.trim().isEmpty() || name.equals("Nome do Funcionário")) {
+                throw new IllegalArgumentException("Informe o Nome do Funcionário!");
+            }
 
+            String phoneNumber = jTextFieldTelefone.getText();
+            String email = jTextFieldEmail.getText();
+            if (email == null || email.trim().isEmpty() || email.equals("exemplo@email.com")) {
+                throw new IllegalArgumentException("Informe o e-mail do Funcionário!");
+            }
+
+            String address = String.format("%s, %s, %s, %s-%s",
+                    jTextFieldRua.getText().trim(),
+                    jTextFieldBairro.getText().trim(),
+                    jTextFieldNumero.getText().trim(),
+                    jTextFieldCidade.getText().trim(),
+                    jComboBoxUF.getSelectedItem()
+            );
+
+            String cpf = jTextFieldCPF.getText();
+            if (cpf == null || cpf.trim().isEmpty()) {
+                throw new IllegalArgumentException("Informe um CPF válido!");
+            }
+
+            String dateOfBirth = jTextFieldDataNascimento.getText();
+            if (dateOfBirth == null || dateOfBirth.trim().isEmpty()) {
+                throw new IllegalArgumentException("Informe a Data de Nascimento!");
+            }
+
+            // Criando o JSON do funcionário
             JsonObject jsonData = new JsonObject();
             jsonData.addProperty("name", name);
             jsonData.addProperty("email", email);
-            jsonData.addProperty("phoneNumber", phone_number);
+            jsonData.addProperty("phoneNumber", phoneNumber);
             jsonData.addProperty("address", address);
             jsonData.addProperty("cpf", cpf);
-            jsonData.addProperty("date_birth", dataString);
+            jsonData.addProperty("date_birth", dateOfBirth);
 
-            // making the request
+            // Configurando a conexão HTTP
             String urlAPI = this.dotenv.get("API_HOST");
             URL url = new URL(urlAPI + "/employee");
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
@@ -423,7 +446,7 @@ public class CadastrarFuncionario extends JPanel {
             connection.setRequestProperty("Content-Type", "application/json");
             connection.setDoOutput(true);
 
-            // send the request with json
+            // Enviando a requisição com JSON
             try (OutputStream os = connection.getOutputStream()) {
                 byte[] input = jsonData.toString().getBytes(StandardCharsets.UTF_8);
                 os.write(input, 0, input.length);
@@ -435,42 +458,65 @@ public class CadastrarFuncionario extends JPanel {
             if (statusCode >= 200 && statusCode < 300) {
                 this.reset();
                 frame.showCard("listar_Funcionario");
-                JOptionPane.showOptionDialog(this.rootPane,
+                JOptionPane.showMessageDialog(this.rootPane,
                         "O Funcionário foi cadastrado com sucesso!",
                         "Funcionário Cadastrado",
-                        JOptionPane.DEFAULT_OPTION,
-                        JOptionPane.INFORMATION_MESSAGE,
-                        null,null,null);
-                connection.disconnect();
-
+                        JOptionPane.INFORMATION_MESSAGE);
             } else {
-                try (BufferedReader br = new BufferedReader(new InputStreamReader(connection.getErrorStream(), "utf-8"))) {
+                try (BufferedReader br = new BufferedReader(new InputStreamReader(connection.getErrorStream(), StandardCharsets.UTF_8))) {
                     String responseLine;
                     while ((responseLine = br.readLine()) != null) {
                         response.append(responseLine.trim());
                     }
                 }
-                connection.disconnect();
-                JsonObject err = JsonParser.parseString(response.toString()).getAsJsonObject();
-                JOptionPane.showOptionDialog(this.rootPane,
-                        "Não foi possível cadastrar o funcionário, verifique as informações dos campos e tente novamente!\n" + err.get("message").toString(),
-                        "Funcionário Não Cadastrado",
-                        JOptionPane.DEFAULT_OPTION,
-                        JOptionPane.ERROR_MESSAGE,
-                        null,null,null);
+
+                try {
+                    JsonObject err = JsonParser.parseString(response.toString()).getAsJsonObject();
+
+                    String errorMessage = (err.has("message") && !err.get("message").isJsonNull())
+                            ? err.get("message").getAsString()
+                            : response.toString();
+
+                    JOptionPane.showMessageDialog(this.rootPane,
+                            "Não foi possível cadastrar o funcionário. Verifique os dados e tente novamente!\n" + errorMessage,
+                            "Erro no Cadastro",
+                            JOptionPane.ERROR_MESSAGE);
+                } catch (Exception jsonException) {
+                    // Se a resposta não for um JSON válido, exibir a resposta bruta
+                    JOptionPane.showMessageDialog(this.rootPane,
+                            "Erro inesperado ao processar a resposta da API.\nCódigo: " + statusCode + "\nResposta: " + response,
+                            "Erro no Cadastro",
+                            JOptionPane.ERROR_MESSAGE);
+                }
             }
 
+            connection.disconnect();
+
+        } catch (IllegalArgumentException e) {
+            JOptionPane.showMessageDialog(this.rootPane, e.getMessage(), "Erro de Validação", JOptionPane.WARNING_MESSAGE);
         } catch (Exception e) {
-            JOptionPane.showMessageDialog(this.rootPane, e.getMessage());
+            JOptionPane.showMessageDialog(this.rootPane, "Erro inesperado: " + e.getMessage(), "Erro", JOptionPane.ERROR_MESSAGE);
         }
     }
 
     private void editEmployee(){
         try {
             String name = jTextFieldNome.getText();
+            if (name == null || name.trim().isEmpty() || name.equals("Nome do Funcionário")) {
+                throw new IllegalArgumentException("Informe o Nome do Funcionário!");
+            }
             String phone_number = jTextFieldTelefone.getText();
             String email = jTextFieldEmail.getText();
-            String address = jTextFieldRua.getText() + ", " + jTextFieldBairro.getText() + ", " + jTextFieldNumero.getText() + ", " + jTextFieldCidade.getText() + "-" + jComboBoxUF.getSelectedItem();
+            if (email == null || email.trim().isEmpty() || email.equals("exemplo@email.com")) {
+                throw new IllegalArgumentException("Informe o e-mail do Funcionário!");
+            }
+            String address = String.format("%s, %s, %s, %s-%s",
+                    jTextFieldRua.getText().trim(),
+                    jTextFieldBairro.getText().trim(),
+                    jTextFieldNumero.getText().trim(),
+                    jTextFieldCidade.getText().trim(),
+                    jComboBoxUF.getSelectedItem()
+            );
             String cpf = jTextFieldCPF.getText();
             String dataString = jTextFieldDataNascimento.getText();
 
@@ -484,7 +530,7 @@ public class CadastrarFuncionario extends JPanel {
 
             // making the request
             String urlAPI = this.dotenv.get("API_HOST");
-            URL url = new URL(urlAPI + "/employee");
+            URL url = new URL(urlAPI + "/employee/"+this.id);
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
             connection.setRequestMethod("PUT");
             connection.setRequestProperty("Content-Type", "application/json");
@@ -502,29 +548,35 @@ public class CadastrarFuncionario extends JPanel {
             if (statusCode >= 200 && statusCode < 300) {
                 this.reset();
                 frame.showCard("listar_Funcionario");
-                JOptionPane.showOptionDialog(this.rootPane,
-                        "O Funcionário foi cadastrado com sucesso!",
-                        "Funcionário Cadastrado",
-                        JOptionPane.DEFAULT_OPTION,
-                        JOptionPane.INFORMATION_MESSAGE,
-                        null,null,null);
-                connection.disconnect();
-
+                JOptionPane.showMessageDialog(this.rootPane,
+                        "O Funcionário foi atualizado com sucesso!",
+                        "Funcionário Atualizado",
+                        JOptionPane.INFORMATION_MESSAGE);
             } else {
-                try (BufferedReader br = new BufferedReader(new InputStreamReader(connection.getErrorStream(), "utf-8"))) {
+                try (BufferedReader br = new BufferedReader(new InputStreamReader(connection.getErrorStream(), StandardCharsets.UTF_8))) {
                     String responseLine;
                     while ((responseLine = br.readLine()) != null) {
                         response.append(responseLine.trim());
                     }
                 }
-                connection.disconnect();
-                JsonObject err = JsonParser.parseString(response.toString()).getAsJsonObject();
-                JOptionPane.showOptionDialog(this.rootPane,
-                        "Não foi possível cadastrar o funcionário, verifique as informações dos campos e tente novamente!\n" + err.get("message").toString(),
-                        "Funcionário Não Cadastrado",
-                        JOptionPane.DEFAULT_OPTION,
-                        JOptionPane.ERROR_MESSAGE,
-                        null,null,null);
+
+                try {
+                    JsonObject err = JsonParser.parseString(response.toString()).getAsJsonObject();
+
+                    String errorMessage = (err.has("message") && !err.get("message").isJsonNull())
+                            ? err.get("message").getAsString()
+                            : response.toString();
+
+                    JOptionPane.showMessageDialog(this.rootPane,
+                            "Não foi possível atualizar o funcionário. Verifique os dados e tente novamente!\n" + errorMessage,
+                            "Erro na Atualização",
+                            JOptionPane.ERROR_MESSAGE);
+                } catch (Exception jsonException) {
+                    JOptionPane.showMessageDialog(this.rootPane,
+                            "Erro inesperado ao processar a resposta da API.\nCódigo: " + statusCode + "\nResposta: " + response,
+                            "Erro na Atualização",
+                            JOptionPane.ERROR_MESSAGE);
+                }
             }
 
         } catch (Exception e) {
@@ -614,154 +666,6 @@ public class CadastrarFuncionario extends JPanel {
         this.jLabelCadastro.setText("Cadastrar Funcionário");
     }
 
-    private void cadastrarFuncionario(){
-        try {
-            String name = jTextFieldNome.getText();
-            String cpf = jTextFieldCPF.getText();
-            String email = jTextFieldEmail.getText();
-            String date_birth = jTextFieldDataNascimento.getText();
-            String street = jTextFieldRua.getText();
-            String district = jTextFieldBairro.getText();
-            String number = jTextFieldNumero.getText();
-            String city = jTextFieldCidade.getText();
-            String phone_number = jTextFieldTelefone.getText();
-
-
-            JsonObject jsonData = new JsonObject();
-            jsonData.addProperty("name", name);
-            jsonData.addProperty("cpf", cpf);
-            jsonData.addProperty("email", email);
-            jsonData.addProperty("date_birth", date_birth);
-            jsonData.addProperty("street", street);
-            jsonData.addProperty("district", district);
-            jsonData.addProperty("number", number);
-            jsonData.addProperty("city", city);
-            jsonData.addProperty("phone_number", phone_number);
-
-            // making the request
-            String urlAPI = this.dotenv.get("API_HOST");
-            URL url = new URL(urlAPI + "/employee");
-            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-            connection.setRequestMethod("POST");
-            connection.setRequestProperty("Content-Type", "application/json");
-            connection.setDoOutput(true);
-
-            // send the request with json
-            try (OutputStream os = connection.getOutputStream()) {
-                byte[] input = jsonData.toString().getBytes(StandardCharsets.UTF_8);
-                os.write(input, 0, input.length);
-            }
-
-            int statusCode = connection.getResponseCode();
-            StringBuilder response = new StringBuilder();
-
-            if (statusCode >= 200 && statusCode < 300) {
-                this.reset();
-                this.frame.showCard("listar_fonecedores");
-                JOptionPane.showOptionDialog(this.rootPane,
-                        "O Funcionário foi cadastrado com sucesso!",
-                        "Funcionário Cadastrado",
-                        JOptionPane.DEFAULT_OPTION,
-                        JOptionPane.INFORMATION_MESSAGE,
-                        null,null,null);
-                connection.disconnect();
-
-
-            } else {
-                try (BufferedReader br = new BufferedReader(new InputStreamReader(connection.getErrorStream(), "utf-8"))) {
-                    String responseLine;
-                    while ((responseLine = br.readLine()) != null) {
-                        response.append(responseLine.trim());
-                    }
-                }
-                connection.disconnect();
-                JOptionPane.showOptionDialog(this.rootPane,
-                        "Não foi possível cadastrar o Funcionário, verifique as informações dos campos e tente novamente!\n" + response.toString(),
-                        "Funcionário Não Cadastrado",
-                        JOptionPane.DEFAULT_OPTION,
-                        JOptionPane.ERROR_MESSAGE,
-                        null,null,null);
-            }
-
-        } catch (Exception e) {
-            JOptionPane.showMessageDialog(this.rootPane, e.getMessage());
-        }
-    }
-
-    private void editarFuncionario(){
-        try {
-            String name = jTextFieldNome.getText();
-            String cpf = jTextFieldCPF.getText();
-            String email = jTextFieldEmail.getText();
-            String date_birth = jTextFieldDataNascimento.getText();
-            String street = jTextFieldRua.getText();
-            String district = jTextFieldBairro.getText();
-            String number = jTextFieldNumero.getText();
-            String city = jTextFieldCidade.getText();
-            String phone_number = jTextFieldTelefone.getText();
-
-
-            JsonObject jsonData = new JsonObject();
-            jsonData.addProperty("name", name);
-            jsonData.addProperty("cpf", cpf);
-            jsonData.addProperty("email", email);
-            jsonData.addProperty("date_birth", date_birth);
-            jsonData.addProperty("street", street);
-            jsonData.addProperty("district", district);
-            jsonData.addProperty("number", number);
-            jsonData.addProperty("city", city);
-            jsonData.addProperty("phone_number", phone_number);
-
-            // making the request
-            String urlAPI = this.dotenv.get("API_HOST");
-            URL url = new URL(urlAPI + "/employee/"+this.id);
-            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-            connection.setRequestMethod("PUT");
-            connection.setRequestProperty("Content-Type", "application/json");
-            connection.setDoOutput(true);
-
-            // send the request with json
-            try (OutputStream os = connection.getOutputStream()) {
-                byte[] input = jsonData.toString().getBytes(StandardCharsets.UTF_8);
-                os.write(input, 0, input.length);
-            }
-
-            int statusCode = connection.getResponseCode();
-            StringBuilder response = new StringBuilder();
-
-            if (statusCode >= 200 && statusCode < 300) {
-                this.reset();
-                this.id = null;
-                this.frame.showCard("listar_funcionario");
-                JOptionPane.showOptionDialog(this.rootPane,
-                        "O Funcionário foi atualizado com sucesso!",
-                        "Funcionário Atualizado",
-                        JOptionPane.DEFAULT_OPTION,
-                        JOptionPane.INFORMATION_MESSAGE,
-                        null,null,null);
-                connection.disconnect();
-
-
-            } else {
-                try (BufferedReader br = new BufferedReader(new InputStreamReader(connection.getErrorStream(), "utf-8"))) {
-                    String responseLine;
-                    while ((responseLine = br.readLine()) != null) {
-                        response.append(responseLine.trim());
-                    }
-                }
-                connection.disconnect();
-                JOptionPane.showOptionDialog(this.rootPane,
-                        "Não foi possível atualizar o Funcionário, verifique as informações dos campos e tente novamente!\n" + response.toString(),
-                        "Funcionário Não Atualizado",
-                        JOptionPane.DEFAULT_OPTION,
-                        JOptionPane.ERROR_MESSAGE,
-                        null,null,null);
-            }
-
-        } catch (Exception e) {
-            JOptionPane.showMessageDialog(this.rootPane, e.getMessage());
-        }
-    }
 
     // componentes que vão ser usados na tela, só o essencial e com os nomes certinhos
     private JLabel jLabelCadastro;

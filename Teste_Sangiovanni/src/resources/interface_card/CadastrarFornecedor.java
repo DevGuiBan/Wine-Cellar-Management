@@ -419,31 +419,36 @@ public class CadastrarFornecedor extends JPanel {
 
             if (statusCode >= 200 && statusCode < 300) {
                 this.reset();
-                this.frame.showCard("listar_fonecedores");
-                JOptionPane.showOptionDialog(this.rootPane,
-                        "O Fornecedor foi cadastrado com sucesso!",
-                        "Fornecedor Cadastrado",
-                        JOptionPane.DEFAULT_OPTION,
-                        JOptionPane.INFORMATION_MESSAGE,
-                        null,null,null);
-                connection.disconnect();
-
-
+                frame.showCard("listar_fonecedores");
+                JOptionPane.showMessageDialog(this.rootPane,
+                        "O Fornecedor foi cadstrado com sucesso!",
+                        "Fornecedor Cadasatrado",
+                        JOptionPane.INFORMATION_MESSAGE);
             } else {
-                try (BufferedReader br = new BufferedReader(new InputStreamReader(connection.getErrorStream(), "utf-8"))) {
+                try (BufferedReader br = new BufferedReader(new InputStreamReader(connection.getErrorStream(), StandardCharsets.UTF_8))) {
                     String responseLine;
                     while ((responseLine = br.readLine()) != null) {
                         response.append(responseLine.trim());
                     }
                 }
-                connection.disconnect();
-                JsonObject err = JsonParser.parseString(response.toString()).getAsJsonObject();
-                JOptionPane.showOptionDialog(this.rootPane,
-                        "Não foi possível cadastrar o fornecedor, verifique as informações dos campos e tente novamente!\n" + err.get("message").toString(),
-                        "Fornecedor Não Cadastrado",
-                        JOptionPane.DEFAULT_OPTION,
-                        JOptionPane.ERROR_MESSAGE,
-                        null,null,null);
+
+                try {
+                    JsonObject err = JsonParser.parseString(response.toString()).getAsJsonObject();
+
+                    String errorMessage = (err.has("message") && !err.get("message").isJsonNull())
+                            ? err.get("message").getAsString()
+                            : response.toString();
+
+                    JOptionPane.showMessageDialog(this.rootPane,
+                            "Não foi possível cadastrar o fornecedor. Verifique os dados e tente novamente!\n" + errorMessage,
+                            "Erro no Cadastro",
+                            JOptionPane.ERROR_MESSAGE);
+                } catch (Exception jsonException) {
+                    JOptionPane.showMessageDialog(this.rootPane,
+                            "Erro inesperado ao processar a resposta da API.\nCódigo: " + statusCode + "\nResposta: " + response,
+                            "Erro no Cadastro",
+                            JOptionPane.ERROR_MESSAGE);
+                }
             }
 
         } catch (Exception e) {
@@ -488,32 +493,36 @@ public class CadastrarFornecedor extends JPanel {
 
             if (statusCode >= 200 && statusCode < 300) {
                 this.reset();
-                this.id = null;
-                this.frame.showCard("listar_fonecedores");
-                JOptionPane.showOptionDialog(this.rootPane,
+                frame.showCard("listar_fonecedores");
+                JOptionPane.showMessageDialog(this.rootPane,
                         "O Fornecedor foi atualizado com sucesso!",
                         "Fornecedor Atualizado",
-                        JOptionPane.DEFAULT_OPTION,
-                        JOptionPane.INFORMATION_MESSAGE,
-                        null,null,null);
-                connection.disconnect();
-
-
+                        JOptionPane.INFORMATION_MESSAGE);
             } else {
-                try (BufferedReader br = new BufferedReader(new InputStreamReader(connection.getErrorStream(), "utf-8"))) {
+                try (BufferedReader br = new BufferedReader(new InputStreamReader(connection.getErrorStream(), StandardCharsets.UTF_8))) {
                     String responseLine;
                     while ((responseLine = br.readLine()) != null) {
                         response.append(responseLine.trim());
                     }
                 }
-                connection.disconnect();
-                JsonObject err = JsonParser.parseString(response.toString()).getAsJsonObject();
-                JOptionPane.showOptionDialog(this.rootPane,
-                        "Não foi possível atualizar o fornecedor, verifique as informações dos campos e tente novamente!\n" + err.get("message").toString(),
-                        "Fornecedor Não Atualizado",
-                        JOptionPane.DEFAULT_OPTION,
-                        JOptionPane.ERROR_MESSAGE,
-                        null,null,null);
+
+                try {
+                    JsonObject err = JsonParser.parseString(response.toString()).getAsJsonObject();
+
+                    String errorMessage = (err.has("message") && !err.get("message").isJsonNull())
+                            ? err.get("message").getAsString()
+                            : response.toString();
+
+                    JOptionPane.showMessageDialog(this.rootPane,
+                            "Não foi possível atualizar o fornecedor. Verifique os dados e tente novamente!\n" + errorMessage,
+                            "Erro na Atualização",
+                            JOptionPane.ERROR_MESSAGE);
+                } catch (Exception jsonException) {
+                    JOptionPane.showMessageDialog(this.rootPane,
+                            "Erro inesperado ao processar a resposta da API.\nCódigo: " + statusCode + "\nResposta: " + response,
+                            "Erro na Atualização",
+                            JOptionPane.ERROR_MESSAGE);
+                }
             }
 
         } catch (Exception e) {
