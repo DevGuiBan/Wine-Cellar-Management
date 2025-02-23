@@ -10,13 +10,50 @@ public class Cadastro {
 
         JPanel mainPanel = new JPanel(new GridLayout(1, 2));
 
-        JPanel leftPanel = new JPanel(new GridBagLayout());
+        JPanel leftPanel = new JPanel();
         leftPanel.setBackground(Color.WHITE);
+        leftPanel.setLayout(new BorderLayout());
 
+
+        JPanel topPanel = new JPanel();
+        topPanel.setBackground(Color.WHITE);
+        topPanel.setLayout(new BoxLayout(topPanel, BoxLayout.Y_AXIS));
+        topPanel.add(Box.createVerticalGlue());
         JLabel casaSanGiovanni = new JLabel("Casa San'Giovanni");
         casaSanGiovanni.setFont(new Font("Cinzel", Font.PLAIN, 24));
+        casaSanGiovanni.setForeground(new Color(128, 0, 32));
+        casaSanGiovanni.setAlignmentX(Component.CENTER_ALIGNMENT);
+        topPanel.add(casaSanGiovanni);
+        topPanel.add(Box.createVerticalGlue());
+        leftPanel.add(topPanel, BorderLayout.CENTER);
 
-        leftPanel.add(casaSanGiovanni);
+
+        JPanel logoPanel = new JPanel();
+        logoPanel.setBackground(Color.WHITE);
+        logoPanel.setLayout(new BoxLayout(logoPanel, BoxLayout.X_AXIS));
+
+        ImageIcon icon = null;
+        try {
+            icon = new ImageIcon(Cadastro.class.getResource("/resources/images/icon.png"));
+
+            Image image = icon.getImage().getScaledInstance(25, 25, Image.SCALE_SMOOTH);
+            icon = new ImageIcon(image);
+        } catch (Exception e) {
+            System.out.println("Erro ao carregar a imagem: " + e.getMessage());
+        }
+
+        JLabel iconLabel = (icon != null) ? new JLabel(icon) : new JLabel("LOGO");
+
+        JLabel textLabel = new JLabel("InfinityCode");
+        textLabel.setFont(new Font("Coda", Font.PLAIN, 16));
+        textLabel.setForeground(Color.BLACK);
+
+        logoPanel.add(iconLabel);
+        logoPanel.add(Box.createRigidArea(new Dimension(10, 0)));
+        logoPanel.add(textLabel);
+
+
+        leftPanel.add(logoPanel, BorderLayout.SOUTH);
 
         JPanel rightPanel = new JPanel(new GridBagLayout());
         rightPanel.setBackground(new Color(128, 0, 32));
