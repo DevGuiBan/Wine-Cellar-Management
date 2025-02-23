@@ -29,6 +29,10 @@ public class SupplierService {
             throw new IllegalArgumentException("Já há um fornecedor cadastrado com este E-mail: " + supplierDTO.getEmail());
         }
 
+        if(supplierDTO.getName().equals("Nome do Fornecedor")){
+            throw new IllegalArgumentException("Insira um nome válido para o Fornecedor!");
+        }
+
         Supplier supplier = new Supplier();
         supplier.setName(supplierDTO.getName());
         supplier.setCnpj(supplierDTO.getCnpj());
@@ -63,6 +67,9 @@ public class SupplierService {
     public Supplier update(UUID id, SupplierDTO supplierDTO) {
         return supplierRepository.findById(id)
                 .map(existingSupplier -> {
+                    if(supplierDTO.getName().equals("Nome do Fornecedor")){
+                        throw new IllegalArgumentException("Insira um nome válido para o Fornecedor!");
+                    }
                     if (supplierDTO.getName() != null) {
                         existingSupplier.setName(supplierDTO.getName());
                     }

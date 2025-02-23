@@ -65,7 +65,7 @@ public class ProductTypeController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<?> update(@PathVariable Long id, @RequestBody ProductTypeDTO productTypeDTO) {
+    public ResponseEntity<?> update(@PathVariable Long id, @RequestBody @Valid ProductTypeDTO productTypeDTO) {
         try{
             ProductType updatedProductType = productTypeService.update(id, productTypeDTO);
             return ResponseEntity.status(HttpStatus.OK).body(updatedProductType);

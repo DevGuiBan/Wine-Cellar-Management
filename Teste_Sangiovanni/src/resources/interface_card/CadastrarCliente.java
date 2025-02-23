@@ -353,29 +353,35 @@ public class CadastrarCliente extends JPanel {
             if (statusCode >= 200 && statusCode < 300) {
                 this.reset();
                 frame.showCard("listar_clientes");
-                JOptionPane.showOptionDialog(this.framePrincipal,
+                JOptionPane.showMessageDialog(this.framePrincipal,
                         "O Cliente foi cadastrado com sucesso!",
-                        "Cleinte Cadastrado",
-                        JOptionPane.DEFAULT_OPTION,
-                        JOptionPane.INFORMATION_MESSAGE,
-                        null,null,null);
-                connection.disconnect();
-
+                        "Cliente Cadastrado",
+                        JOptionPane.INFORMATION_MESSAGE);
             } else {
-                try (BufferedReader br = new BufferedReader(new InputStreamReader(connection.getErrorStream(), "utf-8"))) {
+                try (BufferedReader br = new BufferedReader(new InputStreamReader(connection.getErrorStream(), StandardCharsets.UTF_8))) {
                     String responseLine;
                     while ((responseLine = br.readLine()) != null) {
                         response.append(responseLine.trim());
                     }
                 }
-                connection.disconnect();
-                JsonObject err = JsonParser.parseString(response.toString()).getAsJsonObject();
-                JOptionPane.showOptionDialog(this.framePrincipal,
-                        "Não foi possível cadastrar o cliente, verifique as informações dos campos e tente novamente!\n" + err.get("message").toString(),
-                        "Cliente Não Cadastrado",
-                        JOptionPane.DEFAULT_OPTION,
-                        JOptionPane.ERROR_MESSAGE,
-                        null,null,null);
+
+                try {
+                    JsonObject err = JsonParser.parseString(response.toString()).getAsJsonObject();
+
+                    String errorMessage = (err.has("message") && !err.get("message").isJsonNull())
+                            ? err.get("message").getAsString()
+                            : response.toString();
+
+                    JOptionPane.showMessageDialog(this.framePrincipal,
+                            "Não foi possível cadastrar o cliente. Verifique os dados e tente novamente!\n" + errorMessage,
+                            "Erro no Cadastro",
+                            JOptionPane.ERROR_MESSAGE);
+                } catch (Exception jsonException) {
+                    JOptionPane.showMessageDialog(this.framePrincipal,
+                            "Erro inesperado ao processar a resposta da API.\nCódigo: " + statusCode + "\nResposta: " + response,
+                            "Erro no Cadastro",
+                            JOptionPane.ERROR_MESSAGE);
+                }
             }
 
         } catch (Exception e) {
@@ -419,32 +425,36 @@ public class CadastrarCliente extends JPanel {
 
             if (statusCode >= 200 && statusCode < 300) {
                 this.reset();
-                this.id = null;
                 frame.showCard("listar_clientes");
-                JOptionPane.showOptionDialog(this.framePrincipal,
+                JOptionPane.showMessageDialog(this.framePrincipal,
                         "O Cliente foi atualizado com sucesso!",
                         "Cliente Atualizado",
-                        JOptionPane.DEFAULT_OPTION,
-                        JOptionPane.INFORMATION_MESSAGE,
-                        null,null,null);
-                connection.disconnect();
-
-
+                        JOptionPane.INFORMATION_MESSAGE);
             } else {
-                try (BufferedReader br = new BufferedReader(new InputStreamReader(connection.getErrorStream(), "utf-8"))) {
+                try (BufferedReader br = new BufferedReader(new InputStreamReader(connection.getErrorStream(), StandardCharsets.UTF_8))) {
                     String responseLine;
                     while ((responseLine = br.readLine()) != null) {
                         response.append(responseLine.trim());
                     }
                 }
-                connection.disconnect();
-                JsonObject err = JsonParser.parseString(response.toString()).getAsJsonObject();
-                JOptionPane.showOptionDialog(this.framePrincipal,
-                        "Não foi possível atualizar o cliente, verifique as informações dos campos e tente novamente!\n" + err.get("message").toString(),
-                        "Cliente Não atualizado",
-                        JOptionPane.DEFAULT_OPTION,
-                        JOptionPane.ERROR_MESSAGE,
-                        null,null,null);
+
+                try {
+                    JsonObject err = JsonParser.parseString(response.toString()).getAsJsonObject();
+
+                    String errorMessage = (err.has("message") && !err.get("message").isJsonNull())
+                            ? err.get("message").getAsString()
+                            : response.toString();
+
+                    JOptionPane.showMessageDialog(this.framePrincipal,
+                            "Não foi possível atualizar o cliente. Verifique os dados e tente novamente!\n" + errorMessage,
+                            "Erro na Atualização",
+                            JOptionPane.ERROR_MESSAGE);
+                } catch (Exception jsonException) {
+                    JOptionPane.showMessageDialog(this.framePrincipal,
+                            "Erro inesperado ao processar a resposta da API.\nCódigo: " + statusCode + "\nResposta: " + response,
+                            "Erro na Atualização",
+                            JOptionPane.ERROR_MESSAGE);
+                }
             }
 
         } catch (Exception e) {

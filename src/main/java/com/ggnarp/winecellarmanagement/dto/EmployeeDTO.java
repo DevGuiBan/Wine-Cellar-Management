@@ -27,6 +27,7 @@ public class EmployeeDTO {
 
     @NotNull(message = "O endereço não pode ser nulo")
     @NotBlank(message = "O endereço não pode ser vázio")
+    @Pattern(regexp = "^(.+?), (.+?), (\\d+), (.+)-([A-Z]{2})$",message = "O Endereço deve ser no formato Rua, Bairro, Número, Cidade-UF")
     private String address;
 
     @Email

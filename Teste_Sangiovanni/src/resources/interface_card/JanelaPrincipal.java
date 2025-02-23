@@ -134,7 +134,7 @@ public class JanelaPrincipal extends javax.swing.JFrame {
             jButton5.setFont(new java.awt.Font("Cormorant Garamond SemiBold", 0, 18)); // NOI18N
             jButton5.setForeground(new java.awt.Color(225, 255, 255));
             jButton5.setIcon(new javax.swing.ImageIcon(Objects.requireNonNull(getClass().getResource("/resources/images/carteira-de-identidade.png")))); // NOI18N
-            jButton5.setText("Funcionarios");
+            jButton5.setText("Funcionários");
             jButton5.setBorder(null);
             jButton5.setFocusable(false);
             jButton5.setContentAreaFilled(false);
@@ -202,7 +202,7 @@ public class JanelaPrincipal extends javax.swing.JFrame {
                     cardListarProdutos.atualizarDados();
                     cl.show(cardPanel, cardName);
                     break;
-                case "listar_fonecedores":
+                case "*":
                     cardListarFornecedores.atualizarDados();
                     cl.show(cardPanel, cardName);
                     break;
@@ -210,6 +210,9 @@ public class JanelaPrincipal extends javax.swing.JFrame {
                     cardRegistrarVenda.showCard("produtos");
                     cl.show(cardPanel, cardName);
                     break;
+                case "listar_Funcionario":
+                    cardListarFuncionario.atualizarDados();
+                    cl.show(cardPanel, cardName);
                 default:
                     cl.show(cardPanel, cardName);
                     break;
