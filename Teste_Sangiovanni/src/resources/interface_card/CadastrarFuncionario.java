@@ -52,6 +52,7 @@ public class CadastrarFuncionario extends JPanel {
         jLabelNumero = new JLabel();
         jLabelCidade = new JLabel();
         jLabelUF = new JLabel();
+        jLabelSenha = new JLabel();
 
         // Adicionar novas labels de endereço
 
@@ -62,6 +63,8 @@ public class CadastrarFuncionario extends JPanel {
         jTextFieldNumero = new JTextField();
         jTextFieldCidade = new JTextField();
         jComboBoxUF = new JComboBox<UF>();
+        jTextFieldSenha = new jTextField();
+
         try{
             jTextFieldTelefone = new javax.swing.JFormattedTextField(new MaskFormatter("(##) #####-####"));
             jTextFieldCPF = new javax.swing.JFormattedTextField(new MaskFormatter("###.###.###-##"));
@@ -175,6 +178,7 @@ public class CadastrarFuncionario extends JPanel {
         jTextFieldCPF.setFont(new Font("Cormorant Infant", Font.BOLD, 18));
         jTextFieldCPF.setBorder(new MatteBorder(2, 2, 2, 2, new Color(128, 0, 32)));
         jTextFieldCPF.setPreferredSize(fieldSize);
+        jTextFieldCPF.setText("000.000.000-00");
         gbc.gridx = 0;
         gbc.gridy = 3;
         gbc.insets = new Insets(0, 0, 20, 100);
@@ -193,6 +197,7 @@ public class CadastrarFuncionario extends JPanel {
         jTextFieldTelefone.setFont(new Font("Cormorant Infant", 1, 18));
         jTextFieldTelefone.setForeground(Color.BLACK);
         jTextFieldTelefone.setPreferredSize(fieldSize);
+        jTextFieldTelefone.setText("(00) 00000-0000");
         gbc.gridx = 0;
         gbc.gridy = 5;
         gbc.insets = new Insets(0, 0, 20, 100);
@@ -308,7 +313,7 @@ public class CadastrarFuncionario extends JPanel {
         jTextFieldNumero.setBorder(new MatteBorder(2, 2, 2, 2, new Color(128, 0, 32)));
         jTextFieldNumero.setPreferredSize(fieldSize);
         jTextFieldNumero.setForeground(Color.BLACK);
-        jTextFieldNumero.setText("Nº");
+        jTextFieldNumero.setText("Número");
         gbc.gridx = 1;
         gbc.gridy = 5;
         gbc.insets = new Insets(0, 0, 20, 100);
@@ -355,6 +360,26 @@ public class CadastrarFuncionario extends JPanel {
         gbc.gridy = 9;
         gbc.insets = new Insets(0, 0, 20, 100);
         jPanelContent.add(jComboBoxUF, gbc);
+
+        jLabelSenha.setFont(new Font("Cormorant Garamond", 1, 18));
+        jLabelSenha.setText("Senha:");
+        jLabelSenha.setForeground(Color.BLACK);
+        jLabelSenha.setBackground(Color.WHITE);
+        gbc.gridx = 1;
+        gbc.gridy = 10;
+        gbc.insets = new Insets(0, 0, 0, 100);
+        jPanelContent.add(jLabelSenha, gbc);
+
+        jTextFieldSenha.setBackground(Color.WHITE);
+        jTextFieldSenha.setFont(new Font("Cormorant Infant", 1, 18));
+        jTextFieldSenha.setBorder(new MatteBorder(2, 2, 2, 2, new Color(128, 0, 32)));
+        jTextFieldSenha.setPreferredSize(fieldSize);
+        jTextFieldSenha.setForeground(Color.BLACK);
+        jTextFieldSenha.setText("Senha");
+        gbc.gridx = 1;
+        gbc.gridy = 11;
+        gbc.insets = new Insets(0, 0, 20, 100);
+        jPanelContent.add(jTextFieldSenha, gbc);
 
         jButtonCancelar.setBackground(new Color(225, 225, 200));
         jButtonCancelar.setFont(new Font("Cormorant Garamond Bold", 1, 18));
@@ -437,6 +462,7 @@ public class CadastrarFuncionario extends JPanel {
             jsonData.addProperty("address", address);
             jsonData.addProperty("cpf", cpf);
             jsonData.addProperty("date_birth", dateOfBirth);
+            jsonData.addProperty("password", password);
 
             // Configurando a conexão HTTP
             String urlAPI = this.dotenv.get("API_HOST");
@@ -527,6 +553,7 @@ public class CadastrarFuncionario extends JPanel {
             jsonData.addProperty("address", address);
             jsonData.addProperty("cpf", cpf);
             jsonData.addProperty("date_birth", dataString);
+            jsonData.addProperty("password", password);
 
             // making the request
             String urlAPI = this.dotenv.get("API_HOST");
@@ -608,6 +635,7 @@ public class CadastrarFuncionario extends JPanel {
                 jTextFieldNome.setText(employees.get("name").getAsString());
                 jTextFieldTelefone.setText(employees.get("phoneNumber").getAsString());
                 jTextFieldEmail.setText(employees.get("email").getAsString());
+                jTextFieldSenha.setText(employees.get("password").getAsString());
 
                 String data = employees.get("date_birth").getAsString();
 
@@ -631,6 +659,8 @@ public class CadastrarFuncionario extends JPanel {
                     throw new Exception("O UF não foi encontrado!");
                 }
 
+
+
                 connection.disconnect();
             }
         }
@@ -653,15 +683,16 @@ public class CadastrarFuncionario extends JPanel {
 
     public void reset(){
         jTextFieldNome.setText("Nome do Funcionário");
-        jTextFieldTelefone.setText(null);
+        jTextFieldTelefone.setText("(00) 00000-0000");
         jTextFieldEmail.setText("exemplo@email.com");
-        jTextFieldDataNascimento.setText(null);
-        jTextFieldCPF.setText(null);
+        jTextFieldDataNascimento.setText("DD/MM/AAAA");
+        jTextFieldCPF.setText("000.000.000-00");
         jTextFieldRua.setText("Rua");
         jTextFieldBairro.setText("Bairro");
-        jTextFieldNumero.setText("Nº");
+        jTextFieldNumero.setText("Número");
         jTextFieldCidade.setText("Cidade");
         jComboBoxUF.setSelectedIndex(0);
+        jTextFieldSenha.setText("Senha");
         this.jButtonCadastrar.setText("Cadastrar");
         this.jLabelCadastro.setText("Cadastrar Funcionário");
     }
@@ -679,6 +710,7 @@ public class CadastrarFuncionario extends JPanel {
     private JLabel jLabelNumero;
     private JLabel jLabelCidade;
     private JLabel jLabelUF;
+    private JLabel jLabelSenha;
 
     private JTextField jTextFieldNome;
     private JTextField jTextFieldTelefone;
@@ -690,6 +722,7 @@ public class CadastrarFuncionario extends JPanel {
     private JTextField jTextFieldNumero;
     private JTextField jTextFieldCidade;
     private JComboBox<UF> jComboBoxUF;
+    private JTextField jTextFieldSenha;
 
     private JButton jButtonCancelar;
     private JButton jButtonCadastrar;
