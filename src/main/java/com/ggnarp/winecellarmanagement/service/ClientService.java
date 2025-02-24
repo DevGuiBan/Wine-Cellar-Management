@@ -24,6 +24,7 @@ public class ClientService {
     }
 
     public Client save(ClientDTO clientDTO) {
+
         if(clientDTO.getName().isBlank()){
             throw new IllegalArgumentException("O nome do cliente não pode ser vázio!");
         }

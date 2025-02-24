@@ -42,12 +42,17 @@ public class EmployeeService {
         if(employerDTO.getEmail().isBlank()){
             throw new IllegalArgumentException("O e-mail do Funcionário não pode ser vázio");
         }
+        if(employerDTO.getPassword().isBlank()){
+            throw new IllegalArgumentException("A senha do Funcionário não pode ser vázia");
+        }
 
         Employee employee = new Employee();
         employee.setName(employerDTO.getName());
         employee.setEmail(employerDTO.getEmail());
         employee.setPhoneNumber(employerDTO.getPhoneNumber());
         employee.setAddress(employerDTO.getAddress());
+        employee.setPassword(employerDTO.getPassword());
+
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
         LocalDate data = LocalDate.parse(employerDTO.getDate_birth(), formatter);
         employee.setDate_birth(data);

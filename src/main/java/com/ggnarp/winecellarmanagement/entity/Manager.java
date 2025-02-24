@@ -5,16 +5,16 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDate;
 import java.util.UUID;
 
 @Entity
-@Table(name = "employee")
+@Table(name = "manager")
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 
-public class Employee {
+public class Manager {
+
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
@@ -22,20 +22,11 @@ public class Employee {
     @Column(nullable = false)
     private String name;
 
-    @Column(nullable = false)
-    private LocalDate date_birth;
-
     @Column(nullable = false,unique = true,length = 14)
     private String cpf;
 
-    @Column(nullable = false)
-    private String address;
-
     @Column(nullable = false,unique = true)
     private String email;
-
-    @Column(nullable = false,unique = false,length = 15,name = "phone_number")
-    private String phoneNumber;
 
     @Column(nullable = false)
     private String password;
