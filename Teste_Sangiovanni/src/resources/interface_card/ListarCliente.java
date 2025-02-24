@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import com.toedter.calendar.JDateChooser;
 import io.github.cdimascio.dotenv.Dotenv;
 import resources.interfaces.EditarProduto;
 
@@ -16,6 +17,9 @@ import java.io.InputStreamReader;
 import java.math.BigInteger;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import java.text.SimpleDateFormat;
 import java.util.Objects;
 
 public class ListarCliente extends JPanel {
@@ -103,6 +107,9 @@ public class ListarCliente extends JPanel {
         jButtonFiltrar.setContentAreaFilled(false);
         jButtonFiltrar.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         jButtonFiltrar.setPreferredSize(new java.awt.Dimension(90, 40));
+        jButtonFiltrar.addActionListener(evt->{
+            this.filtro();
+        });
         jPanelTopoTabela.add(jButtonFiltrar);
 
         jPanelTabela.setPreferredSize(new Dimension(1145, 450));
@@ -213,6 +220,283 @@ public class ListarCliente extends JPanel {
 
     public void atualizarDados(){
         this.getClientes();
+    }
+
+    private void getClientByAddress(String endereco){
+        try {
+            String urlAPI = this.dotenv.get("API_HOST");
+            URL url = new URL(urlAPI + "/client/address/"+endereco);
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.setRequestMethod("GET");
+
+            int responseCode = connection.getResponseCode();
+            if (responseCode == HttpURLConnection.HTTP_OK) {
+                BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+                StringBuilder response = new StringBuilder();
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    response.append(line);
+                }
+                reader.close();
+
+                JsonArray clients = JsonParser.parseString(response.toString()).getAsJsonArray();
+
+                DefaultTableModel tableModel = (DefaultTableModel) jtable.getModel();
+                tableModel.setRowCount(0);
+
+                for (int i = 0; i < clients.size(); i++) {
+                    JsonObject client = clients.get(i).getAsJsonObject();
+                    String id = client.get("id").getAsString();
+                    String name = client.get("name").getAsString();
+                    String cpf = client.get("cpf").getAsString();
+                    String address = client.get("address").getAsString();
+                    String phone_number = client.get("phoneNumber").getAsString();
+                    String email = client.get("email").getAsString();
+                    String data = client.get("dateBirth").getAsString();
+                    tableModel.addRow(new Object[]{id, name, cpf, address, phone_number, email, data});
+                    connection.disconnect();
+                }
+            } else {
+                JOptionPane.showOptionDialog(rootPane,
+                        "Ocorreu um erro ao carregar os clientes.",
+                        "Problema no Servidor",
+                        JOptionPane.DEFAULT_OPTION,
+                        JOptionPane.ERROR_MESSAGE,
+                        null,null,null);
+                connection.disconnect();
+            }
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(rootPane, e.getMessage());
+        }
+    }
+
+    private void getClientByDate(String dateIn, String dateOut){
+        try {
+            String urlAPI = this.dotenv.get("API_HOST");
+            String urlString = urlAPI + "/client/date?start_date=" + URLEncoder.encode(dateIn, StandardCharsets.UTF_8) +
+                    "&end_date=" + URLEncoder.encode(dateOut, StandardCharsets.UTF_8);
+            URL url = new URL(urlString);
+
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.setRequestMethod("GET");
+            connection.setRequestProperty("Content-Type", "application/json");
+            connection.setDoOutput(true);
+
+            int statusCode = connection.getResponseCode();
+            if (statusCode == HttpURLConnection.HTTP_OK) {
+                BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+                StringBuilder response = new StringBuilder();
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    response.append(line);
+                }
+                reader.close();
+
+                JsonArray clientes = JsonParser.parseString(response.toString()).getAsJsonArray();
+
+                DefaultTableModel tableModel = (DefaultTableModel) jtable.getModel();
+                tableModel.setRowCount(0);
+
+                for (int i = 0; i < clientes.size(); i++) {
+                    JsonObject client = clientes.get(i).getAsJsonObject();
+                    String id = client.get("id").getAsString();
+                    String name = client.get("name").getAsString();
+                    String cpf = client.get("cpf").getAsString();
+                    String address = client.get("address").getAsString();
+                    String phone_number = client.get("phoneNumber").getAsString();
+                    String email = client.get("email").getAsString();
+                    String data = client.get("dateBirth").getAsString();
+                    tableModel.addRow(new Object[]{id, name, cpf, address, phone_number, email, data});
+                }
+                connection.disconnect();
+            } else {
+                StringBuilder response = new StringBuilder();
+                try (BufferedReader br = new BufferedReader(new InputStreamReader(connection.getErrorStream(), StandardCharsets.UTF_8))) {
+                    String responseLine;
+                    while ((responseLine = br.readLine()) != null) {
+                        response.append(responseLine.trim());
+                    }
+                }
+
+                try {
+                    JsonObject err = JsonParser.parseString(response.toString()).getAsJsonObject();
+
+                    String errorMessage = (err.has("message") && !err.get("message").isJsonNull())
+                            ? err.get("message").getAsString()
+                            : response.toString();
+
+                    JOptionPane.showMessageDialog(this.rootPane,
+                            "Não foi possível encontrar o cliente. Verifique os dados e tente novamente!\n" + errorMessage,
+                            "Erro na Pesquisa",
+                            JOptionPane.ERROR_MESSAGE);
+                } catch (Exception jsonException) {
+                    JOptionPane.showMessageDialog(this.rootPane,
+                            "Erro inesperado ao processar a resposta da API.\nCódigo: " + statusCode + "\nResposta: " + response,
+                            "Erro na Pesquisa",
+                            JOptionPane.ERROR_MESSAGE);
+                }
+                JOptionPane.showOptionDialog(rootPane,
+                        "Ocorreu um erro ao carregar os clientes.",
+                        "Problema no Servidor",
+                        JOptionPane.DEFAULT_OPTION,
+                        JOptionPane.ERROR_MESSAGE,
+                        null,null,null);
+                connection.disconnect();
+            }
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(rootPane, e.getMessage());
+        }
+    }
+
+    private void getClientByDateAndAddress(String dateIn, String dateOut, String endereco){
+        try {
+            String urlAPI = this.dotenv.get("API_HOST");
+            String urlString = urlAPI + "/client/searchByAeD?start_date=" + URLEncoder.encode(dateIn, StandardCharsets.UTF_8) +
+                    "&end_date=" + URLEncoder.encode(dateOut, StandardCharsets.UTF_8)+"&addressTerm="+URLEncoder.encode(endereco, StandardCharsets.UTF_8);
+            URL url = new URL(urlString);
+
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.setRequestMethod("GET");
+            connection.setRequestProperty("Content-Type", "application/json");
+            connection.setDoOutput(true);
+
+            int statusCode = connection.getResponseCode();
+            if (statusCode == HttpURLConnection.HTTP_OK) {
+                BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+                StringBuilder response = new StringBuilder();
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    response.append(line);
+                }
+                reader.close();
+
+                JsonArray clients = JsonParser.parseString(response.toString()).getAsJsonArray();
+
+                DefaultTableModel tableModel = (DefaultTableModel) jtable.getModel();
+                tableModel.setRowCount(0);
+
+                for (int i = 0; i < clients.size(); i++) {
+                    JsonObject client = clients.get(i).getAsJsonObject();
+                    String id = client.get("id").getAsString();
+                    String name = client.get("name").getAsString();
+                    String cpf = client.get("cpf").getAsString();
+                    String address = client.get("address").getAsString();
+                    String phone_number = client.get("phoneNumber").getAsString();
+                    String email = client.get("email").getAsString();
+                    String data = client.get("dateBirth").getAsString();
+                    tableModel.addRow(new Object[]{id, name, cpf, address, phone_number, email, data});
+                }
+                connection.disconnect();
+            } else {
+                StringBuilder response = new StringBuilder();
+                try (BufferedReader br = new BufferedReader(new InputStreamReader(connection.getErrorStream(), StandardCharsets.UTF_8))) {
+                    String responseLine;
+                    while ((responseLine = br.readLine()) != null) {
+                        response.append(responseLine.trim());
+                    }
+                }
+
+                try {
+                    JsonObject err = JsonParser.parseString(response.toString()).getAsJsonObject();
+
+                    String errorMessage = (err.has("message") && !err.get("message").isJsonNull())
+                            ? err.get("message").getAsString()
+                            : response.toString();
+
+                    JOptionPane.showMessageDialog(this.rootPane,
+                            "Não foi possível encontrar o funcionário. Verifique os dados e tente novamente!\n" + errorMessage,
+                            "Erro na Pesquisa",
+                            JOptionPane.ERROR_MESSAGE);
+                } catch (Exception jsonException) {
+                    JOptionPane.showMessageDialog(this.rootPane,
+                            "Erro inesperado ao processar a resposta da API.\nCódigo: " + statusCode + "\nResposta: " + response,
+                            "Erro na Pesquisa",
+                            JOptionPane.ERROR_MESSAGE);
+                }
+                JOptionPane.showOptionDialog(rootPane,
+                        "Ocorreu um erro ao carregar os funcionários.",
+                        "Problema no Servidor",
+                        JOptionPane.DEFAULT_OPTION,
+                        JOptionPane.ERROR_MESSAGE,
+                        null,null,null);
+                connection.disconnect();
+            }
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(rootPane, e.getMessage());
+        }
+    }
+
+    private void filtro(){
+        JFrame frame = (JFrame) SwingUtilities.getWindowAncestor(rootPane);
+
+        JDialog dialog = new JDialog(frame, "Filtros", true);
+        dialog.setSize(250, 300);
+        dialog.setLayout(new GridBagLayout());
+        dialog.setLocationRelativeTo(jButtonFiltrar);
+
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.insets = new Insets(5, 5, 5, 5);
+
+        JCheckBox chkDataNascimento = new JCheckBox("Data de Nascimento:");
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.gridwidth = 2;
+        dialog.add(chkDataNascimento, gbc);
+
+        gbc.gridwidth = 1;
+        gbc.gridy = 1;
+        dialog.add(new JLabel("de"), gbc);
+        gbc.gridx = 1;
+        JDateChooser dateChooserDe = new JDateChooser();
+        dateChooserDe.setDateFormatString("dd/MM/yyyy");
+        dialog.add(dateChooserDe, gbc);
+
+        gbc.gridx = 0;
+        gbc.gridy = 2;
+        dialog.add(new JLabel("até"), gbc);
+        gbc.gridx = 1;
+        JDateChooser dateChooserAte = new JDateChooser();
+        dateChooserAte.setDateFormatString("dd/MM/yyyy");
+        dialog.add(dateChooserAte, gbc);
+
+        gbc.gridx = 0;
+        gbc.gridy = 3;
+        gbc.gridwidth = 2;
+        JCheckBox chkEndereco = new JCheckBox("Endereço");
+        dialog.add(chkEndereco, gbc);
+
+        gbc.gridy = 4;
+        JTextField txtEndereco = new JTextField(15);
+        dialog.add(txtEndereco, gbc);
+
+        gbc.gridy = 5;
+        JButton btnFiltrar = new JButton("Filtrar");
+        dialog.add(btnFiltrar, gbc);
+
+        btnFiltrar.addActionListener(e -> {
+            SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+            String dataDe = dateChooserDe.getDate() != null ? sdf.format(dateChooserDe.getDate()) : "Não selecionado";
+            String dataAte = dateChooserAte.getDate() != null ? sdf.format(dateChooserAte.getDate()) : "Não selecionado";
+            String endereco = txtEndereco.getText().trim().isEmpty() ? "Não informado" : txtEndereco.getText();
+
+            if(chkEndereco.isSelected()){
+                getClientByAddress(endereco);
+                dialog.setVisible(false);
+            } else if (chkDataNascimento.isSelected()) {
+                getClientByDate(dataDe, dataAte);
+                dialog.setVisible(false);
+            } else if (chkDataNascimento.isSelected() && chkEndereco.isSelected()) {
+                getClientByDateAndAddress(dataDe,dataAte,endereco);
+                dialog.setVisible(false);
+            }else {
+                JOptionPane.showMessageDialog(frame,"Selecione uma opção de Filtro!","Erro na pesquisa",JOptionPane.ERROR_MESSAGE);
+            }
+
+        });
+
+        dialog.setVisible(true);
+        frame.setVisible(true);
     }
 
     private javax.swing.JTextField pesquisaProduto;
