@@ -68,7 +68,7 @@ public class ClientController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<?> getSupplier(@PathVariable UUID id) {
+    public ResponseEntity<?> getClient(@PathVariable UUID id) {
         try{
             Client client = clientService.getById(id);
             return ResponseEntity.status(HttpStatus.OK).body(client);
