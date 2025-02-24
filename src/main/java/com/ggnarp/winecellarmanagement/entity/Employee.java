@@ -22,8 +22,8 @@ public class Employee {
     @Column(nullable = false)
     private String name;
 
-    @Column(nullable = false)
-    private LocalDate date_birth;
+    @Column(nullable = false,name = "date_birth")
+    private LocalDate dateBirth;
 
     @Column(nullable = false,unique = true,length = 14)
     private String cpf;

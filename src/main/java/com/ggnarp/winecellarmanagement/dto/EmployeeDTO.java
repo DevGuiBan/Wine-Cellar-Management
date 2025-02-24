@@ -18,7 +18,7 @@ public class EmployeeDTO {
 
     @NotNull(message = "A data de nascimento não pode ser nula!")
     @NotBlank(message = "A data de nascimento não pode ser vázia")
-    private String date_birth;
+    private String dateBirth;
 
     @NotNull(message = "O CPF não pode ser um valor nulo")
     @NotBlank(message = "O CPF não pode ser vázio!")

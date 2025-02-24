@@ -63,7 +63,7 @@ public class CadastrarFuncionario extends JPanel {
         jTextFieldNumero = new JTextField();
         jTextFieldCidade = new JTextField();
         jComboBoxUF = new JComboBox<UF>();
-        jTextFieldSenha = new jTextField();
+        jTextFieldSenha = new JTextField();
 
         try{
             jTextFieldTelefone = new javax.swing.JFormattedTextField(new MaskFormatter("(##) #####-####"));
@@ -453,6 +453,7 @@ public class CadastrarFuncionario extends JPanel {
             if (dateOfBirth == null || dateOfBirth.trim().isEmpty()) {
                 throw new IllegalArgumentException("Informe a Data de Nascimento!");
             }
+            String password = jTextFieldSenha.getText();
 
             // Criando o JSON do funcionário
             JsonObject jsonData = new JsonObject();
@@ -461,7 +462,7 @@ public class CadastrarFuncionario extends JPanel {
             jsonData.addProperty("phoneNumber", phoneNumber);
             jsonData.addProperty("address", address);
             jsonData.addProperty("cpf", cpf);
-            jsonData.addProperty("date_birth", dateOfBirth);
+            jsonData.addProperty("dateBirth", dateOfBirth);
             jsonData.addProperty("password", password);
 
             // Configurando a conexão HTTP
@@ -545,6 +546,7 @@ public class CadastrarFuncionario extends JPanel {
             );
             String cpf = jTextFieldCPF.getText();
             String dataString = jTextFieldDataNascimento.getText();
+            String password = jTextFieldSenha.getText();
 
             JsonObject jsonData = new JsonObject();
             jsonData.addProperty("name", name);

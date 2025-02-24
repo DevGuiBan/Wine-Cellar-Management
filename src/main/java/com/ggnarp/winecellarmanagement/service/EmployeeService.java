@@ -32,7 +32,7 @@ public class EmployeeService {
         if(this.employeeRepository.existsByPhoneNumber(employerDTO.getPhoneNumber())) {
             throw new IllegalArgumentException("Já existe um funcionário cadastrado com esse número de telefone");
         }
-        if(employerDTO.getDate_birth().equals(" / / ")){
+        if(employerDTO.getDateBirth().equals(" / / ")){
             throw new IllegalArgumentException("A data de nascimento não pode ser vázia!");
         }
 
@@ -49,8 +49,8 @@ public class EmployeeService {
         employee.setPhoneNumber(employerDTO.getPhoneNumber());
         employee.setAddress(employerDTO.getAddress());
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-        LocalDate data = LocalDate.parse(employerDTO.getDate_birth(), formatter);
-        employee.setDate_birth(data);
+        LocalDate data = LocalDate.parse(employerDTO.getDateBirth(), formatter);
+        employee.setDateBirth(data);
         employee.setCpf(employerDTO.getCpf());
         return employeeRepository.save(employee);
     }
@@ -64,8 +64,8 @@ public class EmployeeService {
             dto.setAddress(client.getAddress());
             dto.setId(client.getId());
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-            String dataFormatada = client.getDate_birth().format(formatter);
-            dto.setDate_birth(dataFormatada);
+            String dataFormatada = client.getDateBirth().format(formatter);
+            dto.setDateBirth(dataFormatada);
             dto.setCpf(client.getCpf());
             return dto;
         }).collect(Collectors.toList());
@@ -107,13 +107,13 @@ public class EmployeeService {
                         }
 
                     }
-                    if(employerDTO.getDate_birth()!= null && !employerDTO.getDate_birth().isBlank()){
-                        if(" / / ".equals(employerDTO.getDate_birth())){
+                    if(employerDTO.getDateBirth()!= null && !employerDTO.getDateBirth().isBlank()){
+                        if(" / / ".equals(employerDTO.getDateBirth())){
                             throw new IllegalArgumentException("A data não pode ser vázia!");
                         }else {
                             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-                            LocalDate data = LocalDate.parse(employerDTO.getDate_birth(), formatter);
-                            existingEmployee.setDate_birth(data);
+                            LocalDate data = LocalDate.parse(employerDTO.getDateBirth(), formatter);
+                            existingEmployee.setDateBirth(data);
                         }
 
                     }
@@ -132,4 +132,64 @@ public class EmployeeService {
         return employeeRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Funcionário com o id " + id + " não encontrado"));
     }
+
+    public List<EmployeeDTO> listAllByDate(String start_date, String end_date) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+
+        LocalDate date_in = LocalDate.parse(start_date, formatter);
+        LocalDate date_out = LocalDate.parse(end_date, formatter);
+
+        return employeeRepository.findAllByDateBirthBetweenOrderByDateBirthAsc(date_in, date_out).stream().map(employee -> {
+            EmployeeDTO dto = new EmployeeDTO();
+            dto.setName(employee.getName());
+            dto.setEmail(employee.getEmail());
+            dto.setPhoneNumber(employee.getPhoneNumber());
+            dto.setAddress(employee.getAddress());
+            dto.setId(employee.getId());
+
+            String dataFormatada = employee.getDateBirth().format(formatter);
+            dto.setDateBirth(dataFormatada);
+            dto.setCpf(employee.getCpf());
+
+            return dto;
+        }).collect(Collectors.toList());
+    }
+
+    public List<EmployeeDTO> listAllByAdress(String adress){
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+
+        return employeeRepository.searchEmployeeByAddress(adress).stream().map(employee -> {
+            EmployeeDTO dto = new EmployeeDTO();
+            dto.setName(employee.getName());
+            dto.setEmail(employee.getEmail());
+            dto.setPhoneNumber(employee.getPhoneNumber());
+            dto.setAddress(employee.getAddress().replace(":",""));
+            dto.setId(employee.getId());
+            String dataFormatada = employee.getDateBirth().format(formatter);
+            dto.setDateBirth(dataFormatada);
+            dto.setCpf(employee.getCpf());
+            return dto;
+        }).collect(Collectors.toList());
+    }
+
+    public List<EmployeeDTO> listAllByDateAndAddress(String startDate, String endDate, String addressTerm) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+        LocalDate dateIn = LocalDate.parse(startDate, formatter);
+        LocalDate dateOut = LocalDate.parse(endDate, formatter);
+
+        List<Employee> employees = employeeRepository.searchEmployeeByDateAndAddress(dateIn, dateOut, addressTerm);
+
+        return employees.stream().map(employee -> {
+            EmployeeDTO dto = new EmployeeDTO();
+            dto.setName(employee.getName());
+            dto.setEmail(employee.getEmail());
+            dto.setPhoneNumber(employee.getPhoneNumber());
+            dto.setAddress(employee.getAddress());
+            dto.setId(employee.getId());
+            dto.setDateBirth(employee.getDateBirth().format(formatter));
+            dto.setCpf(employee.getCpf());
+            return dto;
+        }).collect(Collectors.toList());
+    }
+
 }
