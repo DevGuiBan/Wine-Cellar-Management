@@ -1,6 +1,7 @@
 package com.ggnarp.winecellarmanagement.controller;
 
 import com.ggnarp.winecellarmanagement.dto.ClientDTO;
+import com.ggnarp.winecellarmanagement.dto.EmployeeDTO;
 import com.ggnarp.winecellarmanagement.entity.Client;
 import com.ggnarp.winecellarmanagement.service.ClientService;
 import com.ggnarp.winecellarmanagement.dto.DateRangeDTO;
@@ -66,6 +67,35 @@ public class ClientController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
         }
     }
+
+    @GetMapping("/searchByAeD")
+    public ResponseEntity<?> searchEmployeeByDateAndAddress(@RequestParam("start_date") String startDate,
+                                                            @RequestParam("end_date") String endDate,
+                                                            @RequestParam("addressTerm") String addressTerm) {
+        try {
+            List<ClientDTO> employees = clientService.listAllByDateAndAddress(startDate, endDate, addressTerm);
+            return ResponseEntity.status(HttpStatus.OK).body(employees);
+        } catch (Exception e) {
+            Map<String, String> errorResponse = new HashMap<>();
+            errorResponse.put("error", "Erro ao procurar os Clientes com os critérios fornecidos");
+            errorResponse.put("message", e.getMessage());
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
+        }
+    }
+
+    @GetMapping("/address/{address}")
+    public ResponseEntity<?> address(@PathVariable String address) {
+        try {
+            List<ClientDTO> employees = clientService.listAllByAdress(address);
+            return ResponseEntity.status(HttpStatus.OK).body(employees);
+        }catch (Exception e) {
+            Map<String, String> errorResponse = new HashMap<>();
+            errorResponse.put("error", "Erro ao procurar os Clientes no servidor com estes endereços!");
+            errorResponse.put("message", e.getMessage());
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
+        }
+    }
+
 
     @GetMapping("/{id}")
     public ResponseEntity<?> getClient(@PathVariable UUID id) {

@@ -2,6 +2,8 @@ package com.ggnarp.winecellarmanagement.repository;
 
 import com.ggnarp.winecellarmanagement.entity.Client;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -16,4 +18,14 @@ public interface ClientRepository extends JpaRepository<Client, UUID> {
 
     List<Client> findAllByDateBirthBetweenOrderByDateBirthAsc(LocalDate startDate, LocalDate endDate);
 
+    @Query("SELECT f FROM Client f WHERE " +
+            "LOWER(REPLACE(f.address, ':-', '-')) LIKE LOWER(CONCAT('%', :termo, '%'))")
+    List<Client> searchClientByAddress(@Param("termo") String termo);
+
+    @Query("SELECT f FROM Client f WHERE " +
+            "f.dateBirth BETWEEN :startDate AND :endDate " +
+            "AND LOWER(REPLACE(f.address, ':-', '-')) LIKE LOWER(CONCAT('%', :termo, '%'))")
+    List<Client> searchClientByDateAndAddress(@Param("startDate") LocalDate startDate,
+                                                  @Param("endDate") LocalDate endDate,
+                                                  @Param("termo") String termo);
 }

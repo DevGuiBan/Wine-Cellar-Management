@@ -1,7 +1,9 @@
 package com.ggnarp.winecellarmanagement.service;
 
 import com.ggnarp.winecellarmanagement.dto.ClientDTO;
+import com.ggnarp.winecellarmanagement.dto.EmployeeDTO;
 import com.ggnarp.winecellarmanagement.entity.Client;
+import com.ggnarp.winecellarmanagement.entity.Employee;
 import com.ggnarp.winecellarmanagement.repository.ClientRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.ResourceAccessException;
@@ -173,6 +175,43 @@ public class ClientService {
             dto.setId(client.getId());
             String dataFormatada = client.getDateBirth().format(formatter);
             dto.setDateBirth(dataFormatada);
+            dto.setCpf(client.getCpf());
+            return dto;
+        }).collect(Collectors.toList());
+    }
+
+    public List<ClientDTO> listAllByAdress(String adress){
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+
+        return clientRepository.searchClientByAddress(adress).stream().map(client -> {
+            ClientDTO dto = new ClientDTO();
+            dto.setName(client.getName());
+            dto.setEmail(client.getEmail());
+            dto.setPhoneNumber(client.getPhoneNumber());
+            dto.setAddress(client.getAddress().replace(":",""));
+            dto.setId(client.getId());
+            String dataFormatada = client.getDateBirth().format(formatter);
+            dto.setDateBirth(dataFormatada);
+            dto.setCpf(client.getCpf());
+            return dto;
+        }).collect(Collectors.toList());
+    }
+
+    public List<ClientDTO> listAllByDateAndAddress(String startDate, String endDate, String addressTerm) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+        LocalDate dateIn = LocalDate.parse(startDate, formatter);
+        LocalDate dateOut = LocalDate.parse(endDate, formatter);
+
+        List<Client> clients = clientRepository.searchClientByDateAndAddress(dateIn, dateOut, addressTerm);
+
+        return clients.stream().map(client -> {
+            ClientDTO dto = new ClientDTO();
+            dto.setName(client.getName());
+            dto.setEmail(client.getEmail());
+            dto.setPhoneNumber(client.getPhoneNumber());
+            dto.setAddress(client.getAddress());
+            dto.setId(client.getId());
+            dto.setDateBirth(client.getDateBirth().format(formatter));
             dto.setCpf(client.getCpf());
             return dto;
         }).collect(Collectors.toList());

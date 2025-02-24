@@ -92,7 +92,7 @@ public class CadastrarFuncionario extends JPanel {
 
         gbc.fill = GridBagConstraints.HORIZONTAL; // Permitir redimensionamento horizontal
         gbc.anchor = GridBagConstraints.WEST; // Alinhamento à esquerda
-        Dimension fieldSize = new Dimension(400, 40); // tamanho padrão dos campos
+        Dimension fieldSize = new Dimension(400, 30); // tamanho padrão dos campos
 
         // painel branco que vai conter tudo
         jPanel.setPreferredSize(new Dimension(1200, 600));
@@ -124,8 +124,8 @@ public class CadastrarFuncionario extends JPanel {
         jPanel.add(jPanelHeader);
 
         // painel dos campos
-        jPanelContent.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-        jPanelContent.setPreferredSize(new Dimension(1200, 450));
+        jPanelContent.setBorder(BorderFactory.createEmptyBorder(10, 10, 0, 10));
+        jPanelContent.setPreferredSize(new Dimension(1200, 480));
         jPanelContent.setBackground(new Color(255, 255, 255));
 
         jLabelNome.setFont(new Font("Cormorant Garamond", 1, 18));
@@ -365,7 +365,7 @@ public class CadastrarFuncionario extends JPanel {
         jLabelSenha.setText("Senha:");
         jLabelSenha.setForeground(Color.BLACK);
         jLabelSenha.setBackground(Color.WHITE);
-        gbc.gridx = 1;
+        gbc.gridx = 0;
         gbc.gridy = 10;
         gbc.insets = new Insets(0, 0, 0, 100);
         jPanelContent.add(jLabelSenha, gbc);
@@ -376,7 +376,7 @@ public class CadastrarFuncionario extends JPanel {
         jTextFieldSenha.setPreferredSize(fieldSize);
         jTextFieldSenha.setForeground(Color.BLACK);
         jTextFieldSenha.setText("Senha");
-        gbc.gridx = 1;
+        gbc.gridx = 0;
         gbc.gridy = 11;
         gbc.insets = new Insets(0, 0, 20, 100);
         jPanelContent.add(jTextFieldSenha, gbc);
@@ -416,7 +416,7 @@ public class CadastrarFuncionario extends JPanel {
         jPanelButtons.add(jButtonCancelar);
         jPanelButtons.add(jButtonCadastrar);
         jPanelButtons.setLayout(new FlowLayout(FlowLayout.RIGHT,10,10));
-        jPanelButtons.setBorder(new EmptyBorder(5,10,5,140));
+        jPanelButtons.setBorder(new EmptyBorder(-10,10,10,140));
 
         jPanel.add(jPanelButtons);
 
@@ -554,7 +554,7 @@ public class CadastrarFuncionario extends JPanel {
             jsonData.addProperty("phoneNumber", phone_number);
             jsonData.addProperty("address", address);
             jsonData.addProperty("cpf", cpf);
-            jsonData.addProperty("date_birth", dataString);
+            jsonData.addProperty("dateBirth", dataString);
             jsonData.addProperty("password", password);
 
             // making the request
