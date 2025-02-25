@@ -6,7 +6,6 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.toedter.calendar.JDateChooser;
 import io.github.cdimascio.dotenv.Dotenv;
-import resources.interfaces.EditarProduto;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -14,7 +13,6 @@ import javax.swing.table.*;
 import java.awt.*;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
-import java.math.BigInteger;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
@@ -253,9 +251,10 @@ public class ListarCliente extends JPanel {
                     String phone_number = client.get("phoneNumber").getAsString();
                     String email = client.get("email").getAsString();
                     String data = client.get("dateBirth").getAsString();
-                    tableModel.addRow(new Object[]{id, name, cpf, address, phone_number, email, data});
-                    connection.disconnect();
+                    tableModel.addRow(new Object[]{id, name,address, cpf, data, phone_number, email });
+
                 }
+                connection.disconnect();
             } else {
                 JOptionPane.showOptionDialog(rootPane,
                         "Ocorreu um erro ao carregar os clientes.",
