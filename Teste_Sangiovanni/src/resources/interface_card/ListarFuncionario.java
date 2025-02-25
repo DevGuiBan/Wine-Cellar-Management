@@ -6,7 +6,6 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.toedter.calendar.JDateChooser;
 import io.github.cdimascio.dotenv.Dotenv;
-import resources.interfaces.EditarProduto;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -14,7 +13,6 @@ import javax.swing.table.*;
 import java.awt.*;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
-import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
@@ -440,6 +438,8 @@ public class ListarFuncionario extends JPanel {
         gbc.insets = new Insets(5, 5, 5, 5);
 
         JCheckBox chkDataNascimento = new JCheckBox("Data de Nascimento:");
+        chkDataNascimento.setForeground(Color.BLACK);
+        chkDataNascimento.setFont(new Font("Cormorant Garamond",Font.BOLD,14));
         gbc.gridx = 0;
         gbc.gridy = 0;
         gbc.gridwidth = 2;
@@ -447,32 +447,51 @@ public class ListarFuncionario extends JPanel {
 
         gbc.gridwidth = 1;
         gbc.gridy = 1;
-        dialog.add(new JLabel("de"), gbc);
+        JLabel de = new JLabel("de");
+        de.setFont(new Font("Cormorant Garamond",Font.BOLD,14));
+        de.setForeground(Color.BLACK);
+        dialog.add(de, gbc);
         gbc.gridx = 1;
         JDateChooser dateChooserDe = new JDateChooser();
         dateChooserDe.setDateFormatString("dd/MM/yyyy");
+        dateChooserDe.setFont(new Font("Cormorant Infant",Font.BOLD,14));
+        dateChooserDe.setForeground(Color.BLACK);
         dialog.add(dateChooserDe, gbc);
 
         gbc.gridx = 0;
         gbc.gridy = 2;
-        dialog.add(new JLabel("até"), gbc);
+        JLabel ate = new JLabel("de");
+        ate.setFont(new Font("Cormorant Garamond",Font.BOLD,14));
+        ate.setForeground(Color.BLACK);
+        dialog.add(ate, gbc);
         gbc.gridx = 1;
         JDateChooser dateChooserAte = new JDateChooser();
         dateChooserAte.setDateFormatString("dd/MM/yyyy");
+        dateChooserAte.setFont(new Font("Cormorant Infant",Font.BOLD,14));
+        dateChooserAte.setForeground(Color.BLACK);
         dialog.add(dateChooserAte, gbc);
 
         gbc.gridx = 0;
         gbc.gridy = 3;
         gbc.gridwidth = 2;
         JCheckBox chkEndereco = new JCheckBox("Endereço");
+        chkEndereco.setFont(new Font("Cormorant Garamond",Font.BOLD,14));
+        chkEndereco.setForeground(Color.BLACK);
         dialog.add(chkEndereco, gbc);
 
         gbc.gridy = 4;
         JTextField txtEndereco = new JTextField(15);
+        txtEndereco.setFont(new Font("Cormorant Infant",Font.BOLD,14));
+        txtEndereco.setForeground(Color.BLACK);
         dialog.add(txtEndereco, gbc);
 
         gbc.gridy = 5;
         JButton btnFiltrar = new JButton("Filtrar");
+        btnFiltrar.setBackground(new Color(0, 0, 139));
+        btnFiltrar.setFont(new Font("Cormorant Garamond",Font.BOLD,16));
+        btnFiltrar.setForeground(Color.WHITE);
+        btnFiltrar.setFocusPainted(false);
+        btnFiltrar.setCursor(new Cursor(Cursor.HAND_CURSOR));
         dialog.add(btnFiltrar, gbc);
 
         btnFiltrar.addActionListener(e -> {

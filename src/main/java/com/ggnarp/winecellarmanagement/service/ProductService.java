@@ -151,4 +151,60 @@ public class ProductService {
                 .map(this::mapToDTO)
                 .collect(Collectors.toList());
     }
+
+    public List<ProductDTO> getProductByProductType(String productType){
+        return productRepository.findProductByProductType_Name(productType)
+                .stream()
+                .map(this::mapToDTO)
+                .collect(Collectors.toList());
+    }
+
+    public List<ProductDTO> getProductsBySupplierAndQuantity(String supplierName, int quantity) {
+        return productRepository.findBySupplier_NameAndQuantity(supplierName, quantity)
+                .stream()
+                .map(this::mapToDTO)
+                .collect(Collectors.toList());
+    }
+
+    public List<ProductDTO> getProductsBySupplierAndLowStock(String supplierName) {
+        return productRepository.findBySupplier_NameAndQuantityLessThan(supplierName, 5)
+                .stream()
+                .map(this::mapToDTO)
+                .collect(Collectors.toList());
+    }
+
+    public List<ProductDTO> getProductsBySupplierAndProductType(String supplierName, String productType) {
+        return productRepository.findBySupplier_NameAndProductType_Name(supplierName, productType)
+                .stream()
+                .map(this::mapToDTO)
+                .collect(Collectors.toList());
+    }
+
+    public List<ProductDTO> getProductsByQuantityAndProductType(int quantity, String productType) {
+        return productRepository.findByQuantityAndProductType_Name(quantity, productType)
+                .stream()
+                .map(this::mapToDTO)
+                .collect(Collectors.toList());
+    }
+
+    public List<ProductDTO> getProductsByLowStockAndProductType(String productType) {
+        return productRepository.findByQuantityLessThanAndProductType_Name(5, productType)
+                .stream()
+                .map(this::mapToDTO)
+                .collect(Collectors.toList());
+    }
+
+    public List<ProductDTO> getProductsBySupplierQuantityAndProductType(String supplierName, int quantity, String productType) {
+        return productRepository.findBySupplier_NameAndQuantityAndProductType_Name(supplierName, quantity, productType)
+                .stream()
+                .map(this::mapToDTO)
+                .collect(Collectors.toList());
+    }
+
+    public List<ProductDTO> getProductsBySupplierLowStockAndProductType(String supplierName, String productType) {
+        return productRepository.findBySupplier_NameAndQuantityLessThanAndProductType_Name(supplierName, 5, productType)
+                .stream()
+                .map(this::mapToDTO)
+                .collect(Collectors.toList());
+    }
 }

@@ -202,7 +202,7 @@ public class JanelaPrincipal extends javax.swing.JFrame {
                     cardListarProdutos.atualizarDados();
                     cl.show(cardPanel, cardName);
                     break;
-                case "*":
+                case "listar_fonecedores":
                     cardListarFornecedores.atualizarDados();
                     cl.show(cardPanel, cardName);
                     break;

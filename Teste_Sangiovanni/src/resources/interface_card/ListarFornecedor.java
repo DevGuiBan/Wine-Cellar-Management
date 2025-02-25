@@ -10,12 +10,19 @@ import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.table.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.Objects;
 import io.github.cdimascio.dotenv.Dotenv;
+import resources.interfaces.ProductType;
+import resources.interfaces.Supplier;
 
 public class ListarFornecedor extends JPanel {
     private final Dotenv dotenv;
@@ -40,6 +47,8 @@ public class ListarFornecedor extends JPanel {
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
             connection.setRequestMethod("GET");
 
+            ArrayList<SupplierCount> counts = getSupplierCount();
+
             int responseCode = connection.getResponseCode();
             if (responseCode == HttpURLConnection.HTTP_OK) {
                 BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
@@ -63,9 +72,16 @@ public class ListarFornecedor extends JPanel {
                     String cnpj = supplier.get("cnpj").getAsString();
                     String address = supplier.get("address").getAsString();
                     String phone = supplier.get("phone_number").getAsString();
-                    String observation = supplier.get("observation").getAsString();
 
-                    tableModel.addRow(new Object[]{id, name, email, cnpj,observation, address, phone});
+                    Long count = 0L;
+                    for (SupplierCount sc : counts) {
+                        if (sc.getSupplierName().equals(name)) {
+                            count = sc.getProductCount();
+                            break;
+                        }
+                    }
+
+                    tableModel.addRow(new Object[]{id, name, email, cnpj, address, phone, count});
                     connection.disconnect();
                 }
             } else {
@@ -153,6 +169,10 @@ public class ListarFornecedor extends JPanel {
         jButtonFiltrar.setContentAreaFilled(false);
         jButtonFiltrar.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         jButtonFiltrar.setPreferredSize(new java.awt.Dimension(90, 40));
+        jButtonFiltrar.addActionListener(evt->{
+            JFrame frame = (JFrame) SwingUtilities.getWindowAncestor(rootPane);
+            abrirDialogoFiltro(frame);
+        });
         jPanelTopoTabela.add(jButtonFiltrar);
 
         jPanelTabela.setPreferredSize(new Dimension(1145, 450));
@@ -162,7 +182,7 @@ public class ListarFornecedor extends JPanel {
         jtable.setModel(new javax.swing.table.DefaultTableModel(
                 new Object[][]{},
                 new String[]{
-                        "Código", "Nome", "E-mail", "CPNJ", "Observações", "Endereço","Telefone","Ações"
+                        "Código", "Nome", "E-mail", "CPNJ", "Endereço","Telefone","N° Produtos","Ações"
                 }
         ));
 
@@ -215,6 +235,229 @@ public class ListarFornecedor extends JPanel {
 
     public void atualizarDados(){
         this.getSupplier();
+    }
+
+    private ArrayList<SupplierCount> getSupplierCount(){
+        ArrayList<SupplierCount> list = new ArrayList<SupplierCount>();
+        try {
+            String urlAPI = this.dotenv.get("API_HOST");
+            String urlString = urlAPI + "/supplier/count";
+            URL url = new URL(urlString);
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.setRequestMethod("GET");
+
+            int responseCode = connection.getResponseCode();
+            if (responseCode == HttpURLConnection.HTTP_OK) {
+                BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+                StringBuilder response = new StringBuilder();
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    response.append(line);
+                }
+                reader.close();
+
+                JsonArray suppliers = JsonParser.parseString(response.toString()).getAsJsonArray();
+
+                for (int i = 0; i < suppliers.size(); i++) {
+                    JsonObject supplier = suppliers.get(i).getAsJsonObject();
+                    Long count = supplier.get("productCount").getAsLong();
+                    String name = supplier.get("supplierName").getAsString();
+
+                    list.add(new SupplierCount(name, count));
+
+                }
+                connection.disconnect();
+                return list;
+            } else {
+                JOptionPane.showOptionDialog(rootPane,
+                        "Ocorreu um erro ao carregar a quantidade de produto para cada fornecedor!",
+                        "Problema no Servidor",
+                        JOptionPane.DEFAULT_OPTION,
+                        JOptionPane.ERROR_MESSAGE,
+                        null,null,null);
+                connection.disconnect();
+                return null;
+            }
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(rootPane, e.getMessage());
+            return null;
+        }
+    }
+
+    private void getSupplierByAddress(String adress){
+        try {
+            String urlAPI = this.dotenv.get("API_HOST");
+            String urlString = urlAPI + "/supplier/address/?address=" + URLEncoder.encode(adress, StandardCharsets.UTF_8);
+            URL url = new URL(urlString);
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.setRequestMethod("GET");
+
+            ArrayList<SupplierCount> counts = getSupplierCount();
+
+            int responseCode = connection.getResponseCode();
+            if (responseCode == HttpURLConnection.HTTP_OK) {
+                BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+                StringBuilder response = new StringBuilder();
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    response.append(line);
+                }
+                reader.close();
+
+                JsonArray suppliers = JsonParser.parseString(response.toString()).getAsJsonArray();
+
+                DefaultTableModel tableModel = (DefaultTableModel) jtable.getModel();
+                tableModel.setRowCount(0);
+
+                for (int i = 0; i < suppliers.size(); i++) {
+                    JsonObject supplier = suppliers.get(i).getAsJsonObject();
+                    String id = supplier.get("id").getAsString();
+                    String name = supplier.get("name").getAsString();
+                    String email = supplier.get("email").getAsString();
+                    String cnpj = supplier.get("cnpj").getAsString();
+                    String address = supplier.get("address").getAsString();
+                    String phone = supplier.get("phone_number").getAsString();
+
+                    Long count = 0L;
+                    for (SupplierCount sc : counts) {
+                        if (sc.getSupplierName().equals(name)) {
+                            count = sc.getProductCount();
+                            break;
+                        }
+                    }
+
+                    tableModel.addRow(new Object[]{id, name, email, cnpj, address, phone,count});
+                    connection.disconnect();
+                }
+            } else {
+                JOptionPane.showOptionDialog(rootPane,
+                        "Ocorreu um erro ao carregar os fornecedores",
+                        "Problema no Servidor",
+                        JOptionPane.DEFAULT_OPTION,
+                        JOptionPane.ERROR_MESSAGE,
+                        null,null,null);
+                connection.disconnect();
+            }
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(rootPane, e.getMessage());
+        }
+    }
+
+    private void getSupplierByQtdProd(String quantity){
+        try {
+            String urlAPI = this.dotenv.get("API_HOST");
+            String urlString = urlAPI + "/supplier/countBigThan/?quantity=" + URLEncoder.encode(quantity, StandardCharsets.UTF_8);
+            URL url = new URL(urlString);
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.setRequestMethod("GET");
+
+            ArrayList<SupplierCount> counts = getSupplierCount();
+
+            int responseCode = connection.getResponseCode();
+            if (responseCode == HttpURLConnection.HTTP_OK) {
+                BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+                StringBuilder response = new StringBuilder();
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    response.append(line);
+                }
+                reader.close();
+
+                JsonArray suppliers = JsonParser.parseString(response.toString()).getAsJsonArray();
+
+                DefaultTableModel tableModel = (DefaultTableModel) jtable.getModel();
+                tableModel.setRowCount(0);
+
+                for (int i = 0; i < suppliers.size(); i++) {
+                    JsonObject supplier = suppliers.get(i).getAsJsonObject();
+                    String id = supplier.get("supplierId").getAsString();
+                    String name = supplier.get("supplierName").getAsString();
+                    String email = supplier.get("email").getAsString();
+                    String cnpj = supplier.get("cnpj").getAsString();
+                    String address = supplier.get("address").getAsString();
+                    String phone = supplier.get("phoneNumber").getAsString();
+                    Long count = supplier.get("productCount").getAsLong();
+
+
+                    tableModel.addRow(new Object[]{id, name, email, cnpj, address, phone,count});
+                    connection.disconnect();
+                }
+            } else {
+                JOptionPane.showOptionDialog(rootPane,
+                        "Ocorreu um erro ao carregar os fornecedores",
+                        "Problema no Servidor",
+                        JOptionPane.DEFAULT_OPTION,
+                        JOptionPane.ERROR_MESSAGE,
+                        null,null,null);
+                connection.disconnect();
+            }
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(rootPane, e.getMessage());
+        }
+    }
+
+    private void abrirDialogoFiltro(JFrame parent) {
+        JDialog dialog = new JDialog(parent, "Filtros", true);
+        dialog.setSize(200, 250);
+        dialog.setLayout(new GridBagLayout());
+        dialog.setLocationRelativeTo(jButtonFiltrar);
+
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.insets = new Insets(5, 5, 5, 5);
+
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.gridwidth = 2;
+        JCheckBox chkAddress = new JCheckBox("Endereço");
+        chkAddress.setFont(new Font("Cormorant Garamond",Font.BOLD,14));
+        chkAddress.setForeground(Color.BLACK);
+        dialog.add(chkAddress, gbc);
+
+        gbc.gridy = 1;
+        JTextField jTextFieldAdress = new JTextField();
+        jTextFieldAdress.setFont(new Font("Cormorant Garamond",Font.BOLD,14));
+        jTextFieldAdress.setForeground(Color.BLACK);
+        dialog.add(jTextFieldAdress, gbc);
+
+        gbc.gridy = 2;
+        JCheckBox chkNProd = new JCheckBox("N° Produtos");
+        chkNProd.setFont(new Font("Cormorant Garamond",Font.BOLD,14));
+        chkNProd.setForeground(Color.BLACK);
+        dialog.add(chkNProd, gbc);
+
+        gbc.gridy = 3;
+        JSpinner spnQuantidade = new JSpinner(new SpinnerNumberModel(0, 0, 1000, 1));
+        spnQuantidade.setFont(new Font("Cormorant Infant",Font.BOLD,14));
+        spnQuantidade.setForeground(Color.BLACK);
+        dialog.add(spnQuantidade, gbc);
+
+        gbc.gridy = 7;
+        JButton btnFiltrar = new JButton("Filtrar");
+        btnFiltrar.setBackground(new Color(0, 0, 139));
+        btnFiltrar.setFont(new Font("Cormorant Garamond",Font.BOLD,16));
+        btnFiltrar.setForeground(Color.WHITE);
+        btnFiltrar.setFocusPainted(false);
+        btnFiltrar.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        dialog.add(btnFiltrar, gbc);
+
+        btnFiltrar.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if(chkAddress.isSelected()) {
+                    getSupplierByAddress(jTextFieldAdress.getText());
+                    dialog.setVisible(false);
+                } else if (chkNProd.isSelected()) {
+                    getSupplierByQtdProd(spnQuantidade.getValue().toString());
+                    dialog.setVisible(false);
+                }
+                else{
+                    JOptionPane.showMessageDialog(parent,"Selecione uma opção de Filtro!","Erro na seleção de filtro",JOptionPane.ERROR_MESSAGE);
+                }
+            }
+        });
+
+        dialog.setVisible(true);
     }
 
     // Declaração de variáveis

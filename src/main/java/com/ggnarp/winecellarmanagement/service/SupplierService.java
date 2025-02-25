@@ -1,6 +1,7 @@
 package com.ggnarp.winecellarmanagement.service;
 
 import com.ggnarp.winecellarmanagement.dto.SupplierDTO;
+import com.ggnarp.winecellarmanagement.dto.SupplierProductCountDTO;
 import com.ggnarp.winecellarmanagement.entity.Supplier;
 import com.ggnarp.winecellarmanagement.repository.SupplierRepository;
 import org.springframework.stereotype.Service;
@@ -100,13 +101,7 @@ public class SupplierService {
     }
 
     public List<SupplierDTO> getSupplierByAddress(String address) {
-        String regex = "^(.+?), (.+?), (\\d+), (.+)-([A-Z]{2})$";
-        boolean result = address.matches(regex);
-        if(!result){
-            throw new IllegalArgumentException("Insira um endereço válido!");
-        }
-
-        return supplierRepository.findSupplierByAddressOrderByAddressAsc(address).stream().map(supplier -> {
+        return supplierRepository.searchSupplierByAddress(address).stream().map(supplier -> {
             SupplierDTO dto = new SupplierDTO();
             dto.setName(supplier.getName());
             dto.setEmail(supplier.getEmail());
@@ -119,4 +114,15 @@ public class SupplierService {
         }).collect(Collectors.toList());
     }
 
+    public List<SupplierProductCountDTO> getProductCountBySupplier() {
+        return supplierRepository.countProductsBySupplier();
+    }
+
+    public List<SupplierProductCountDTO> getSupplierProductCountBigThan(Long quantity) {
+        List<Object[]> results = supplierRepository.countProductsBySupplierBigThan(quantity);
+        return results.stream().map(row -> new SupplierProductCountDTO(
+                (UUID) row[0], (String) row[1], (String) row[2],
+                (String) row[3], (String) row[4], (String) row[5], (Long) row[6]
+        )).collect(Collectors.toList());
+    }
 }

@@ -1,6 +1,7 @@
 package com.ggnarp.winecellarmanagement.controller;
 
 import com.ggnarp.winecellarmanagement.dto.SupplierDTO;
+import com.ggnarp.winecellarmanagement.dto.SupplierProductCountDTO;
 import com.ggnarp.winecellarmanagement.entity.Supplier;
 import com.ggnarp.winecellarmanagement.service.SupplierService;
 import jakarta.validation.Valid;
@@ -37,8 +38,36 @@ public class SupplierController {
         }
     }
 
-    @GetMapping("/address/{address}")
-    public ResponseEntity<?> getSupplierByAddress(@PathVariable String address) {
+    @GetMapping("/count")
+    public ResponseEntity<?> getProductCountBySupplier() {
+        try{
+            List<SupplierProductCountDTO> counts = supplierService.getProductCountBySupplier();
+            return ResponseEntity.ok(counts);
+        }catch (Exception e){
+            Map<String, String> errorResponse = new HashMap<>();
+            errorResponse.put("error", "Erro ao pesquisar a quantidade de produtos para cada fornecedor!!");
+            errorResponse.put("message", e.getMessage());
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
+        }
+
+    }
+
+    @GetMapping("/countBigThan/")
+    public ResponseEntity<?> getProductCountBySupplierBigThan(@RequestParam("quantity") String quantity) {
+        try{
+            List<SupplierProductCountDTO> counts = supplierService.getSupplierProductCountBigThan(Long.parseLong(quantity));
+            return ResponseEntity.ok(counts);
+        }catch (Exception e){
+            Map<String, String> errorResponse = new HashMap<>();
+            errorResponse.put("error", "Erro ao pesquisar a quantidade de produtos para cada fornecedor!!");
+            errorResponse.put("message", e.getMessage());
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
+        }
+
+    }
+
+    @GetMapping("/address/")
+    public ResponseEntity<?> getSupplierByAddress(@RequestParam("address") String address) {
         try{
             List<SupplierDTO> suppliers = supplierService.getSupplierByAddress(address);
             return ResponseEntity.status(HttpStatus.OK).body(suppliers);

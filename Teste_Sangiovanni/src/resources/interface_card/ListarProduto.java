@@ -9,7 +9,11 @@ import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.table.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.math.BigInteger;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.Objects;
 import com.google.gson.JsonObject;
 import java.net.HttpURLConnection;
@@ -17,6 +21,8 @@ import java.net.URL;
 import java.io.InputStreamReader;
 import java.io.BufferedReader;
 import io.github.cdimascio.dotenv.Dotenv;
+import resources.interfaces.ProductType;
+import resources.interfaces.Supplier;
 
 public class ListarProduto extends JPanel {
     private final Dotenv dotenv;
@@ -107,6 +113,10 @@ public class ListarProduto extends JPanel {
         jButtonFiltrar.setContentAreaFilled(false);
         jButtonFiltrar.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         jButtonFiltrar.setPreferredSize(new java.awt.Dimension(90, 40));
+        jButtonFiltrar.addActionListener(evt->{
+            JFrame frame = (JFrame) SwingUtilities.getWindowAncestor(rootPane);
+            abrirDialogoFiltro(frame);
+        });
         jPanelTopoTabela.add(jButtonFiltrar);
 
         jPanelTabela.setPreferredSize(new Dimension(1145, 450));
@@ -167,6 +177,96 @@ public class ListarProduto extends JPanel {
         getProduct();
     }
 
+    private void loadSupplier(JComboBox<Supplier> cbSupplier){
+        try {
+            String urlAPI = this.dotenv.get("API_HOST");
+            URL url = new URL(urlAPI + "/supplier");
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.setRequestMethod("GET");
+
+            int responseCode = connection.getResponseCode();
+            if (responseCode == HttpURLConnection.HTTP_OK) {
+                BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+                StringBuilder response = new StringBuilder();
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    response.append(line);
+                }
+                reader.close();
+
+                JsonArray products = JsonParser.parseString(response.toString()).getAsJsonArray();
+
+                DefaultComboBoxModel<Supplier> cb = (DefaultComboBoxModel<Supplier>) cbSupplier.getModel();
+
+                for (int i = 0; i < products.size(); i++) {
+                    JsonObject product = products.get(i).getAsJsonObject();
+                    String id = product.get("id").getAsString();
+                    String name = product.get("name").getAsString();
+
+                    cb.addElement(new Supplier(id,name));
+
+                }
+                connection.disconnect();
+                cbSupplier.setModel(cb);
+            } else {
+                JOptionPane.showOptionDialog(rootPane,
+                        "Ocorreu um erro ao carregar os Fornecedores no filtro",
+                        "Problema no Servidor",
+                        JOptionPane.DEFAULT_OPTION,
+                        JOptionPane.ERROR_MESSAGE,
+                        null,null,null);
+                connection.disconnect();
+            }
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(rootPane, e.getMessage());
+        }
+    }
+
+    private void loadProductType(JComboBox<ProductType> cbProductType){
+        try {
+            String urlAPI = this.dotenv.get("API_HOST");
+            URL url = new URL(urlAPI + "/product_type");
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.setRequestMethod("GET");
+
+            int responseCode = connection.getResponseCode();
+            if (responseCode == HttpURLConnection.HTTP_OK) {
+                BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+                StringBuilder response = new StringBuilder();
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    response.append(line);
+                }
+                reader.close();
+
+                JsonArray products = JsonParser.parseString(response.toString()).getAsJsonArray();
+
+                DefaultComboBoxModel<ProductType> cb = (DefaultComboBoxModel<ProductType>) cbProductType.getModel();
+
+                for (int i = 0; i < products.size(); i++) {
+                    JsonObject product = products.get(i).getAsJsonObject();
+                    String id = product.get("id").getAsString();
+                    String name = product.get("name").getAsString();
+
+                    cb.addElement(new ProductType(id,name));
+
+                }
+                connection.disconnect();
+                cbProductType.setModel(cb);
+            } else {
+                JOptionPane.showOptionDialog(rootPane,
+                        "Ocorreu um erro ao carregar os Tipos de Produtos no Filtro",
+                        "Problema no Servidor",
+                        JOptionPane.DEFAULT_OPTION,
+                        JOptionPane.ERROR_MESSAGE,
+                        null,null,null);
+                connection.disconnect();
+            }
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(rootPane, e.getMessage());
+        }
+    }
+
     private void getProduct(){
         try {
             String urlAPI = this.dotenv.get("API_HOST");
@@ -220,6 +320,723 @@ public class ListarProduto extends JPanel {
 
     public void atualizarDados(){
         this.getProduct();
+    }
+
+    private void getSupplier(String supplierName){
+        try {
+            String urlAPI = this.dotenv.get("API_HOST");
+            String encodedSupplier = URLEncoder.encode(supplierName, StandardCharsets.UTF_8);
+            URL url = new URL(urlAPI + "/product/supplier/?s_name=" + encodedSupplier);
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.setRequestMethod("GET");
+            connection.setRequestProperty("Content-Type", "application/json");
+            connection.setDoOutput(true);
+
+            int responseCode = connection.getResponseCode();
+            if (responseCode == HttpURLConnection.HTTP_OK) {
+                BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+                StringBuilder response = new StringBuilder();
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    response.append(line);
+                }
+                reader.close();
+
+                JsonArray products = JsonParser.parseString(response.toString()).getAsJsonArray();
+                DefaultTableModel tableModel = (DefaultTableModel) jtable.getModel();
+                tableModel.setRowCount(0);
+
+                for (int i = 0; i < products.size(); i++) {
+                    JsonObject product = products.get(i).getAsJsonObject();
+                    BigInteger id = product.get("id").getAsBigInteger();
+                    String name = product.get("name").getAsString();
+                    JsonObject supplier = product.get("supplier").getAsJsonObject();
+                    JsonObject prodT = product.get("productType").getAsJsonObject();
+                    String product_type = prodT.get("name").getAsString();
+                    String supplierN = supplier.get("name").getAsString();
+                    String quantity = product.get("quantity").getAsString();
+                    String price = product.get("price").getAsString();
+
+                    tableModel.addRow(new Object[]{id, name, supplierN,product_type, price,quantity});
+
+                }
+                connection.disconnect();
+            } else {
+                JOptionPane.showOptionDialog(rootPane,
+                        "Ocorreu um erro ao carregar os Fornecedores no filtro",
+                        "Problema no Servidor",
+                        JOptionPane.DEFAULT_OPTION,
+                        JOptionPane.ERROR_MESSAGE,
+                        null,null,null);
+                connection.disconnect();
+            }
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(rootPane, e.getMessage());
+        }
+    }
+
+    private void getStock(int quantity){
+        try {
+            String urlAPI = this.dotenv.get("API_HOST");
+            URL url = new URL(urlAPI + "/product/quantity/"+quantity);
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.setRequestMethod("GET");
+
+            int responseCode = connection.getResponseCode();
+            if (responseCode == HttpURLConnection.HTTP_OK) {
+                BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+                StringBuilder response = new StringBuilder();
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    response.append(line);
+                }
+                reader.close();
+
+                JsonArray products = JsonParser.parseString(response.toString()).getAsJsonArray();
+                DefaultTableModel tableModel = (DefaultTableModel) jtable.getModel();
+                tableModel.setRowCount(0);
+
+                for (int i = 0; i < products.size(); i++) {
+                    JsonObject product = products.get(i).getAsJsonObject();
+                    BigInteger id = product.get("id").getAsBigInteger();
+                    String name = product.get("name").getAsString();
+                    JsonObject supplier = product.get("supplier").getAsJsonObject();
+                    JsonObject prodT = product.get("productType").getAsJsonObject();
+                    String product_type = prodT.get("name").getAsString();
+                    String supplierN = supplier.get("name").getAsString();
+                    String quantit = product.get("quantity").getAsString();
+                    String price = product.get("price").getAsString();
+
+                    tableModel.addRow(new Object[]{id, name, supplierN,product_type, price,quantit});
+
+                }
+                connection.disconnect();
+            } else {
+                JOptionPane.showOptionDialog(rootPane,
+                        "Ocorreu um erro ao carregar os Fornecedores no filtro",
+                        "Problema no Servidor",
+                        JOptionPane.DEFAULT_OPTION,
+                        JOptionPane.ERROR_MESSAGE,
+                        null,null,null);
+                connection.disconnect();
+            }
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(rootPane, e.getMessage());
+        }
+    }
+
+    private void getLowStock(){
+        try {
+            String urlAPI = this.dotenv.get("API_HOST");
+            URL url = new URL(urlAPI + "/product/quantity");
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.setRequestMethod("GET");
+
+            int responseCode = connection.getResponseCode();
+            if (responseCode == HttpURLConnection.HTTP_OK) {
+                BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+                StringBuilder response = new StringBuilder();
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    response.append(line);
+                }
+                reader.close();
+
+                JsonArray products = JsonParser.parseString(response.toString()).getAsJsonArray();
+                DefaultTableModel tableModel = (DefaultTableModel) jtable.getModel();
+                tableModel.setRowCount(0);
+
+                for (int i = 0; i < products.size(); i++) {
+                    JsonObject product = products.get(i).getAsJsonObject();
+                    BigInteger id = product.get("id").getAsBigInteger();
+                    String name = product.get("name").getAsString();
+                    JsonObject supplier = product.get("supplier").getAsJsonObject();
+                    JsonObject prodT = product.get("productType").getAsJsonObject();
+                    String product_type = prodT.get("name").getAsString();
+                    String supplierN = supplier.get("name").getAsString();
+                    String quantit = product.get("quantity").getAsString();
+                    String price = product.get("price").getAsString();
+
+                    tableModel.addRow(new Object[]{id, name, supplierN,product_type, price,quantit});
+
+                }
+                connection.disconnect();
+            } else {
+                JOptionPane.showOptionDialog(rootPane,
+                        "Ocorreu um erro ao carregar os Fornecedores no filtro",
+                        "Problema no Servidor",
+                        JOptionPane.DEFAULT_OPTION,
+                        JOptionPane.ERROR_MESSAGE,
+                        null,null,null);
+                connection.disconnect();
+            }
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(rootPane, e.getMessage());
+        }
+    }
+
+    private void getProductByProdT(String prodT){
+        try {
+            String urlAPI = this.dotenv.get("API_HOST");
+            URL url = new URL(urlAPI + "/product/prodType/"+prodT);
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.setRequestMethod("GET");
+
+            int responseCode = connection.getResponseCode();
+            if (responseCode == HttpURLConnection.HTTP_OK) {
+                BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+                StringBuilder response = new StringBuilder();
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    response.append(line);
+                }
+                reader.close();
+
+                JsonArray products = JsonParser.parseString(response.toString()).getAsJsonArray();
+                DefaultTableModel tableModel = (DefaultTableModel) jtable.getModel();
+                tableModel.setRowCount(0);
+
+                for (int i = 0; i < products.size(); i++) {
+                    JsonObject product = products.get(i).getAsJsonObject();
+                    BigInteger id = product.get("id").getAsBigInteger();
+                    String name = product.get("name").getAsString();
+                    JsonObject supplier = product.get("supplier").getAsJsonObject();
+                    JsonObject prodType = product.get("productType").getAsJsonObject();
+                    String product_type = prodType.get("name").getAsString();
+                    String supplierN = supplier.get("name").getAsString();
+                    String quantit = product.get("quantity").getAsString();
+                    String price = product.get("price").getAsString();
+
+                    tableModel.addRow(new Object[]{id, name, supplierN,product_type, price,quantit});
+
+                }
+                connection.disconnect();
+            } else {
+                JOptionPane.showOptionDialog(rootPane,
+                        "Ocorreu um erro ao carregar os Fornecedores no filtro",
+                        "Problema no Servidor",
+                        JOptionPane.DEFAULT_OPTION,
+                        JOptionPane.ERROR_MESSAGE,
+                        null,null,null);
+                connection.disconnect();
+            }
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(rootPane, e.getMessage());
+        }
+    }
+
+    private void getSupplierQuantity(String supplierName, int quantity){
+        try {
+            String urlAPI = this.dotenv.get("API_HOST");
+            String urlString = urlAPI + "/product/get/SupQua?quantity=" + URLEncoder.encode(String.valueOf(quantity), StandardCharsets.UTF_8) +
+                    "&supplier=" + URLEncoder.encode(supplierName, StandardCharsets.UTF_8);
+            URL url = new URL(urlString);
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.setRequestMethod("GET");
+            connection.setRequestProperty("Content-Type", "application/json");
+            connection.setDoOutput(true);
+
+            int responseCode = connection.getResponseCode();
+            if (responseCode == HttpURLConnection.HTTP_OK) {
+                BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+                StringBuilder response = new StringBuilder();
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    response.append(line);
+                }
+                reader.close();
+
+                JsonArray products = JsonParser.parseString(response.toString()).getAsJsonArray();
+                DefaultTableModel tableModel = (DefaultTableModel) jtable.getModel();
+                tableModel.setRowCount(0);
+
+                for (int i = 0; i < products.size(); i++) {
+                    JsonObject product = products.get(i).getAsJsonObject();
+                    BigInteger id = product.get("id").getAsBigInteger();
+                    String name = product.get("name").getAsString();
+                    JsonObject supplier = product.get("supplier").getAsJsonObject();
+                    JsonObject prodType = product.get("productType").getAsJsonObject();
+                    String product_type = prodType.get("name").getAsString();
+                    String supplierN = supplier.get("name").getAsString();
+                    String quantit = product.get("quantity").getAsString();
+                    String price = product.get("price").getAsString();
+
+                    tableModel.addRow(new Object[]{id, name, supplierN,product_type, price,quantit});
+
+                }
+                connection.disconnect();
+            } else {
+                JOptionPane.showOptionDialog(rootPane,
+                        "Ocorreu um erro ao carregar os Fornecedores no filtro",
+                        "Problema no Servidor",
+                        JOptionPane.DEFAULT_OPTION,
+                        JOptionPane.ERROR_MESSAGE,
+                        null,null,null);
+                connection.disconnect();
+            }
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(rootPane, e.getMessage());
+        }
+    }
+
+    private void getSupplierLowQuantity(String supplierName){
+        try {
+            String urlAPI = this.dotenv.get("API_HOST");
+            String urlString = urlAPI + "/product/get/SupLQ?supplier=" + URLEncoder.encode(supplierName, StandardCharsets.UTF_8);
+            URL url = new URL(urlString);
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.setRequestMethod("GET");
+            connection.setRequestProperty("Content-Type", "application/json");
+            connection.setDoOutput(true);
+
+            int responseCode = connection.getResponseCode();
+            if (responseCode == HttpURLConnection.HTTP_OK) {
+                BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+                StringBuilder response = new StringBuilder();
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    response.append(line);
+                }
+                reader.close();
+
+                JsonArray products = JsonParser.parseString(response.toString()).getAsJsonArray();
+                DefaultTableModel tableModel = (DefaultTableModel) jtable.getModel();
+                tableModel.setRowCount(0);
+
+                for (int i = 0; i < products.size(); i++) {
+                    JsonObject product = products.get(i).getAsJsonObject();
+                    BigInteger id = product.get("id").getAsBigInteger();
+                    String name = product.get("name").getAsString();
+                    JsonObject supplier = product.get("supplier").getAsJsonObject();
+                    JsonObject prodType = product.get("productType").getAsJsonObject();
+                    String product_type = prodType.get("name").getAsString();
+                    String supplierN = supplier.get("name").getAsString();
+                    String quantit = product.get("quantity").getAsString();
+                    String price = product.get("price").getAsString();
+
+                    tableModel.addRow(new Object[]{id, name, supplierN,product_type, price,quantit});
+
+                }
+                connection.disconnect();
+            } else {
+                JOptionPane.showOptionDialog(rootPane,
+                        "Ocorreu um erro ao carregar os Fornecedores no filtro",
+                        "Problema no Servidor",
+                        JOptionPane.DEFAULT_OPTION,
+                        JOptionPane.ERROR_MESSAGE,
+                        null,null,null);
+                connection.disconnect();
+            }
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(rootPane, e.getMessage());
+        }
+    }
+
+    private void getSupplierProdT(String supplierName, String prodTName){
+        try {
+            String urlAPI = this.dotenv.get("API_HOST");
+            String urlString = urlAPI + "/product/get/SupProdT?supplier=" + URLEncoder.encode(supplierName, StandardCharsets.UTF_8)
+                                        +"&prod_t="+URLEncoder.encode(prodTName, StandardCharsets.UTF_8);
+            URL url = new URL(urlString);
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.setRequestMethod("GET");
+            connection.setRequestProperty("Content-Type", "application/json");
+            connection.setDoOutput(true);
+
+            int responseCode = connection.getResponseCode();
+            if (responseCode == HttpURLConnection.HTTP_OK) {
+                BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+                StringBuilder response = new StringBuilder();
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    response.append(line);
+                }
+                reader.close();
+
+                JsonArray products = JsonParser.parseString(response.toString()).getAsJsonArray();
+                DefaultTableModel tableModel = (DefaultTableModel) jtable.getModel();
+                tableModel.setRowCount(0);
+
+                for (int i = 0; i < products.size(); i++) {
+                    JsonObject product = products.get(i).getAsJsonObject();
+                    BigInteger id = product.get("id").getAsBigInteger();
+                    String name = product.get("name").getAsString();
+                    JsonObject supplier = product.get("supplier").getAsJsonObject();
+                    JsonObject prodType = product.get("productType").getAsJsonObject();
+                    String product_type = prodType.get("name").getAsString();
+                    String supplierN = supplier.get("name").getAsString();
+                    String quantit = product.get("quantity").getAsString();
+                    String price = product.get("price").getAsString();
+
+                    tableModel.addRow(new Object[]{id, name, supplierN,product_type, price,quantit});
+
+                }
+                connection.disconnect();
+            } else {
+                JOptionPane.showOptionDialog(rootPane,
+                        "Ocorreu um erro ao carregar os Fornecedores no filtro",
+                        "Problema no Servidor",
+                        JOptionPane.DEFAULT_OPTION,
+                        JOptionPane.ERROR_MESSAGE,
+                        null,null,null);
+                connection.disconnect();
+            }
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(rootPane, e.getMessage());
+        }
+    }
+
+    private void getQuantityByProdType(int quantity,String prodTName){
+        try {
+            String urlAPI = this.dotenv.get("API_HOST");
+            String urlString = urlAPI + "/product/get/QuaProdT?quantity=" + URLEncoder.encode(String.valueOf(quantity), StandardCharsets.UTF_8)
+                    +"&prod_t="+URLEncoder.encode(prodTName, StandardCharsets.UTF_8);
+            URL url = new URL(urlString);
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.setRequestMethod("GET");
+            connection.setRequestProperty("Content-Type", "application/json");
+            connection.setDoOutput(true);
+
+            int responseCode = connection.getResponseCode();
+            if (responseCode == HttpURLConnection.HTTP_OK) {
+                BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+                StringBuilder response = new StringBuilder();
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    response.append(line);
+                }
+                reader.close();
+
+                JsonArray products = JsonParser.parseString(response.toString()).getAsJsonArray();
+                DefaultTableModel tableModel = (DefaultTableModel) jtable.getModel();
+                tableModel.setRowCount(0);
+
+                for (int i = 0; i < products.size(); i++) {
+                    JsonObject product = products.get(i).getAsJsonObject();
+                    BigInteger id = product.get("id").getAsBigInteger();
+                    String name = product.get("name").getAsString();
+                    JsonObject supplier = product.get("supplier").getAsJsonObject();
+                    JsonObject prodType = product.get("productType").getAsJsonObject();
+                    String product_type = prodType.get("name").getAsString();
+                    String supplierN = supplier.get("name").getAsString();
+                    String quantit = product.get("quantity").getAsString();
+                    String price = product.get("price").getAsString();
+
+                    tableModel.addRow(new Object[]{id, name, supplierN,product_type, price,quantit});
+
+                }
+                connection.disconnect();
+            } else {
+                JOptionPane.showOptionDialog(rootPane,
+                        "Ocorreu um erro ao carregar os Fornecedores no filtro",
+                        "Problema no Servidor",
+                        JOptionPane.DEFAULT_OPTION,
+                        JOptionPane.ERROR_MESSAGE,
+                        null,null,null);
+                connection.disconnect();
+            }
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(rootPane, e.getMessage());
+        }
+    }
+
+    private void getLowStockAndProdType(String prodTName){
+        try {
+            String urlAPI = this.dotenv.get("API_HOST");
+            String urlString = urlAPI + "/product/get/LQProdT?prod_t=" + URLEncoder.encode(prodTName, StandardCharsets.UTF_8);
+            URL url = new URL(urlString);
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.setRequestMethod("GET");
+            connection.setRequestProperty("Content-Type", "application/json");
+            connection.setDoOutput(true);
+
+            int responseCode = connection.getResponseCode();
+            if (responseCode == HttpURLConnection.HTTP_OK) {
+                BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+                StringBuilder response = new StringBuilder();
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    response.append(line);
+                }
+                reader.close();
+
+                JsonArray products = JsonParser.parseString(response.toString()).getAsJsonArray();
+                DefaultTableModel tableModel = (DefaultTableModel) jtable.getModel();
+                tableModel.setRowCount(0);
+
+                for (int i = 0; i < products.size(); i++) {
+                    JsonObject product = products.get(i).getAsJsonObject();
+                    BigInteger id = product.get("id").getAsBigInteger();
+                    String name = product.get("name").getAsString();
+                    JsonObject supplier = product.get("supplier").getAsJsonObject();
+                    JsonObject prodType = product.get("productType").getAsJsonObject();
+                    String product_type = prodType.get("name").getAsString();
+                    String supplierN = supplier.get("name").getAsString();
+                    String quantit = product.get("quantity").getAsString();
+                    String price = product.get("price").getAsString();
+
+                    tableModel.addRow(new Object[]{id, name, supplierN,product_type, price,quantit});
+
+                }
+                connection.disconnect();
+            } else {
+                JOptionPane.showOptionDialog(rootPane,
+                        "Ocorreu um erro ao carregar os Fornecedores no filtro",
+                        "Problema no Servidor",
+                        JOptionPane.DEFAULT_OPTION,
+                        JOptionPane.ERROR_MESSAGE,
+                        null,null,null);
+                connection.disconnect();
+            }
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(rootPane, e.getMessage());
+        }
+    }
+
+    private void getSupplierQuantityAndProdType(String supplierName, String quantity, String prodTName){
+        try {
+            String urlAPI = this.dotenv.get("API_HOST");
+            String urlString = urlAPI + "/product/get/SupQuaProdT?supplier=" + URLEncoder.encode(supplierName, StandardCharsets.UTF_8)
+                                        +"&quantity="+URLEncoder.encode(quantity, StandardCharsets.UTF_8)
+                                        +"&prod_t="+URLEncoder.encode(prodTName, StandardCharsets.UTF_8);
+            URL url = new URL(urlString);
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.setRequestMethod("GET");
+            connection.setRequestProperty("Content-Type", "application/json");
+            connection.setDoOutput(true);
+
+            int responseCode = connection.getResponseCode();
+            if (responseCode == HttpURLConnection.HTTP_OK) {
+                BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+                StringBuilder response = new StringBuilder();
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    response.append(line);
+                }
+                reader.close();
+
+                JsonArray products = JsonParser.parseString(response.toString()).getAsJsonArray();
+                DefaultTableModel tableModel = (DefaultTableModel) jtable.getModel();
+                tableModel.setRowCount(0);
+
+                for (int i = 0; i < products.size(); i++) {
+                    JsonObject product = products.get(i).getAsJsonObject();
+                    BigInteger id = product.get("id").getAsBigInteger();
+                    String name = product.get("name").getAsString();
+                    JsonObject supplier = product.get("supplier").getAsJsonObject();
+                    JsonObject prodType = product.get("productType").getAsJsonObject();
+                    String product_type = prodType.get("name").getAsString();
+                    String supplierN = supplier.get("name").getAsString();
+                    String quantit = product.get("quantity").getAsString();
+                    String price = product.get("price").getAsString();
+
+                    tableModel.addRow(new Object[]{id, name, supplierN,product_type, price,quantit});
+
+                }
+                connection.disconnect();
+            } else {
+                JOptionPane.showOptionDialog(rootPane,
+                        "Ocorreu um erro ao carregar os Fornecedores no filtro",
+                        "Problema no Servidor",
+                        JOptionPane.DEFAULT_OPTION,
+                        JOptionPane.ERROR_MESSAGE,
+                        null,null,null);
+                connection.disconnect();
+            }
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(rootPane, e.getMessage());
+        }
+    }
+
+    private void getSupplierLowStockAndProdType(String supplierName, String prodTName){
+        try {
+            String urlAPI = this.dotenv.get("API_HOST");
+            String urlString = urlAPI + "/product/get/SupLQProdT?supplier=" + URLEncoder.encode(supplierName, StandardCharsets.UTF_8)
+                    +"&prod_t="+URLEncoder.encode(prodTName, StandardCharsets.UTF_8);
+            URL url = new URL(urlString);
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.setRequestMethod("GET");
+            connection.setRequestProperty("Content-Type", "application/json");
+            connection.setDoOutput(true);
+
+            int responseCode = connection.getResponseCode();
+            if (responseCode == HttpURLConnection.HTTP_OK) {
+                BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+                StringBuilder response = new StringBuilder();
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    response.append(line);
+                }
+                reader.close();
+
+                JsonArray products = JsonParser.parseString(response.toString()).getAsJsonArray();
+                DefaultTableModel tableModel = (DefaultTableModel) jtable.getModel();
+                tableModel.setRowCount(0);
+
+                for (int i = 0; i < products.size(); i++) {
+                    JsonObject product = products.get(i).getAsJsonObject();
+                    BigInteger id = product.get("id").getAsBigInteger();
+                    String name = product.get("name").getAsString();
+                    JsonObject supplier = product.get("supplier").getAsJsonObject();
+                    JsonObject prodType = product.get("productType").getAsJsonObject();
+                    String product_type = prodType.get("name").getAsString();
+                    String supplierN = supplier.get("name").getAsString();
+                    String quantit = product.get("quantity").getAsString();
+                    String price = product.get("price").getAsString();
+
+                    tableModel.addRow(new Object[]{id, name, supplierN,product_type, price,quantit});
+
+                }
+                connection.disconnect();
+            } else {
+                JOptionPane.showOptionDialog(rootPane,
+                        "Ocorreu um erro ao carregar os Fornecedores no filtro",
+                        "Problema no Servidor",
+                        JOptionPane.DEFAULT_OPTION,
+                        JOptionPane.ERROR_MESSAGE,
+                        null,null,null);
+                connection.disconnect();
+            }
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(rootPane, e.getMessage());
+        }
+    }
+
+    private void abrirDialogoFiltro(JFrame parent) {
+        JDialog dialog = new JDialog(parent, "Filtros", true);
+        dialog.setSize(250, 320);
+        dialog.setLayout(new GridBagLayout());
+        dialog.setLocationRelativeTo(jButtonFiltrar);
+
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.insets = new Insets(5, 5, 5, 5);
+
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.gridwidth = 2;
+        JCheckBox chkFornecedor = new JCheckBox("Fornecedor");
+        chkFornecedor.setFont(new Font("Cormorant Garamond",Font.BOLD,14));
+        chkFornecedor.setForeground(Color.BLACK);
+        dialog.add(chkFornecedor, gbc);
+
+        gbc.gridy = 1;
+        JComboBox<Supplier> cbFornecedor = new JComboBox<Supplier>();
+        cbFornecedor.setFont(new Font("Cormorant Garamond",Font.BOLD,14));
+        cbFornecedor.setForeground(Color.BLACK);
+        this.loadSupplier(cbFornecedor);
+        dialog.add(cbFornecedor, gbc);
+
+        gbc.gridy = 2;
+        JCheckBox chkEstoque = new JCheckBox("Quant. em estoque");
+        chkEstoque.setFont(new Font("Cormorant Garamond",Font.BOLD,14));
+        chkEstoque.setForeground(Color.BLACK);
+        dialog.add(chkEstoque, gbc);
+
+        gbc.gridy = 3;
+        JSpinner spnQuantidade = new JSpinner(new SpinnerNumberModel(0, 0, Integer.MAX_VALUE, 1));
+        spnQuantidade.setFont(new Font("Cormorant Infant",Font.BOLD,14));
+        spnQuantidade.setForeground(Color.BLACK);
+        dialog.add(spnQuantidade, gbc);
+
+        gbc.gridy = 4;
+        JCheckBox chkBaixoEstoque = new JCheckBox("Com baixo estoque");
+        chkBaixoEstoque.setFont(new Font("Cormorant Garamond",Font.BOLD,14));
+        chkBaixoEstoque.setForeground(Color.BLACK);
+        dialog.add(chkBaixoEstoque, gbc);
+
+        gbc.gridy = 5;
+        JCheckBox chkTipo = new JCheckBox("Tipo");
+        chkTipo.setFont(new Font("Cormorant Garamond",Font.BOLD,14));
+        chkTipo.setForeground(Color.BLACK);
+        dialog.add(chkTipo, gbc);
+
+        gbc.gridy = 6;
+        JComboBox<ProductType> cbTipo = new JComboBox<ProductType>();
+        cbTipo.setFont(new Font("Cormorant Garamond",Font.BOLD,14));
+        cbTipo.setForeground(Color.BLACK);
+        loadProductType(cbTipo);
+        dialog.add(cbTipo, gbc);
+
+        gbc.gridy = 7;
+        JButton btnFiltrar = new JButton("Filtrar");
+        btnFiltrar.setBackground(new Color(0, 0, 139));
+        btnFiltrar.setFont(new Font("Cormorant Garamond",Font.BOLD,16));
+        btnFiltrar.setForeground(Color.BLACK);
+        btnFiltrar.setForeground(Color.WHITE);
+        btnFiltrar.setFocusPainted(false);
+        btnFiltrar.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        dialog.add(btnFiltrar, gbc);
+
+        btnFiltrar.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if(chkFornecedor.isSelected()){
+                    if (chkTipo.isSelected()) {
+                        Supplier sup = (Supplier) cbFornecedor.getSelectedItem();
+                        ProductType prod = (ProductType) cbTipo.getSelectedItem();
+                        getSupplierProdT(sup.getName(),prod.getName());
+                        dialog.setVisible(false);
+                    } else if (chkEstoque.isSelected()) {
+                        Supplier sup = (Supplier) cbFornecedor.getSelectedItem();
+                        getSupplierQuantity(sup.getName(), Integer.parseInt(spnQuantidade.getValue().toString()));
+                        dialog.setVisible(false);
+                    } else if (chkBaixoEstoque.isSelected()) {
+                        Supplier sup = (Supplier) cbFornecedor.getSelectedItem();
+                        getSupplierLowQuantity(sup.getName());
+                        dialog.setVisible(false);
+                    }else{
+                        Supplier sup = (Supplier) cbFornecedor.getSelectedItem();
+                        getSupplier(sup.getName());
+                        dialog.setVisible(false);
+                    }
+
+
+                } else if (chkEstoque.isSelected()) {
+                    if (chkTipo.isSelected()) {
+                        ProductType prod = (ProductType) cbTipo.getSelectedItem();
+                        getQuantityByProdType(Integer.parseInt(spnQuantidade.getValue().toString()),prod.getName());
+                        dialog.setVisible(false);
+                    }else if(chkBaixoEstoque.isSelected()){
+                        JOptionPane.showMessageDialog(rootPane,"Não é possivel filtrar por quantidade especifica de estoque e por baixo estoque!","Erro na seleção de filtragem",JOptionPane.ERROR_MESSAGE);
+                    }else{
+                        getStock(Integer.parseInt(spnQuantidade.getValue().toString()));
+                        dialog.setVisible(false);
+                    }
+
+
+                } else if (chkBaixoEstoque.isSelected()) {
+                    if (chkTipo.isSelected()) {
+                        ProductType prod = (ProductType) cbTipo.getSelectedItem();
+                        getLowStockAndProdType(prod.getName());
+                        dialog.setVisible(false);
+                    }else{
+                        getLowStock();
+                        dialog.setVisible(false);
+                    }
+
+                } else if (chkTipo.isSelected()) {
+                    ProductType prod = (ProductType) cbTipo.getSelectedItem();
+                    getProductByProdT(prod.getName());
+                    dialog.setVisible(false);
+                } else if (chkFornecedor.isSelected() && chkTipo.isSelected() && chkBaixoEstoque.isSelected()) {
+                    ProductType prod = (ProductType) cbTipo.getSelectedItem();
+                    Supplier sup = (Supplier) cbFornecedor.getSelectedItem();
+                    getSupplierQuantityAndProdType(sup.getName(),spnQuantidade.getValue().toString(),prod.getName());
+                    dialog.setVisible(false);
+                } else if (chkFornecedor.isSelected() && chkEstoque.isSelected() && chkTipo.isSelected()) {
+                    ProductType prod = (ProductType) cbTipo.getSelectedItem();
+                    Supplier sup = (Supplier) cbFornecedor.getSelectedItem();
+                    getSupplierLowStockAndProdType(sup.getName(),prod.getName());
+                    dialog.setVisible(false);
+                }
+                else{
+                    JOptionPane.showMessageDialog(parent,"Selecione uma opção de Filtro!","Erro na seleção de filtro",JOptionPane.ERROR_MESSAGE);
+                }
+            }
+        });
+
+        dialog.setVisible(true);
     }
 
     private javax.swing.JTextField pesquisaProduto;
