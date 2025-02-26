@@ -59,7 +59,7 @@ public class JanelaPrincipal extends javax.swing.JFrame {
 // Criando o painel principal (jPanel2)
             JPanel jPanel2 = new JPanel(new BorderLayout());
             jPanel2.setBackground(new Color(243, 243, 223));
-            jPanel2.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20));
+            jPanel2.setBorder(BorderFactory.createEmptyBorder(0, 20, 0, 20));
 
 
             JPanel jPanelSuperior = new JPanel(new GridBagLayout());
@@ -74,7 +74,7 @@ public class JanelaPrincipal extends javax.swing.JFrame {
             jPanelTitulo.setBackground(new Color(243, 243, 223));
 
             JLabel jLabel1 = new JLabel("Casa San'Giovanni");
-            jLabel1.setFont(new Font("Cinzel", Font.BOLD, 24));
+            jLabel1.setFont(new Font("Cinzel", Font.PLAIN, 24));
             jLabel1.setForeground(new Color(128, 0, 32));
 
             jPanelTitulo.add(jLabel1);
