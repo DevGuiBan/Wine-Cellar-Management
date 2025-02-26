@@ -1,14 +1,43 @@
 package resources.interface_card;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+import io.github.cdimascio.dotenv.Dotenv;
+
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 
 public class RegistrarVenda extends JPanel {
+
+    private Dotenv dotenv;
+    private ArrayList<Map<String, Object>> produtosSelecionados;
+    private String clienteSelecionado;
+    private String metodoPagamento;
+
+    private void initComponents() {
+        JButton btnFinalizar = new JButton("Finalizar Venda");
+        btnFinalizar.addActionListener(this::finalizarVenda);
+        add(btnFinalizar);
+    }
+
     public RegistrarVenda(JPanel mainPanel, JanelaPrincipal janelaPrincipal) {
+
+        this.dotenv = Dotenv.load();
+        this.produtosSelecionados = new ArrayList<>();
+        this.clienteSelecionado = "";
+        this.metodoPagamento = "";
+
+        initComponents();
         // inicialização de variáveis
         JFrame frame = (JFrame) SwingUtilities.getWindowAncestor(janelaPrincipal);
 
@@ -210,6 +239,71 @@ public class RegistrarVenda extends JPanel {
     public void showCard(String cardName) {
         CardLayout cl = (CardLayout) jPanelContent.getLayout();
         cl.show(jPanelContent, cardName);
+    }
+
+    public void adicionarProduto(String nome, int id, double preco, int quantidade) {
+        Map<String, Object> produto = new HashMap<>();
+        produto.put("id", id);
+        produto.put("nome", nome);
+        produto.put("preco", preco);
+        produto.put("quantidade", quantidade);
+        produtosSelecionados.add(produto);
+    }
+
+    public void selecionarCliente(String clienteId) {
+        this.clienteSelecionado = clienteId;
+    }
+
+    public void selecionarMetodoPagamento(String metodo) {
+        this.metodoPagamento = metodo;
+    }
+
+    private void finalizarVenda(ActionEvent e) {
+        if (clienteSelecionado.isEmpty() || produtosSelecionados.isEmpty() || metodoPagamento.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Todos os dados devem ser preenchidos para finalizar a venda.", "Erro", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        try {
+            String urlAPI = dotenv.get("API_HOST") + "/sale";
+            URL url = new URL(urlAPI);
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.setRequestMethod("POST");
+            connection.setRequestProperty("Content-Type", "application/json");
+            connection.setDoOutput(true);
+
+            JsonObject vendaJson = new JsonObject();
+            vendaJson.addProperty("clienteId", clienteSelecionado);
+            vendaJson.addProperty("metodoPagamento", metodoPagamento);
+
+            JsonArray produtosArray = new JsonArray();
+            for (Map<String, Object> produto : produtosSelecionados) {
+                JsonObject prodJson = new JsonObject();
+                prodJson.addProperty("id", (Integer) produto.get("id"));
+                prodJson.addProperty("quantidade", (Integer) produto.get("quantidade"));
+                produtosArray.add(prodJson);
+            }
+            vendaJson.add("produtos", produtosArray);
+
+            try (OutputStream os = connection.getOutputStream()) {
+                byte[] input = vendaJson.toString().getBytes("utf-8");
+                os.write(input, 0, input.length);
+            }
+
+            int responseCode = connection.getResponseCode();
+            if (responseCode == HttpURLConnection.HTTP_CREATED) {
+                JOptionPane.showMessageDialog(this, "Venda registrada com sucesso!", "Sucesso", JOptionPane.INFORMATION_MESSAGE);
+                produtosSelecionados.clear();
+                clienteSelecionado = "";
+                metodoPagamento = "";
+            } else {
+                JOptionPane.showMessageDialog(this, "Erro ao registrar a venda.", "Erro", JOptionPane.ERROR_MESSAGE);
+            }
+
+            connection.disconnect();
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(this, "Erro: " + ex.getMessage(), "Erro", JOptionPane.ERROR_MESSAGE);
+        }
     }
 
     private static void abrirModal(JFrame parentFrame) {
