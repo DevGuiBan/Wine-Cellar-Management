@@ -6,9 +6,9 @@ import java.util.Objects;
 
 public class JanelaPrincipal extends javax.swing.JFrame {
 
-        public JanelaPrincipal() {
-            initComponents();
-        }
+    public JanelaPrincipal() {
+        initComponents();
+    }
 
         @SuppressWarnings("unchecked")
         private void initComponents() {
@@ -56,7 +56,7 @@ public class JanelaPrincipal extends javax.swing.JFrame {
                 //COMEÇO DO BOTAO
 
 
-// Criando o painel principal (jPanel2)
+            // Criando o painel principal (jPanel2)
             JPanel jPanel2 = new JPanel(new BorderLayout());
             jPanel2.setBackground(new Color(243, 243, 223));
             jPanel2.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20));
@@ -67,9 +67,9 @@ public class JanelaPrincipal extends javax.swing.JFrame {
 
 
             GridBagConstraints gbc = new GridBagConstraints();
-            gbc.fill = GridBagConstraints.HORIZONTAL; 
+            gbc.fill = GridBagConstraints.HORIZONTAL;
 
-// Criando o painel do título
+            // Criando o painel do título
             JPanel jPanelTitulo = new JPanel();
             jPanelTitulo.setBackground(new Color(243, 243, 223));
 
@@ -79,7 +79,7 @@ public class JanelaPrincipal extends javax.swing.JFrame {
 
             jPanelTitulo.add(jLabel1);
 
-// Ajustando GridBagConstraints para o título
+            // Ajustando GridBagConstraints para o título
             gbc.gridx = 0; // Coluna 0
             gbc.gridy = 0; // Linha 0
             gbc.gridwidth = 2; // O título ocupa as duas colunas disponíveis
@@ -87,14 +87,14 @@ public class JanelaPrincipal extends javax.swing.JFrame {
             gbc.weightx = 1;  // O título ocupa o espaço disponível
             jPanelSuperior.add(jPanelTitulo, gbc);
 
-// Criando o painel do botão de sair
+            // Criando o painel do botão de sair
             JPanel jPanelBotaoWrapper = new JPanel();
             jPanelBotaoWrapper.setBackground(new Color(243, 243, 223));
 
-// Definindo um tamanho preferido maior para o botão de sair
+            // Definindo um tamanho preferido maior para o botão de sair
             JButton botaoSair = new JButton("Sair");
 
-// Carregar e redimensionar a imagem do ícone
+            // Carregar e redimensionar a imagem do ícone
             String caminhoIcone = "../images/sair.png"; // Substitua pelo caminho correto
             ImageIcon iconeRedimensionado = null;
 
@@ -111,7 +111,7 @@ public class JanelaPrincipal extends javax.swing.JFrame {
                 botaoSair.setHorizontalTextPosition(SwingConstants.LEFT); // Texto antes da imagem
             }
 
-// Estilizando o botão diretamente
+            // Estilizando o botão diretamente
             botaoSair.setFont(new Font("Arial", Font.BOLD, 14));
             botaoSair.setForeground(new Color(128, 0, 32)); // Cor vinho
             botaoSair.setBackground(new Color(243, 243, 223)); // Fundo igual ao painel
@@ -119,20 +119,15 @@ public class JanelaPrincipal extends javax.swing.JFrame {
             botaoSair.setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 10));
             botaoSair.setContentAreaFilled(false); // Remove o fundo do botão
 
-// Definindo um tamanho preferido para o botão para garantir que ele seja largo o suficiente
+            // Definindo um tamanho preferido para o botão para garantir que ele seja largo o suficiente
             botaoSair.setPreferredSize(new Dimension(120, 40)); // Ajuste a largura conforme necessário
 
-// Adicionando o ActionListener ao botão para torná-lo funcional
-            botaoSair.addActionListener(e -> {
-                // Aqui você pode definir o que acontece quando o botão for clicado.
-                System.out.println("Botão de sair clicado!");
-                // Fechar a janela ou sair da aplicação
-                System.exit(0); // Fecha a aplicação
-            });
+            // Adicionando o ActionListener ao botão para torná-lo funcional
+            botaoSair.addActionListener(e -> exibirModalConfirmacao());
 
             jPanelBotaoWrapper.add(botaoSair);
 
-// Ajustando GridBagConstraints para o botão
+            // Ajustando GridBagConstraints para o botão
             gbc.gridx = 2; // Coluna 2 (botão à direita)
             gbc.gridy = 0; // Linha 0 (mesma linha do título)
             gbc.gridwidth = 1; // Ocupa uma coluna
@@ -140,16 +135,11 @@ public class JanelaPrincipal extends javax.swing.JFrame {
             gbc.weightx = 0;  // O botão ocupa apenas o espaço necessário
             jPanelSuperior.add(jPanelBotaoWrapper, gbc);
 
-// Adicionando o painel superior ao painel principal
+            // Adicionando o painel superior ao painel principal
             jPanel2.add(jPanelSuperior, BorderLayout.NORTH);
 
-// Adicionando jPanel2 ao painel principal existente (supondo que jPanel1 já exista)
+            // Adicionando jPanel2 ao painel principal existente (supondo que jPanel1 já exista)
             jPanel1.add(jPanel2, BorderLayout.NORTH);
-
-
-
-
-            //FIM DO BOTAO
 
 
             // Painel de botões (jPanel3)
@@ -274,6 +264,37 @@ public class JanelaPrincipal extends javax.swing.JFrame {
             pack();
         }
 
+    private void exibirModalConfirmacao() {
+        new ModalConfirmacao(this).setVisible(true);
+    }
+
+    private class ModalConfirmacao extends JDialog {
+        public ModalConfirmacao(JFrame parent) {
+            super(parent, "Sair da Conta", true);
+            setLayout(new BorderLayout());
+            setSize(350, 150);
+            setLocationRelativeTo(parent);
+
+            JLabel mensagem = new JLabel("Tem certeza que deseja sair da conta?", SwingConstants.CENTER);
+            mensagem.setFont(new Font("Cormorant Garamond", Font.BOLD, 20));
+            add(mensagem, BorderLayout.CENTER);
+
+            JPanel painelBotoes = new JPanel();
+
+            JButton btnCancelar = new JButton("Cancelar");
+            btnCancelar.setFont(new Font("Cormorant Garamond", Font.BOLD, 15));
+            btnCancelar.addActionListener(e -> dispose());
+
+            JButton btnSair = new JButton("Sair");
+            btnSair.setFont(new Font("Cormorant Garamond", Font.BOLD, 15));
+            btnSair.addActionListener(e -> System.exit(0)); // Simula logout
+
+            painelBotoes.add(btnCancelar);
+            painelBotoes.add(btnSair);
+            add(painelBotoes, BorderLayout.SOUTH);
+        }
+    }
+
         // Método para alternar o card visível
         public void showCard(String cardName) {
             CardLayout cl = (CardLayout) cardPanel.getLayout();
@@ -367,6 +388,8 @@ public class JanelaPrincipal extends javax.swing.JFrame {
         private javax.swing.JPanel jPanel1;
         private javax.swing.JPanel jPanel2;
         private javax.swing.JPanel jPanel3;
+
+
         private javax.swing.JPanel cardPanel;
         private ListarProduto cardListarProdutos;
         private ListarFornecedor cardListarFornecedores;
