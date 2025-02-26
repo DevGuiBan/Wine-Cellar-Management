@@ -460,7 +460,7 @@ public class ListarFuncionario extends JPanel {
 
         gbc.gridx = 0;
         gbc.gridy = 2;
-        JLabel ate = new JLabel("de");
+        JLabel ate = new JLabel("até");
         ate.setFont(new Font("Cormorant Garamond",Font.BOLD,14));
         ate.setForeground(Color.BLACK);
         dialog.add(ate, gbc);
