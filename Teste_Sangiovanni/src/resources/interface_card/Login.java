@@ -3,12 +3,13 @@ package resources.interface_card;
 import javax.swing.*;
 import java.awt.*;
 
-public class Login {
-    public static void main(String[] args) {
-        JFrame frame = new JFrame("LOGIN");
-        frame.setSize(800, 600);
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setLocationRelativeTo(null);
+public class Login extends JFrame {
+
+    private void initComponents(){
+        this.setTitle("Login");
+        setSize(800, 600);
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setLocationRelativeTo(null);
 
         JPanel mainPanel = new JPanel(new GridLayout(1, 2));
 
@@ -89,6 +90,9 @@ public class Login {
         btnCadastrar.setBackground(new Color(128, 0, 32));
         btnCadastrar.setBorder(BorderFactory.createLineBorder(new Color(255, 235, 43), 2));
         btnCadastrar.setPreferredSize(fieldSize);
+        btnCadastrar.addActionListener(evt->{
+            cadastrar();
+        });
 
         GridBagConstraints gbcForm = new GridBagConstraints();
         gbcForm.gridx = 0;
@@ -122,7 +126,25 @@ public class Login {
         mainPanel.add(leftPanel);
         mainPanel.add(rightPanel);
 
-        frame.add(mainPanel);
-        frame.setVisible(true);
+        add(mainPanel);
+        setVisible(true);
+    }
+
+    public Login(){
+        initComponents();
+    }
+
+    private void cadastrar(){
+        JFrame cadastro = new Cadastro();
+        cadastro.setVisible(true);
+        this.setVisible(false);
+    }
+
+    public static void main(String[] args) {
+        java.awt.EventQueue.invokeLater(new Runnable() {
+            public void run() {
+                new Login().setVisible(true);
+            }
+        });
     }
 }

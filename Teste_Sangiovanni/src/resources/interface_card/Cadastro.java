@@ -3,12 +3,13 @@ package resources.interface_card;
 import javax.swing.*;
 import java.awt.*;
 
-public class Cadastro {
-    public static void main(String[] args) {
-        JFrame frame = new JFrame("CADASTRAR");
-        frame.setSize(800, 600);
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setLocationRelativeTo(null);
+public class Cadastro extends JFrame{
+
+    private void initComponents() {
+        setTitle("CADASTRAR");
+        setSize(800, 600);
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setLocationRelativeTo(null);
 
         JPanel mainPanel = new JPanel(new GridLayout(1, 2));
 
@@ -116,6 +117,9 @@ public class Cadastro {
         btnJaTenhoConta.setBackground(new Color(128, 0, 32));
         btnJaTenhoConta.setBorder(BorderFactory.createLineBorder(new Color(255, 235, 43), 2));
         btnJaTenhoConta.setPreferredSize(fieldSize);
+        btnJaTenhoConta.addActionListener(evt->{
+            login();
+        });
 
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.gridx = 0;
@@ -161,7 +165,25 @@ public class Cadastro {
         mainPanel.add(leftPanel);
         mainPanel.add(rightPanel);
 
-        frame.add(mainPanel);
-        frame.setVisible(true);
+        add(mainPanel);
+        setVisible(true);
+    }
+
+    public Cadastro(){
+        initComponents();
+    }
+
+    private void login(){
+        JFrame login = new Login();
+        this.setVisible(false);
+        login.setVisible(true);
+    }
+
+    public static void main(String[] args) {
+        java.awt.EventQueue.invokeLater(new Runnable() {
+            public void run() {
+                new Cadastro().setVisible(true);
+            }
+        });
     }
 }
