@@ -13,6 +13,7 @@ public class JanelaPrincipal extends javax.swing.JFrame {
         @SuppressWarnings("unchecked")
         private void initComponents() {
             // Painel principal
+
             jPanel1 = new javax.swing.JPanel();
 
             // Painéis adicionais
@@ -52,18 +53,104 @@ public class JanelaPrincipal extends javax.swing.JFrame {
             // Configuração do painel principal
             jPanel1.setLayout(new BorderLayout());
 
-            // Painel superior (jPanel2) com título
-            jPanel2.setBackground(new java.awt.Color(243, 243, 223));
-            jPanel2.setLayout(new BorderLayout());
+                //COMEÇO DO BOTAO
 
-            jLabel1.setFont(new java.awt.Font("Cinzel", 0, 24));
-            jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-            jLabel1.setText("Casa San'Giovanni");
-            jLabel1.setForeground(new java.awt.Color(128, 0, 32));
-            jPanel2.add(jLabel1, BorderLayout.CENTER);
 
-            // Adicionando jPanel2 ao topo do jPanel1
+// Criando o painel principal (jPanel2)
+            JPanel jPanel2 = new JPanel(new BorderLayout());
+            jPanel2.setBackground(new Color(243, 243, 223));
+            jPanel2.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20));
+
+
+            JPanel jPanelSuperior = new JPanel(new GridBagLayout());
+            jPanelSuperior.setBackground(new Color(243, 243, 223));
+
+
+            GridBagConstraints gbc = new GridBagConstraints();
+            gbc.fill = GridBagConstraints.HORIZONTAL; 
+
+// Criando o painel do título
+            JPanel jPanelTitulo = new JPanel();
+            jPanelTitulo.setBackground(new Color(243, 243, 223));
+
+            JLabel jLabel1 = new JLabel("Casa San'Giovanni");
+            jLabel1.setFont(new Font("Cinzel", Font.BOLD, 24));
+            jLabel1.setForeground(new Color(128, 0, 32));
+
+            jPanelTitulo.add(jLabel1);
+
+// Ajustando GridBagConstraints para o título
+            gbc.gridx = 0; // Coluna 0
+            gbc.gridy = 0; // Linha 0
+            gbc.gridwidth = 2; // O título ocupa as duas colunas disponíveis
+            gbc.anchor = GridBagConstraints.CENTER; // Alinha no centro
+            gbc.weightx = 1;  // O título ocupa o espaço disponível
+            jPanelSuperior.add(jPanelTitulo, gbc);
+
+// Criando o painel do botão de sair
+            JPanel jPanelBotaoWrapper = new JPanel();
+            jPanelBotaoWrapper.setBackground(new Color(243, 243, 223));
+
+// Definindo um tamanho preferido maior para o botão de sair
+            JButton botaoSair = new JButton("Sair");
+
+// Carregar e redimensionar a imagem do ícone
+            String caminhoIcone = "../images/sair.png"; // Substitua pelo caminho correto
+            ImageIcon iconeRedimensionado = null;
+
+            try {
+                ImageIcon iconeOriginal = new ImageIcon(caminhoIcone);
+                Image imagemRedimensionada = iconeOriginal.getImage().getScaledInstance(20, 20, Image.SCALE_SMOOTH);
+                iconeRedimensionado = new ImageIcon(imagemRedimensionada);
+            } catch (Exception e) {
+                System.out.println("Erro ao carregar ícone: " + e.getMessage());
+            }
+
+            if (iconeRedimensionado != null) {
+                botaoSair.setIcon(iconeRedimensionado); // Adiciona a imagem no botão
+                botaoSair.setHorizontalTextPosition(SwingConstants.LEFT); // Texto antes da imagem
+            }
+
+// Estilizando o botão diretamente
+            botaoSair.setFont(new Font("Arial", Font.BOLD, 14));
+            botaoSair.setForeground(new Color(128, 0, 32)); // Cor vinho
+            botaoSair.setBackground(new Color(243, 243, 223)); // Fundo igual ao painel
+            botaoSair.setFocusPainted(false);
+            botaoSair.setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 10));
+            botaoSair.setContentAreaFilled(false); // Remove o fundo do botão
+
+// Definindo um tamanho preferido para o botão para garantir que ele seja largo o suficiente
+            botaoSair.setPreferredSize(new Dimension(120, 40)); // Ajuste a largura conforme necessário
+
+// Adicionando o ActionListener ao botão para torná-lo funcional
+            botaoSair.addActionListener(e -> {
+                // Aqui você pode definir o que acontece quando o botão for clicado.
+                System.out.println("Botão de sair clicado!");
+                // Fechar a janela ou sair da aplicação
+                System.exit(0); // Fecha a aplicação
+            });
+
+            jPanelBotaoWrapper.add(botaoSair);
+
+// Ajustando GridBagConstraints para o botão
+            gbc.gridx = 2; // Coluna 2 (botão à direita)
+            gbc.gridy = 0; // Linha 0 (mesma linha do título)
+            gbc.gridwidth = 1; // Ocupa uma coluna
+            gbc.anchor = GridBagConstraints.EAST; // Alinha à direita
+            gbc.weightx = 0;  // O botão ocupa apenas o espaço necessário
+            jPanelSuperior.add(jPanelBotaoWrapper, gbc);
+
+// Adicionando o painel superior ao painel principal
+            jPanel2.add(jPanelSuperior, BorderLayout.NORTH);
+
+// Adicionando jPanel2 ao painel principal existente (supondo que jPanel1 já exista)
             jPanel1.add(jPanel2, BorderLayout.NORTH);
+
+
+
+
+            //FIM DO BOTAO
+
 
             // Painel de botões (jPanel3)
             jPanel3.setBackground(new java.awt.Color(128, 0, 32));
