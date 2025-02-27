@@ -128,6 +128,10 @@ public class EmployeeService {
                         }
                     }
 
+                    if(employerDTO.getPassword() != null && !employerDTO.getPassword().isBlank()){
+                        existingEmployee.setPassword(employerDTO.getPassword());
+                    }
+
                     return employeeRepository.save(existingEmployee);
                 })
                 .orElseThrow(() -> new ResourceAccessException("Funcionário com o id " + id + " não encontrado"));
@@ -195,6 +199,10 @@ public class EmployeeService {
             dto.setCpf(employee.getCpf());
             return dto;
         }).collect(Collectors.toList());
+    }
+
+    public boolean login(String email,String password){
+        return this.employeeRepository.existsByEmailAndPassword(email, password);
     }
 
 }

@@ -1,9 +1,21 @@
 package resources.interface_card;
 
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+import io.github.cdimascio.dotenv.Dotenv;
+
 import javax.swing.*;
 import java.awt.*;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.nio.charset.StandardCharsets;
 
 public class Cadastro extends JFrame{
+
+    private Dotenv dotenv;
 
     private void initComponents() {
         setTitle("CADASTRAR");
@@ -73,35 +85,35 @@ public class Cadastro extends JFrame{
         JLabel nome = new JLabel("Nome: ");
         nome.setFont(new Font("Cormorant Infant", Font.PLAIN, 18));
         nome.setForeground(Color.WHITE);
-        JTextField textoNome = new JTextField();
+        textoNome = new JTextField();
         textoNome.setFont(new Font("Cormorant Infant", Font.PLAIN, 18));
         textoNome.setPreferredSize(fieldSize);
 
         JLabel cpf = new JLabel("CPF: ");
         cpf.setFont(new Font("Cormorant Infant", Font.PLAIN, 18));
         cpf.setForeground(Color.WHITE);
-        JTextField textoCPF = new JTextField();
+        textoCPF = new JTextField();
         textoCPF.setFont(new Font("Cormorant Infant", Font.PLAIN, 18));
         textoCPF.setPreferredSize(fieldSize);
 
         JLabel email = new JLabel("Email: ");
         email.setFont(new Font("Cormorant Infant", Font.PLAIN, 18));
         email.setForeground(Color.WHITE);
-        JTextField textoEmail = new JTextField();
+        textoEmail = new JTextField();
         textoEmail.setFont(new Font("Cormorant Infant", Font.PLAIN, 18));
         textoEmail.setPreferredSize(fieldSize);
 
         JLabel senha = new JLabel("Senha: ");
         senha.setFont(new Font("Cormorant Infant", Font.PLAIN, 18));
         senha.setForeground(Color.WHITE);
-        JPasswordField textoSenha = new JPasswordField();
+        textoSenha = new JPasswordField();
         textoSenha.setFont(new Font("Cormorant Infant", Font.PLAIN, 18));
         textoSenha.setPreferredSize(fieldSize);
 
         JLabel confirmarSenha = new JLabel("Confirmar Senha: ");
         confirmarSenha.setFont(new Font("Cormorant Infant", Font.PLAIN, 18));
         confirmarSenha.setForeground(Color.WHITE);
-        JPasswordField textoConfirmarSenha = new JPasswordField();
+        textoConfirmarSenha = new JPasswordField();
         textoConfirmarSenha.setFont(new Font("Cormorant Infant", Font.PLAIN, 18));
         textoConfirmarSenha.setPreferredSize(fieldSize);
 
@@ -110,6 +122,9 @@ public class Cadastro extends JFrame{
         btnCadastrar.setForeground(Color.BLACK);
         btnCadastrar.setBackground(new Color(255, 235, 43));
         btnCadastrar.setPreferredSize(fieldSize);
+        btnCadastrar.addActionListener(evt->{
+                cadastrar();
+        });
 
         JButton btnJaTenhoConta = new JButton("Já tenho conta");
         btnJaTenhoConta.setFont(new Font("Cormorant Infant", Font.BOLD, 18));
@@ -170,7 +185,92 @@ public class Cadastro extends JFrame{
     }
 
     public Cadastro(){
+        this.dotenv = Dotenv.load();
         initComponents();
+    }
+
+    private void cadastrar(){
+        try {
+            String name = textoNome.getText();
+            String email = textoEmail.getText();
+            String cpf = textoCPF.getText();
+            char[] senhaArr = textoSenha.getPassword();
+            String senha = new String(senhaArr);
+            char[] senhaArrConf = textoConfirmarSenha.getPassword();
+            String senhaConf = new String(senhaArrConf);
+
+            if(!senha.equals(senhaConf)){
+                JOptionPane.showMessageDialog(this.rootPane, "As senhas precisam ser iguais!", "Erro", JOptionPane.ERROR_MESSAGE);
+            }
+
+
+            // Criando o JSON do funcionário
+            JsonObject jsonData = new JsonObject();
+            jsonData.addProperty("name", name);
+            jsonData.addProperty("email", email);
+            jsonData.addProperty("cpf", cpf);
+            jsonData.addProperty("password", senha);
+
+            // Configurando a conexão HTTP
+            String urlAPI = this.dotenv.get("API_HOST");
+            URL url = new URL(urlAPI + "/managers");
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.setRequestMethod("POST");
+            connection.setRequestProperty("Content-Type", "application/json");
+            connection.setDoOutput(true);
+
+            // Enviando a requisição com JSON
+            try (OutputStream os = connection.getOutputStream()) {
+                byte[] input = jsonData.toString().getBytes(StandardCharsets.UTF_8);
+                os.write(input, 0, input.length);
+            }
+
+            int statusCode = connection.getResponseCode();
+            StringBuilder response = new StringBuilder();
+
+            if (statusCode >= 200 && statusCode < 300) {
+                JFrame frame = new Login();
+                JOptionPane.showMessageDialog(this.rootPane,
+                        "O Gerente foi cadastrado com sucesso!",
+                        "Gerente Cadastrado",
+                        JOptionPane.INFORMATION_MESSAGE);
+                frame.setVisible(true);
+                this.setVisible(false);
+            } else {
+                try (BufferedReader br = new BufferedReader(new InputStreamReader(connection.getErrorStream(), StandardCharsets.UTF_8))) {
+                    String responseLine;
+                    while ((responseLine = br.readLine()) != null) {
+                        response.append(responseLine.trim());
+                    }
+                }
+
+                try {
+                    JsonObject err = JsonParser.parseString(response.toString()).getAsJsonObject();
+
+                    String errorMessage = (err.has("message") && !err.get("message").isJsonNull())
+                            ? err.get("message").getAsString()
+                            : response.toString();
+
+                    JOptionPane.showMessageDialog(this.rootPane,
+                            "Não foi possível cadastrar o gerente. Verifique os dados e tente novamente!\n" + errorMessage,
+                            "Erro no Cadastro",
+                            JOptionPane.ERROR_MESSAGE);
+                } catch (Exception jsonException) {
+                    // Se a resposta não for um JSON válido, exibir a resposta bruta
+                    JOptionPane.showMessageDialog(this.rootPane,
+                            "Erro inesperado ao processar a resposta da API.\nCódigo: " + statusCode + "\nResposta: " + response,
+                            "Erro no Cadastro",
+                            JOptionPane.ERROR_MESSAGE);
+                }
+            }
+
+            connection.disconnect();
+
+        } catch (IllegalArgumentException e) {
+            JOptionPane.showMessageDialog(this.rootPane, e.getMessage(), "Erro de Validação", JOptionPane.WARNING_MESSAGE);
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this.rootPane, "Erro inesperado: " + e.getMessage(), "Erro", JOptionPane.ERROR_MESSAGE);
+        }
     }
 
     private void login(){
@@ -186,4 +286,10 @@ public class Cadastro extends JFrame{
             }
         });
     }
+
+    private JTextField textoNome;
+    private JTextField textoCPF;
+    private JTextField textoEmail;
+    private JPasswordField textoSenha;
+    private JPasswordField textoConfirmarSenha;
 }

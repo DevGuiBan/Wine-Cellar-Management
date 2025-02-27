@@ -10,4 +10,5 @@ import java.util.UUID;
 public interface ManagerRepository extends JpaRepository<Manager, UUID> {
     boolean existsByEmail(String email);
     boolean existsByCpf(String cpf);
+    boolean existsByEmailAndPassword(String email, String password);
 }

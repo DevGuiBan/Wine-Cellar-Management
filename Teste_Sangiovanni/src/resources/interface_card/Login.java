@@ -1,9 +1,22 @@
 package resources.interface_card;
 
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+import io.github.cdimascio.dotenv.Dotenv;
+
 import javax.swing.*;
 import java.awt.*;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 
 public class Login extends JFrame {
+
+    private Dotenv dotenv;
 
     private void initComponents(){
         this.setTitle("Login");
@@ -63,14 +76,14 @@ public class Login extends JFrame {
         JLabel email = new JLabel("Email: ");
         email.setFont(new Font("Cormorant Infant", Font.PLAIN, 18));
         email.setForeground(Color.WHITE);
-        JTextField textoEmail = new JTextField();
+        textoEmail = new JTextField();
         textoEmail.setFont(new Font("Cormorant Infant", Font.PLAIN, 18));
         textoEmail.setPreferredSize(fieldSize);
 
         JLabel senha = new JLabel("Senha: ");
         senha.setFont(new Font("Cormorant Infant", Font.PLAIN, 18));
         senha.setForeground(Color.WHITE);
-        JPasswordField textoSenha = new JPasswordField();
+        textoSenha = new JPasswordField();
         textoSenha.setFont(new Font("Cormorant Infant", Font.PLAIN, 18));
         textoSenha.setPreferredSize(fieldSize);
 
@@ -83,6 +96,9 @@ public class Login extends JFrame {
         btnEntrar.setForeground(Color.BLACK);
         btnEntrar.setBackground(new Color(255, 235, 43));
         btnEntrar.setPreferredSize(fieldSize);
+        btnEntrar.addActionListener(evt->{
+            login();
+        });
 
         JButton btnCadastrar = new JButton("Cadastrar-se");
         btnCadastrar.setFont(new Font("Cormorant Infant", Font.BOLD, 18));
@@ -131,6 +147,7 @@ public class Login extends JFrame {
     }
 
     public Login(){
+        this.dotenv = Dotenv.load();
         initComponents();
     }
 
@@ -140,6 +157,112 @@ public class Login extends JFrame {
         this.setVisible(false);
     }
 
+    private void login() {
+        try {
+            // Pegando os valores do formulário
+            String email = textoEmail.getText();
+            char[] passwordArr = textoSenha.getPassword();
+            String password = new String(passwordArr);
+
+            // Criando o JSON da requisição
+            JsonObject jsonData = new JsonObject();
+            jsonData.addProperty("email", email);
+            jsonData.addProperty("password", password);
+            String jsonString = jsonData.toString();
+
+            // Configuração da URL da API
+            String urlAPI = this.dotenv.get("API_HOST");
+
+            // Tentando login como Manager
+            boolean isLogged = tryLogin(urlAPI + "/managers/login", jsonString);
+
+            // Se o login do Manager falhar, tenta login como Employee
+            if (!isLogged) {
+                isLogged = tryLogin(urlAPI + "/employee/login", jsonString);
+            }
+
+            // Verificando se o login foi bem-sucedido
+            if (isLogged) {
+                JFrame frame = new JanelaPrincipal();
+                JOptionPane.showMessageDialog(this.rootPane,
+                        "Login realizado com sucesso!",
+                        "Sucesso",
+                        JOptionPane.INFORMATION_MESSAGE);
+                this.setVisible(false);
+                frame.setVisible(true);
+            } else {
+                JOptionPane.showMessageDialog(this.rootPane,
+                        "Falha no login! Verifique suas credenciais.",
+                        "Erro",
+                        JOptionPane.ERROR_MESSAGE);
+            }
+
+        } catch (IllegalArgumentException e) {
+            JOptionPane.showMessageDialog(this.rootPane, e.getMessage(), "Erro de Validação", JOptionPane.WARNING_MESSAGE);
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this.rootPane, "Erro inesperado: " + e.getMessage(), "Erro", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    private boolean tryLogin(String urlString, String jsonString) {
+        try {
+            // Abrindo conexão HTTP
+            URL url = new URL(urlString);
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.setRequestMethod("POST");
+            connection.setRequestProperty("Content-Type", "application/json");
+            connection.setRequestProperty("Accept", "application/json");
+            connection.setDoOutput(true);
+
+            // Enviando JSON no corpo da requisição
+            try (OutputStream os = connection.getOutputStream()) {
+                byte[] input = jsonString.getBytes(StandardCharsets.UTF_8);
+                os.write(input, 0, input.length);
+            }
+
+            // Obtendo o código de resposta HTTP
+            int statusCode = connection.getResponseCode();
+            StringBuilder response = new StringBuilder();
+
+            // Se o login foi bem-sucedido (código 200 OK)
+            if (statusCode == HttpURLConnection.HTTP_OK) {
+                return true;
+            }
+
+            // Se não foi bem-sucedido, lê a resposta de erro
+            try (BufferedReader br = new BufferedReader(new InputStreamReader(connection.getErrorStream(), StandardCharsets.UTF_8))) {
+                String responseLine;
+                while ((responseLine = br.readLine()) != null) {
+                    response.append(responseLine.trim());
+                }
+            }
+
+            // Tenta interpretar o erro em JSON
+            try {
+                JsonObject err = JsonParser.parseString(response.toString()).getAsJsonObject();
+                String errorMessage = err.has("message") ? err.get("message").getAsString() : response.toString();
+                JOptionPane.showMessageDialog(this.rootPane,
+                        "Erro no login: " + errorMessage,
+                        "Erro",
+                        JOptionPane.ERROR_MESSAGE);
+            } catch (Exception jsonException) {
+                JOptionPane.showMessageDialog(this.rootPane,
+                        "Erro inesperado ao processar a resposta. Código: " + statusCode + "\nResposta: " + response,
+                        "Erro",
+                        JOptionPane.ERROR_MESSAGE);
+            }
+
+            connection.disconnect();
+            return false;
+
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this.rootPane, "Erro ao tentar login: " + e.getMessage(), "Erro", JOptionPane.ERROR_MESSAGE);
+            return false;
+        }
+    }
+
+
+
     public static void main(String[] args) {
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
@@ -147,4 +270,7 @@ public class Login extends JFrame {
             }
         });
     }
+
+    private JTextField textoEmail;
+    private JPasswordField textoSenha;
 }

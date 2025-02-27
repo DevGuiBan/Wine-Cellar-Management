@@ -616,7 +616,6 @@ public class CadastrarFuncionario extends JPanel {
     private void getEmployee(){
         try {
             String urlAPI = this.dotenv.get("API_HOST");
-            String encodedId = URLEncoder.encode(this.id, StandardCharsets.UTF_8.toString());
             URL url = new URL(urlAPI + "/employee/"+this.id);
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
             connection.setRequestMethod("GET");
@@ -639,7 +638,7 @@ public class CadastrarFuncionario extends JPanel {
                 jTextFieldEmail.setText(employees.get("email").getAsString());
                 jTextFieldSenha.setText(employees.get("password").getAsString());
 
-                String data = employees.get("date_birth").getAsString();
+                String data = employees.get("dateBirth").getAsString();
 
                 DateTimeFormatter formatoEntrada = DateTimeFormatter.ofPattern("yyyy-MM-dd");
                 DateTimeFormatter formatoSaida = DateTimeFormatter.ofPattern("dd/MM/yyyy");
