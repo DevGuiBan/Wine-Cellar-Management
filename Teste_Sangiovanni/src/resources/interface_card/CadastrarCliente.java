@@ -124,23 +124,7 @@ public class CadastrarCliente extends JPanel {
         this.jTextFieldNome.setPreferredSize(fieldSize);
         this.jTextFieldNome.setForeground(Color.BLACK);
         this.jTextFieldNome.setText("Nome Completo");
-        this.jTextFieldNome.addFocusListener(new FocusAdapter() { // adicionar um evento ao clicar no campo
-            @Override
-            public void focusGained(FocusEvent e) { // clicou
-                if (jTextFieldNome.getText().equals("Nome Completo")) {
-                    jTextFieldNome.setText("");
-                    jTextFieldNome.setForeground(Color.BLACK);
-                }
-            }
 
-            @Override
-            public void focusLost(FocusEvent e) { // clicou em outra coisa
-                if (jTextFieldNome.getText().isEmpty()) {
-                    jTextFieldNome.setText("Nome Completo");
-                    jTextFieldNome.setForeground(Color.BLACK);
-                }
-            }
-        });
         this.gbc.gridx = 0;
         this.gbc.gridy = 1;
         this.gbc.insets = new Insets(0, 0, 20, 100);
@@ -525,10 +509,11 @@ public class CadastrarCliente extends JPanel {
         this.jButtonCadastrar.setText("Cadastrar");
         this.jTextFieldCPF.setText(null);
         this.jTextFieldEndereco.setText(null);
-        this.jTextFieldEmail.setText("email@gmail.com");
+        this.jTextFieldEmail.setText(null);
         this.jTextFieldTelefone.setText(null);
-        this.jTextFieldNome.setText("Nome do cliente");
+        this.jTextFieldNome.setText(null);
         this.jLabelCadastro.setText("Cadastrar Cliente");
+        this.id = null;
     }
 
     // componentes que vão ser usados na tela, só o essencial e com os nomes certinhos

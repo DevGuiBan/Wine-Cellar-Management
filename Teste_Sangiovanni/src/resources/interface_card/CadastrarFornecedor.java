@@ -372,14 +372,15 @@ public class CadastrarFornecedor extends JPanel {
     }
 
     public void reset(){
-        jTextFieldNome.setText("Nome do Fornecedor");
+        jTextFieldNome.setText(null);
         jTextFieldTelefone.setText(null);
         jTextFieldEmail.setText("email@gmail.com");
         jTextFieldCPNJ.setText(null);
-        jTextFieldEndereco.setText("Rua - Bairro - Número - UF");
+        jTextFieldEndereco.setText(null);
         jTextFieldObservacoes.setText(null);
         this.jButtonCadastrar.setText("Cadastrar");
         this.jLabelCadastro.setText("Cadastrar Fornecedor");
+        this.id = null;
     }
 
     private void cadastrarFornecedor(){

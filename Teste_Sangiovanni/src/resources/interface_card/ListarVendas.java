@@ -173,7 +173,6 @@ public class ListarVendas extends JPanel {
                         response.append(line);
                     }
 
-                    Gson gson = new Gson();
                     JsonArray sales = JsonParser.parseString(response.toString()).getAsJsonArray();
 
                     DefaultTableModel tableModel = (DefaultTableModel) jtable.getModel();

@@ -547,6 +547,9 @@ public class CadastrarFuncionario extends JPanel {
             String cpf = jTextFieldCPF.getText();
             String dataString = jTextFieldDataNascimento.getText();
             String password = jTextFieldSenha.getText();
+            if(password.isBlank() || password.trim().isBlank()){
+                throw new IllegalArgumentException("Informe a senha do funcionário!");
+            }
 
             JsonObject jsonData = new JsonObject();
             jsonData.addProperty("name", name);
@@ -565,7 +568,6 @@ public class CadastrarFuncionario extends JPanel {
             connection.setRequestProperty("Content-Type", "application/json");
             connection.setDoOutput(true);
 
-            // send the request with json
             try (OutputStream os = connection.getOutputStream()) {
                 byte[] input = jsonData.toString().getBytes(StandardCharsets.UTF_8);
                 os.write(input, 0, input.length);
@@ -630,7 +632,6 @@ public class CadastrarFuncionario extends JPanel {
                 }
                 reader.close();
 
-                Gson gson = new Gson();
                 JsonObject employees = JsonParser.parseString(response.toString()).getAsJsonObject();
 
                 jTextFieldNome.setText(employees.get("name").getAsString());
@@ -683,17 +684,17 @@ public class CadastrarFuncionario extends JPanel {
     }
 
     public void reset(){
-        jTextFieldNome.setText("Nome do Funcionário");
-        jTextFieldTelefone.setText("(00) 00000-0000");
-        jTextFieldEmail.setText("exemplo@email.com");
-        jTextFieldDataNascimento.setText("DD/MM/AAAA");
-        jTextFieldCPF.setText("000.000.000-00");
-        jTextFieldRua.setText("Rua");
-        jTextFieldBairro.setText("Bairro");
-        jTextFieldNumero.setText("Número");
-        jTextFieldCidade.setText("Cidade");
+        jTextFieldNome.setText(null);
+        jTextFieldTelefone.setText(null);
+        jTextFieldEmail.setText(null);
+        jTextFieldDataNascimento.setText(null);
+        jTextFieldCPF.setText(null);
+        jTextFieldRua.setText(null);
+        jTextFieldBairro.setText(null);
+        jTextFieldNumero.setText(null);
+        jTextFieldCidade.setText(null);
         jComboBoxUF.setSelectedIndex(0);
-        jTextFieldSenha.setText("Senha");
+        jTextFieldSenha.setText(null);
         this.jButtonCadastrar.setText("Cadastrar");
         this.jLabelCadastro.setText("Cadastrar Funcionário");
     }

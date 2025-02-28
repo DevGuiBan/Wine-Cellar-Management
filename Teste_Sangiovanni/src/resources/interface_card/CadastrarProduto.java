@@ -51,10 +51,11 @@ public class CadastrarProduto extends JPanel {
         this.jComboBoxProductType.setSelectedIndex(0);
         this.jSpinnerQuantidade.setValue(0);
         this.jSpinnerPrecoVenda.setValue(0);
-        this.jTextFieldDescricao.setText("Descrição do Produto");
-        this.jTextFieldNome.setText("Nome do Produto");
+        this.jTextFieldDescricao.setText(null);
+        this.jTextFieldNome.setText(null);
         this.jButtonCadastrar.setText("Cadastrar");
         jLabelCadastro.setText("Cadastrar Produto");
+        this.id = null;
     }
 
     private void initComponentes() {
@@ -147,23 +148,7 @@ public class CadastrarProduto extends JPanel {
         jTextFieldNome.setPreferredSize(fieldSize);
         jTextFieldNome.setForeground(Color.BLACK);
         jTextFieldNome.setText("Nome do Produto");
-        jTextFieldNome.addFocusListener(new FocusAdapter() { // adicionar um evento ao clicar no campo
-            @Override
-            public void focusGained(FocusEvent e) { // clicou
-                if (jTextFieldNome.getText().equals("Nome do Produto")) {
-                    jTextFieldNome.setText("");
-                    jTextFieldNome.setForeground(Color.BLACK);
-                }
-            }
 
-            @Override
-            public void focusLost(FocusEvent e) { // clicou em outra coisa
-                if (jTextFieldNome.getText().isEmpty()) {
-                    jTextFieldNome.setText("Nome do Produto");
-                    jTextFieldNome.setForeground(Color.BLACK);
-                }
-            }
-        });
         gbc.gridx = 0;
         gbc.gridy = 1;
         gbc.insets = new Insets(0, 0, 20, 100);
