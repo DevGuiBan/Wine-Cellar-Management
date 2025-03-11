@@ -374,7 +374,7 @@ public class CadastrarFornecedor extends JPanel {
     public void reset(){
         jTextFieldNome.setText(null);
         jTextFieldTelefone.setText(null);
-        jTextFieldEmail.setText("email@gmail.com");
+        jTextFieldEmail.setText(null);
         jTextFieldCPNJ.setText(null);
         jTextFieldEndereco.setText(null);
         jTextFieldObservacoes.setText(null);

@@ -223,7 +223,7 @@ public class ListarCliente extends JPanel {
     private void getClientByAddress(String endereco){
         try {
             String urlAPI = this.dotenv.get("API_HOST");
-            URL url = new URL(urlAPI + "/client/address/"+endereco);
+            URL url = new URL(urlAPI + "/client/address/?address="+URLEncoder.encode(endereco, StandardCharsets.UTF_8));
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
             connection.setRequestMethod("GET");
 

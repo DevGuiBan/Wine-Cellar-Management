@@ -6,7 +6,7 @@ out/
 ### Modules for testing ###
 test/
 resources/interfaces/test/
-.env
+src/resources/.env
 ### Eclipse ###
 .apt_generated
 .classpath

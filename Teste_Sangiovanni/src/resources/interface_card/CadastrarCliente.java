@@ -303,6 +303,9 @@ public class CadastrarCliente extends JPanel {
     private void cadastrarCliente(){
         try {
             String name = jTextFieldNome.getText();
+            if(name.equals("Nome Completo")){
+                throw new IllegalArgumentException("Insira um nome válido!");
+            }
             String phone_number = jTextFieldTelefone.getText();
             String email = jTextFieldEmail.getText();
             String address = jTextFieldEndereco.getText();
@@ -376,6 +379,9 @@ public class CadastrarCliente extends JPanel {
     private void editarCliente(){
         try {
             String name = jTextFieldNome.getText();
+            if(name.equals("Nome Completo")){
+                throw new IllegalArgumentException("Insira um nome válido!");
+            }
             String phone_number = jTextFieldTelefone.getText();
             String email = jTextFieldEmail.getText();
             String address = jTextFieldEndereco.getText();

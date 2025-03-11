@@ -83,8 +83,8 @@ public class ClientController {
         }
     }
 
-    @GetMapping("/address/{address}")
-    public ResponseEntity<?> address(@PathVariable String address) {
+    @GetMapping("/address/")
+    public ResponseEntity<?> address(@RequestParam("address") String address) {
         try {
             List<ClientDTO> employees = clientService.listAllByAdress(address);
             return ResponseEntity.status(HttpStatus.OK).body(employees);

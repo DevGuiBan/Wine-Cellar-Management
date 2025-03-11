@@ -436,6 +436,10 @@ public class CadastrarFuncionario extends JPanel {
                 throw new IllegalArgumentException("Informe o e-mail do Funcionário!");
             }
 
+            if(jTextFieldRua.getText().isBlank()||jTextFieldBairro.getText().isBlank()||jTextFieldNumero.getText().isBlank()||jTextFieldCidade.getText().isBlank()){
+                throw new IllegalArgumentException("Todos os campos de Endereço devem ser informados!");
+            }
+
             String address = String.format("%s, %s, %s, %s-%s",
                     jTextFieldRua.getText().trim(),
                     jTextFieldBairro.getText().trim(),
@@ -537,6 +541,11 @@ public class CadastrarFuncionario extends JPanel {
             if (email == null || email.trim().isEmpty() || email.equals("exemplo@email.com")) {
                 throw new IllegalArgumentException("Informe o e-mail do Funcionário!");
             }
+
+            if(jTextFieldRua.getText().isBlank()||jTextFieldBairro.getText().isBlank()||jTextFieldNumero.getText().isBlank()||jTextFieldCidade.getText().isBlank()){
+                throw new IllegalArgumentException("Todos os campos de Endereço devem ser informados!");
+            }
+
             String address = String.format("%s, %s, %s, %s-%s",
                     jTextFieldRua.getText().trim(),
                     jTextFieldBairro.getText().trim(),
