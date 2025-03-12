@@ -1,1 +1,0 @@
-DROP TABLE class_products;
