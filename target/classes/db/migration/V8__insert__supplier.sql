@@ -1,0 +1,15 @@
+INSERT INTO supplier (name, cnpj, email, phone_number, address, observation) VALUES
+    ('Fornecedor A', '12.345.678/0001-99', 'contato@fornecedorA.com', '(11) 91234-5678', 'Rua das Flores - Centro - 123 - SP', 'Fornecedor de embalagens'),
+    ('Fornecedor B', '98.765.432/0001-88', 'contato@fornecedorB.com', '(21) 99876-5432', 'Avenida Brasil - Bairro Novo - 456 - RJ', 'Fornecedor de ingredientes'),
+    ('Fornecedor C', '33.222.111/0001-77', 'contato@fornecedorC.com', '(31) 98765-4321', 'Praça Central - Vila Verde - 789 - MG', 'Fornecedor de equipamentos'),
+    ('Fornecedor D', '44.555.666/0001-99', 'contato@fornecedorD.com', '(41) 97654-3210', 'Rua X - Bairro Y - 321 - PR', 'Fornecedor de produtos importados'),
+    ('Fornecedor E', '55.666.777/0001-84', 'contato@fornecedore.com', '(51) 96543-2109', 'Rua Alpha - Centro - 100 - RS', 'Fornecedor de laticínios'),
+    ('Fornecedor F', '66.777.888/0001-33', 'contato@fornecedorf.com', '(61) 95432-1098', 'Avenida Beta - Bairro Novo - 200 - DF', 'Fornecedor de carnes'),
+    ('Fornecedor G', '77.888.999/0001-22', 'contato@fornecedorg.com', '(71) 94321-0987', 'Rua Gama - Vila Velha - 300 - BA', 'Fornecedor de frutas e verduras'),
+    ('Fornecedor H', '88.999.000/0001-11', 'contato@fornecedorh.com', '(81) 93210-9876', 'Rua Delta - Bairro Azul - 400 - PE', 'Fornecedor de bebidas'),
+    ('Fornecedor I', '99.000.111/0001-99', 'contato@fornecedorI.com', '(91) 92109-8765', 'Avenida Epsilon - Centro - 500 - PA', 'Fornecedor de embalagens recicláveis'),
+    ('Fornecedor J', '11.222.333/0001-88', 'contato@fornecedorJ.com', '(31) 91098-7654', 'Rua Zeta - Bairro Verde - 600 - MG', 'Fornecedor de utensílios de cozinha'),
+    ('Fornecedor K', '22.333.444/0001-77', 'contato@fornecedorK.com', '(41) 90987-6543', 'Rua Eta - Bairro Vermelho - 700 - PR', 'Fornecedor de produtos orgânicos'),
+    ('Fornecedor L', '33.444.555/0001-66', 'contato@fornecedorL.com', '(51) 89876-5432', 'Avenida Theta - Vila Central - 800 - RS', 'Fornecedor de pescados'),
+    ('Fornecedor M', '44.555.666/0001-55', 'contato@fornecedorM.com', '(61) 88765-4321', 'Rua Iota - Bairro Cinza - 900 - DF', 'Fornecedor de grãos e cereais'),
+    ('Fornecedor N', '55.666.777/0001-44', 'contato@fornecedorN.com', '(71) 87654-3210', 'Avenida Kappa - Centro - 1000 - BA', 'Fornecedor de doces e confeitaria');

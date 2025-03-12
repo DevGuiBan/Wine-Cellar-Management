@@ -4,8 +4,6 @@ import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import io.github.cdimascio.dotenv.Dotenv;
-import resources.interfaces.ProductType;
-import resources.interfaces.Supplier;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -23,7 +21,6 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
-import java.util.Objects;
 
 public class CadastrarFornecedor extends JPanel {
     private JPanel mainPanel;

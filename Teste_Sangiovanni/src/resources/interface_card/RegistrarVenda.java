@@ -2,9 +2,14 @@ package resources.interface_card;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableCellEditor;
+import javax.swing.table.TableCellRenderer;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.Objects;
 
 public class RegistrarVenda extends JPanel {
@@ -30,7 +35,7 @@ public class RegistrarVenda extends JPanel {
         // cards
         cardProdutos = new ProdutoVenda(frame);
         cardClientes = new ClienteVenda(frame);
-        cardFinalizarVenda = new FinalizarVenda();
+        cardFinalizarVenda = new FinalizarVenda(frame);
 
         jSeparator = new JSeparator();
 
@@ -174,8 +179,6 @@ public class RegistrarVenda extends JPanel {
             }else if(cardClientes.isVisible()){
                 jButtonCadastrar.setText("Finalizar Venda");
                 this.jButtonFinalizarVendaCardActionEvent(evt);
-            } else if (cardFinalizarVenda.isVisible()) {
-                // continua a lógica final aqui
             }
 
         });
@@ -192,7 +195,7 @@ public class RegistrarVenda extends JPanel {
             if(cardFinalizarVenda.isVisible()) {
                 abrirModal(frame);
             }else if(cardProdutos.isVisible()){
-
+                cardProdutos.addProduct();
             }
         });
 
@@ -212,8 +215,8 @@ public class RegistrarVenda extends JPanel {
         cl.show(jPanelContent, cardName);
     }
 
-    private static void abrirModal(JFrame parentFrame) {
-        Double totalVenda = 100.0;
+    private void abrirModal(JFrame parentFrame) {
+        Double totalVenda = cardFinalizarVenda.getValorTotal();
         JDialog modal = new JDialog(parentFrame, "Aplicar Desconto", true);
         modal.setIconImage(new ImageIcon(Objects.requireNonNull(RegistrarVenda.class.getResource("/resources/images/icon.png"))).getImage());
         modal.setSize(350, 200);
@@ -290,6 +293,7 @@ public class RegistrarVenda extends JPanel {
                     lblValorFinal.setText("R$ " + String.format("%.2f", novoTotal));
                     JOptionPane.showMessageDialog(modal, "Desconto aplicado com sucesso!", "Sucesso", JOptionPane.INFORMATION_MESSAGE);
                     txtDesconto.setText(""); // Limpa o campo de desconto
+                    cardFinalizarVenda.setDicount(novoTotal,desconto);
                 }
             } catch (NumberFormatException ex) {
                 JOptionPane.showMessageDialog(modal, "Digite um valor numérico!", "Erro", JOptionPane.ERROR_MESSAGE);
@@ -324,6 +328,8 @@ public class RegistrarVenda extends JPanel {
         jButtonFinalizarVendaCard.setForeground(new Color(128, 0, 32));
         jButtonAdicionarCarrinho.setText("Aplicar Desconto");
         jButtonCadastrar.setText("Finalizar Venda");
+        cardFinalizarVenda.setClient(cardClientes.getClientDAO());
+        cardFinalizarVenda.setProducts(cardProdutos.getProductsList());
         this.showCard("finalizar_venda");
     }
 
@@ -342,9 +348,9 @@ public class RegistrarVenda extends JPanel {
     private JPanel jPanelContent;
     private JPanel jPanelButtonsCard;
     private JPanel jPanel;
-    private JPanel cardProdutos;
-    private JPanel cardClientes;
-    private JPanel cardFinalizarVenda;
+    private ProdutoVenda cardProdutos;
+    private ClienteVenda cardClientes;
+    private FinalizarVenda cardFinalizarVenda;
     private JPanel leftPanel;
     private JPanel rightPanel;
 

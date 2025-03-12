@@ -23,17 +23,33 @@ public class ClienteVenda extends JPanel {
     private final ArrayList<String> cpfs = new ArrayList<>();
     private final ArrayList<String> nomes = new ArrayList<>();
     private final ArrayList<String> datas = new ArrayList<>();
+    private final ArrayList<String> ids = new ArrayList<>();
     private final HashMap<String, Integer> nomeIndexMap = new HashMap<>();
     private final HashMap<String, Integer> cpfIndexMap = new HashMap<>();
     private final HashMap<String, Integer> idIndexMap = new HashMap<>();
     private final Frame framePrincipal;
-    private String clientIndex;
+    private Client client = new Client();
 
     public ClienteVenda(Frame frame) {
         this.dotenv = Dotenv.load();
         this.framePrincipal = frame;
         initComponents();
         getClient();
+    }
+
+    private void saveClient(int index) {
+        this.client.setId(ids.get(index));
+        this.client.setName(jComboBoxName.getSelectedItem().toString());
+        this.client.setData(jTextFieldDataNascimento.getText().toString());
+        this.client.setPayment(jComboBoxMetodoPagamento.getSelectedItem().toString());
+    }
+
+    private void updatePayment(){
+        this.client.setPayment(jComboBoxMetodoPagamento.getSelectedItem().toString());
+    }
+
+    public Client getClientDAO(){
+        return this.client;
     }
 
     private void initComponents() {
@@ -110,6 +126,7 @@ public class ClienteVenda extends JPanel {
                 if (index != null) {
                     jComboBoxCPF.setSelectedItem(cpfs.get(index));
                     jTextFieldDataNascimento.setText(datas.get(index));
+                    this.saveClient(index);
                 }
             }
         });
@@ -177,6 +194,7 @@ public class ClienteVenda extends JPanel {
                 if (index != null) {
                     jComboBoxName.setSelectedItem(nomes.get(index));
                     jTextFieldDataNascimento.setText(datas.get(index));
+                    this.saveClient(index);
                 }
             }
         });
@@ -203,6 +221,7 @@ public class ClienteVenda extends JPanel {
         jComboBoxMetodoPagamento.addItem("DINHEIRO");
         jComboBoxMetodoPagamento.addItem("PIX");
         jComboBoxMetodoPagamento.addItem("TRANSFERÊNCIA_BANCÁRIA");
+        jComboBoxMetodoPagamento.addItemListener(evt->updatePayment());
         gbc.gridx = 1;
         gbc.gridy = 3;
         gbc.insets = new Insets(0, 0, 20, 0);
@@ -237,6 +256,7 @@ public class ClienteVenda extends JPanel {
                 datas.clear();
                 nomeIndexMap.clear();
                 cpfIndexMap.clear();
+                idIndexMap.clear();
 
                 int index = 0;
                 for (JsonElement arr : arrClient) {
@@ -249,6 +269,7 @@ public class ClienteVenda extends JPanel {
                     nomes.add(nome);
                     cpfs.add(cpf);
                     datas.add(dataNascimento);
+                    ids.add(id);
                     model_nome.addElement(nome);
                     model_cpf.addElement(cpf);
 
@@ -270,9 +291,6 @@ public class ClienteVenda extends JPanel {
         }
     }
 
-    public ArrayList<String> clienteVenda(){
-        return null;
-    }
 
     private JLabel jLabelCPF;
     private JLabel jLabelNome;

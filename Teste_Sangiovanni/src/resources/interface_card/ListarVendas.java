@@ -1,11 +1,9 @@
 package resources.interface_card;
 
-import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import io.github.cdimascio.dotenv.Dotenv;
-import resources.interfaces.EditarProduto;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -294,11 +292,6 @@ class ButtonEditorProductVenda extends AbstractCellEditor implements TableCellEd
         editButton.addActionListener(evt -> {
             int cellIndex = table.getSelectedRow();
             Object cellValue = table.getValueAt(cellIndex,0);
-            JFrame tela = new EditarProduto(cellValue.toString());
-            SwingUtilities.invokeLater(() -> {
-                this.frame.setVisible(false);
-                tela.setVisible(true);
-            });
             stopCellEditing();
         });
 

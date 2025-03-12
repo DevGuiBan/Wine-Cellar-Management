@@ -11,16 +11,29 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.ArrayList;
 
 
 public class ProdutoVenda extends JPanel {
     private final Dotenv dotenv;
     private final JFrame rootPane;
+    private final ArrayList<Product> productData  = new ArrayList<>();
+
     public ProdutoVenda(JFrame rootPane) {
-      initComponents();
-      this.dotenv = Dotenv.load();
-      getProducts();
-      this.rootPane = rootPane;
+        initComponents();
+        this.dotenv = Dotenv.load();
+        getProducts();
+        this.rootPane = rootPane;
+    }
+
+    public void addProduct(){
+        Product prod = (Product) jComboBoxProduct.getSelectedItem();
+        prod.setQuantity(Integer.parseInt(this.jSpinnerQuantidade.getValue().toString()));
+        this.productData.add(prod);
+    }
+
+    public ArrayList<Product> getProductsList(){
+        return this.productData;
     }
 
     private void initComponents(){
@@ -31,7 +44,7 @@ public class ProdutoVenda extends JPanel {
 
         jPanelContent = new JPanel(new GridBagLayout());
 
-        jSpinnerQuantidade = new JSpinner((new SpinnerNumberModel(0.0, 0.0, Integer.MAX_VALUE, 1)));
+        jSpinnerQuantidade = new JSpinner((new SpinnerNumberModel(0, 0, Integer.MAX_VALUE, 1)));
         jTextFildQtdValorUnitario = new JTextField();
 
         jComboBoxProduct = new JComboBox<Product>();

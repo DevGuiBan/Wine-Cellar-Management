@@ -1,8 +1,6 @@
 package resources.interface_card;
 
 import com.google.gson.*;
-import resources.interfaces.ProductType;
-import resources.interfaces.Supplier;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -17,7 +15,6 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 
 import io.github.cdimascio.dotenv.Dotenv;

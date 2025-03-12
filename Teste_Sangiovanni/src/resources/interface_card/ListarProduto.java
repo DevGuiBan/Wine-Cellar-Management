@@ -3,7 +3,6 @@ package resources.interface_card;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonParser;
-import resources.interfaces.EditarProduto;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -21,8 +20,6 @@ import java.net.URL;
 import java.io.InputStreamReader;
 import java.io.BufferedReader;
 import io.github.cdimascio.dotenv.Dotenv;
-import resources.interfaces.ProductType;
-import resources.interfaces.Supplier;
 
 public class ListarProduto extends JPanel {
     private final Dotenv dotenv;

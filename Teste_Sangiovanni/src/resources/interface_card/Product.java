@@ -4,6 +4,7 @@ public class Product {
     private String productName;
     private int id;
     private Double valorUnitario;
+    private int quantity;
 
     public Product(String productName, int id, Double valorUnitario) {
         this.productName = productName;
@@ -14,6 +15,14 @@ public class Product {
     public Product(String productName, int id) {
         this.productName = productName;
         this.id = id;
+    }
+
+    public void setQuantity(int quantity) {
+        this.quantity = quantity;
+    }
+
+    public int getQuantity() {
+        return quantity;
     }
 
     public int getId() {
@@ -32,5 +41,8 @@ public class Product {
     }
     public void setProductName(String productName) {
         this.productName = productName;
+    }
+    public String getProductName(){
+        return productName;
     }
 }

@@ -1,17 +1,103 @@
 package resources.interface_card;
 
+import com.google.gson.JsonObject;
+
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.MatteBorder;
-import javax.swing.table.DefaultTableCellRenderer;
-import javax.swing.table.JTableHeader;
+import javax.swing.table.*;
 import javax.swing.text.MaskFormatter;
 import java.awt.*;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.time.LocalDate;
+import java.time.MonthDay;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.Objects;
 
 public class FinalizarVenda extends JPanel {
+    private Client client;
+    private ArrayList<Product> products = new ArrayList<>();
+    private JFrame rootPane;
 
-    public FinalizarVenda() {
+    public void setClient(Client client) {
+        this.client = client;
+        loadClient();
+    }
+
+    public double getValorTotal() {
+        return Double.parseDouble(this.jLabelValorTotal.getText().replace("R$","").trim());
+    }
+
+    public void setProducts(ArrayList<Product> prods) {
+        this.products = prods;
+        jTable.getColumn("Remover").setCellRenderer(new ButtonRendererEndSale());
+        jTable.getColumn("Remover").setCellEditor(new ButtonEditorEndSale(jTable,this.rootPane , this.products, this));
+        loadProducts();
+    }
+
+    public FinalizarVenda(JFrame frame) {
+        this.rootPane = frame;
+        initComponents();
+    }
+
+    private void loadClient() {
+        jLabelIconCliente.setText(client.getName());
+        jLabelPagamento.setText(client.getPayment());
+        DateTimeFormatter inputFormatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+
+        LocalDate aniversario = LocalDate.parse(client.getData().replace("/","-"), inputFormatter);
+
+        MonthDay hoje = MonthDay.from(LocalDate.now());
+        MonthDay aniversarioMd = MonthDay.from(aniversario);
+
+        if(hoje.equals(aniversarioMd)){
+            jLabelDesconto.setText("Aplicado!");
+        }
+        else{
+            jLabelDesconto.setText("Não Aplicado");
+        }
+
+        LocalDate hojeData = LocalDate.now();
+
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+
+        String dataFormatada = hojeData.format(formatter);
+        jTextFieldData.setText(dataFormatada);
+
+    }
+
+    public void setDicount(double valorTotal, double desconto) {
+        jLabelValorTotal.setText("R$ " + valorTotal);
+        jLabelDescontoTabela.setText("-R$ " + desconto);
+    }
+
+    public void loadProducts() {
+        DefaultTableModel tableModel = (DefaultTableModel) jTable.getModel();
+        tableModel.setRowCount(0);
+        double valorTotal = 0;
+
+        for (int i = 0; i < products.size(); i++) {
+            Product prod = products.get(i);
+            String id = String.valueOf(prod.getId());
+            String name = prod.getProductName();
+            String qtdXvalor = prod.getQuantity() + "x" + prod.getValorUnitario();
+            double subtotal = prod.getQuantity() * prod.getValorUnitario();
+            valorTotal += subtotal;
+            tableModel.addRow(new Object[]{id, name, qtdXvalor, subtotal});
+        }
+        jLabelValorTotal.setText("R$ " + valorTotal);
+
+        if(jLabelDesconto.getText().equals("Aplicado!")){
+            double desconto = valorTotal*0.10;
+            jLabelDescontoTabela.setText("-R$ "+desconto);
+        }else{
+            jLabelDescontoTabela.setText("-R$ 00,00");
+        }
+    }
+
+    private void initComponents() {
         // iniciando variáveis
         jLabelCliente = new JLabel();
         jLabelData = new JLabel();
@@ -33,7 +119,7 @@ public class FinalizarVenda extends JPanel {
         jPanelTabelaContentRight = new JPanel();
         jPanelTabelaContentLeft = new JPanel();
 
-        try{
+        try {
             jTextFieldData = new JFormattedTextField(new MaskFormatter("##/##/####"));
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -91,7 +177,7 @@ public class FinalizarVenda extends JPanel {
         jLabelProdutos.setForeground(Color.BLACK);
         jLabelProdutos.setFont(new Font("Cormorant Garamond", 0, 24));
 
-        jPanelTabelaContentLeft.add(jLabelProdutos,BorderLayout.WEST);
+        jPanelTabelaContentLeft.add(jLabelProdutos, BorderLayout.WEST);
 
         jPanelTabelaContentRight.setPreferredSize(new Dimension(700, 200));
         jPanelTabelaContentRight.setBackground(Color.WHITE);
@@ -111,7 +197,7 @@ public class FinalizarVenda extends JPanel {
         jTable.setBackground(Color.WHITE);
         jTable.setRowHeight(30);
         jTable.setFocusable(false);
-        jTable.setPreferredSize(new Dimension(600,150));
+        jTable.setPreferredSize(new Dimension(600, 150));
 
         DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
         centerRenderer.setHorizontalAlignment(SwingConstants.CENTER);
@@ -134,6 +220,9 @@ public class FinalizarVenda extends JPanel {
             }
         }
 
+        jTable.getColumn("Remover").setCellRenderer(new ButtonRendererEndSale());
+        jTable.getColumn("Remover").setCellEditor(new ButtonEditorEndSale(jTable,this.rootPane , this.products, this));
+
         jScrollPaneTable.setViewportView(jTable);
         jScrollPaneTable.setBackground(Color.WHITE);
         jScrollPaneTable.setPreferredSize(new Dimension(650, 150));
@@ -144,7 +233,7 @@ public class FinalizarVenda extends JPanel {
         jLabelDescontoTabela.setText("-Desconto");
         jLabelDescontoTabela.setForeground(Color.RED);
         jLabelDescontoTabela.setFont(new Font("Cormorant Infant Bold", Font.BOLD, 20));
-        jLabelDescontoTabela.setBorder(new EmptyBorder(0,0,0,400));
+        jLabelDescontoTabela.setBorder(new EmptyBorder(0, 0, 0, 400));
 
         jPanelTabelaContentRight.add(jLabelDescontoTabela);
 
@@ -212,10 +301,10 @@ public class FinalizarVenda extends JPanel {
 
         jTextFieldData.setForeground(Color.BLACK);
         jTextFieldData.setFont(new Font("Cormorant Infant Bold", Font.BOLD, 20));
-        jTextFieldData.setBackground(new Color(217,217,217));
-        jTextFieldData.setPreferredSize(new Dimension(40,25));
+        jTextFieldData.setBackground(new Color(217, 217, 217));
+        jTextFieldData.setPreferredSize(new Dimension(40, 25));
         jTextFieldData.setOpaque(true);
-        jTextFieldData.setBorder(new MatteBorder(1,1,1,1,Color.GRAY));
+        jTextFieldData.setBorder(new MatteBorder(1, 1, 1, 1, Color.GRAY));
         gbc.gridx = 1;
         gbc.gridy = 3;
         gbc.insets = new Insets(0, -100, 0, 230);
@@ -255,4 +344,99 @@ public class FinalizarVenda extends JPanel {
 
     private JScrollPane jScrollPaneTable;
     private JTable jTable;
+}
+
+class ButtonRendererEndSale extends JPanel implements TableCellRenderer {
+    private final JButton deleteButton = new JButton();
+
+    public ButtonRendererEndSale() {
+        setOpaque(true);
+        setLayout(new FlowLayout(FlowLayout.CENTER, 5, 0));
+
+        this.deleteButton.setIcon(new javax.swing.ImageIcon(Objects.requireNonNull(getClass().getResource("/resources/images/excluir.png"))));
+        this.deleteButton.setBackground(Color.WHITE);
+        this.deleteButton.setBorder(null);
+        this.deleteButton.setContentAreaFilled(false);
+        this.deleteButton.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+
+        add(deleteButton);
+
+        deleteButton.setFocusable(false);
+    }
+
+
+    @Override
+    public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+        setBackground(new java.awt.Color(255, 255, 255));
+        setForeground(new java.awt.Color(128, 0, 32));
+        return this;
+    }
+}
+
+class ButtonEditorEndSale extends AbstractCellEditor implements TableCellEditor {
+    private final JPanel panel = new JPanel();
+    private final JButton editButton = new JButton();
+    private final JButton deleteButton = new JButton();
+    private final JTable table;
+    private int currentRow;
+    private final JFrame frame;
+
+    public ButtonEditorEndSale(JTable table, JFrame rootPane, ArrayList<Product> products, FinalizarVenda mainPanel) {
+        this.table = table;
+        this.frame = rootPane;
+
+        panel.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 0));
+
+        this.deleteButton.setIcon(new javax.swing.ImageIcon(Objects.requireNonNull(
+                getClass().getResource("/resources/images/excluir.png"))));
+        this.deleteButton.setBackground(new java.awt.Color(255, 255, 255));
+        this.deleteButton.setForeground(new java.awt.Color(128, 0, 32));
+        this.deleteButton.setFocusPainted(false);
+        this.deleteButton.setBorder(null);
+        this.deleteButton.setContentAreaFilled(false);
+        this.deleteButton.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+
+        panel.add(deleteButton);
+
+
+        // Action for delete button
+        deleteButton.addActionListener(e -> {
+            String[] options = {"Cancelar", "Excluir"};
+            int confirmation = JOptionPane.showOptionDialog(table,
+                    "Deseja excluir o produto? Essa ação não poderá ser desfeita. ",
+                    "Deletar Produto",
+                    JOptionPane.YES_NO_OPTION,
+                    JOptionPane.QUESTION_MESSAGE,
+                    null,
+                    options,
+                    options[0]);
+            if (confirmation == 1) {
+                try {
+                    int cellIndex = table.getSelectedRow();
+                    if (table.isEditing()) {
+                        table.getCellEditor().stopCellEditing();
+                    }
+                    ((DefaultTableModel) table.getModel()).removeRow(currentRow);
+                    products.remove(cellIndex);
+                    mainPanel.loadProducts();
+
+
+                } catch (Exception ex) {
+                    JOptionPane.showMessageDialog(this.frame, "Ocorreu um erro ao remover o Produto "+ex.getMessage());
+                }
+            }
+
+        });
+    }
+
+    @Override
+    public Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected, int row, int column) {
+        currentRow = row;
+        return panel;
+    }
+
+    @Override
+    public Object getCellEditorValue() {
+        return null;
+    }
 }
