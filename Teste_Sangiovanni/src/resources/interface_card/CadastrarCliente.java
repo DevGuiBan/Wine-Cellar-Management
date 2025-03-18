@@ -181,23 +181,7 @@ public class CadastrarCliente extends JPanel {
         this.jTextFieldEmail.setPreferredSize(fieldSize);
         this.jTextFieldEmail.setText("email@gmail.com");
         this.jTextFieldEmail.setForeground(Color.BLACK);
-        this.jTextFieldEmail.addFocusListener(new FocusAdapter() {
-            @Override
-            public void focusGained(FocusEvent e) {
-                if (jTextFieldEmail.getText().equals("email@gmail.com")) {
-                    jTextFieldEmail.setText("");
-                    jTextFieldEmail.setForeground(Color.BLACK);
-                }
-            }
 
-            @Override
-            public void focusLost(FocusEvent e) {
-                if (jTextFieldEmail.getText().isEmpty()) {
-                    jTextFieldEmail.setText("email@gmail.com");
-                    jTextFieldEmail.setForeground(Color.BLACK);
-                }
-            }
-        });
         this.gbc.gridx = 1;
         this.gbc.gridy = 3;
         this.gbc.insets = new Insets(0, 0, 20, 0);
@@ -218,21 +202,7 @@ public class CadastrarCliente extends JPanel {
         this.jTextFieldEndereco.setPreferredSize(fieldSize);
         this.jTextFieldEndereco.setForeground(Color.BLACK);
         this.jTextFieldEndereco.setText("Rua, Bairro, Número, Cidade-UF");
-        this.jTextFieldEndereco.addFocusListener(new FocusListener() {
-            @Override
-            public void focusGained(FocusEvent evt) {
-                if (jTextFieldEndereco.getText().equals("Rua, Bairro, Número, Cidade-UF")) {
-                    jTextFieldEndereco.setText("");
-                }
-            }
 
-            @Override
-            public void focusLost(FocusEvent evt) {
-                if (jTextFieldEndereco.getText().isEmpty()) {
-                    jTextFieldEndereco.setText("Rua, Bairro, Número, Cidade-UF");
-                }
-            }
-        });
         this.gbc.gridx = 0;
         this.gbc.gridy = 5;
         this.gbc.insets = new Insets(0, 0, 20, 100);

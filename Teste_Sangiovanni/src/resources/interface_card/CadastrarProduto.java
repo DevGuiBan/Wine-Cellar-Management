@@ -165,23 +165,7 @@ public class CadastrarProduto extends JPanel {
         jTextFieldDescricao.setPreferredSize(fieldSize);
         jTextFieldDescricao.setForeground(Color.BLACK);
         jTextFieldDescricao.setText("Descrição do Produto");
-        jTextFieldDescricao.addFocusListener(new FocusAdapter() {
-            @Override
-            public void focusGained(FocusEvent e) {
-                if (jTextFieldDescricao.getText().equals("Descrição do Produto")) {
-                    jTextFieldDescricao.setText("");
-                    jTextFieldDescricao.setForeground(Color.GRAY);
-                }
-            }
 
-            @Override
-            public void focusLost(FocusEvent e) {
-                if (jTextFieldDescricao.getText().isEmpty()) {
-                    jTextFieldDescricao.setText("Descrição do Produto");
-                    jTextFieldDescricao.setForeground(Color.GRAY);
-                }
-            }
-        });
         gbc.gridx = 1;
         gbc.gridy = 1;
         gbc.insets = new Insets(0, 0, 20, 0);
