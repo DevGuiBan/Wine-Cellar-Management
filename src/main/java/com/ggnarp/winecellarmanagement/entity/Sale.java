@@ -6,7 +6,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
+import java.time.LocalDate;
+import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -17,30 +18,24 @@ import java.util.UUID;
 public class Sale {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    private UUID id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "id_client", nullable = false)
+    @JoinColumn(name = "client_id", nullable = false)
     private Client client;
 
-    @ManyToOne
-    @JoinColumn(name = "id_product", nullable = false)
-    private Product product;
+    @ManyToMany
+    @JoinTable(
+            name = "sale_product",
+            joinColumns = @JoinColumn(name = "sale_id"),
+            inverseJoinColumns = @JoinColumn(name = "product_id")
+    )
+    private List<Product> products;
 
-    @Column(name = "quantity", nullable = false)
-    private Integer quantity;
+    @Column(nullable = false)
+    private LocalDate saleDate;
 
-    @Column(name = "total_value")
-    private BigDecimal totalValue;
-
-    @Column(name = "discount")
-    private BigDecimal discount;
-
-    @Enumerated(EnumType.STRING)
-    @Column(name = "payment_method", nullable = false)
-    private PaymentMethod paymentMethod;
-
-    @Column(name = "purchase_date", nullable = false, updatable = false)
-    private LocalDateTime purchaseDate;
+    @Column(nullable = false)
+    private BigDecimal totalPrice;
 }
