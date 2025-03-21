@@ -34,4 +34,24 @@ public class SaleController {
     public ResponseEntity<List<Sale>> listSales() {
         return ResponseEntity.ok(saleService.listSales());
     }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<?> updateSale(@PathVariable Long id, @RequestBody @Valid SaleDTO saleDTO) {
+        try {
+            Sale updatedSale = saleService.updateSale(id, saleDTO);
+            return ResponseEntity.ok(updatedSale);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Erro ao atualizar a venda: " + e.getMessage());
+        }
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> deleteSale(@PathVariable Long id) {
+        try {
+            saleService.deleteSale(id);
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Erro ao excluir a venda: " + e.getMessage());
+        }
+    }
 }
