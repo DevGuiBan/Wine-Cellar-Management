@@ -31,7 +31,7 @@ public class CadastrarFuncionario extends JPanel {
     private JRootPane rootPane;
     private JanelaPrincipal frame;
 
-    public CadastrarFuncionario(JPanel mainPanel,JRootPane rootPane) {
+    public CadastrarFuncionario(JPanel mainPanel, JRootPane rootPane) {
         this.mainPanel = mainPanel;
         this.rootPane = rootPane;
         this.frame = (JanelaPrincipal) SwingUtilities.getWindowAncestor(rootPane);
@@ -39,7 +39,7 @@ public class CadastrarFuncionario extends JPanel {
         this.initComponentes();
     }
 
-    private void initComponentes(){
+    private void initComponentes() {
         // inicialização de variáveis
         jLabelTelefone = new JLabel();
         jLabelCPF = new JLabel();
@@ -65,7 +65,7 @@ public class CadastrarFuncionario extends JPanel {
         jComboBoxUF = new JComboBox<UF>();
         jTextFieldSenha = new JTextField();
 
-        try{
+        try {
             jTextFieldTelefone = new javax.swing.JFormattedTextField(new MaskFormatter("(##) #####-####"));
             jTextFieldCPF = new javax.swing.JFormattedTextField(new MaskFormatter("###.###.###-##"));
             jTextFieldDataNascimento = new javax.swing.JFormattedTextField(new MaskFormatter("##/##/####"));
@@ -88,7 +88,7 @@ public class CadastrarFuncionario extends JPanel {
         // configuração do card
         setBackground(new Color(243, 243, 223));
         setPreferredSize(new Dimension(1366, 650)); // tamanho do painel que tem tudo
-        setLayout(new FlowLayout(FlowLayout.CENTER,30,30));
+        setLayout(new FlowLayout(FlowLayout.CENTER, 30, 30));
 
         gbc.fill = GridBagConstraints.HORIZONTAL; // Permitir redimensionamento horizontal
         gbc.anchor = GridBagConstraints.WEST; // Alinhamento à esquerda
@@ -107,7 +107,7 @@ public class CadastrarFuncionario extends JPanel {
 
         jLabelCadastro.setFont(new Font("Cormorant Garamond SemiBold", 0, 30));
         jLabelCadastro.setText("Cadastrar Funcionário");
-        jLabelCadastro.setPreferredSize(new Dimension(250,30));
+        jLabelCadastro.setPreferredSize(new Dimension(250, 30));
         jLabelCadastro.setAlignmentX(Component.CENTER_ALIGNMENT); // centralizar
 
         jSeparator.setBackground(new Color(128, 0, 32));
@@ -142,23 +142,7 @@ public class CadastrarFuncionario extends JPanel {
         jTextFieldNome.setPreferredSize(fieldSize);
         jTextFieldNome.setForeground(Color.BLACK);
         jTextFieldNome.setText("Nome do Funcionário");
-        jTextFieldNome.addFocusListener(new FocusAdapter() { // adicionar um evento ao clicar no campo
-            @Override
-            public void focusGained(FocusEvent e) { // clicou
-                if (jTextFieldNome.getText().equals("Nome do Funcionário")) {
-                    jTextFieldNome.setText("");
-                    jTextFieldNome.setForeground(Color.BLACK);
-                }
-            }
 
-            @Override
-            public void focusLost(FocusEvent e) { // clicou em outra coisa
-                if (jTextFieldNome.getText().isEmpty()) {
-                    jTextFieldNome.setText("Nome do Funcionário");
-                    jTextFieldNome.setForeground(Color.BLACK);
-                }
-            }
-        });
         gbc.gridx = 0;
         gbc.gridy = 1;
         gbc.insets = new Insets(0, 0, 20, 100);
@@ -217,23 +201,7 @@ public class CadastrarFuncionario extends JPanel {
         jTextFieldEmail.setPreferredSize(fieldSize);
         jTextFieldEmail.setForeground(Color.BLACK);
         jTextFieldEmail.setText("exemplo@email.com");
-        jTextFieldEmail.addFocusListener(new FocusAdapter() {
-            @Override
-            public void focusGained(FocusEvent e) {
-                if (jTextFieldEmail.getText().equals("exemplo@email.com")) {
-                    jTextFieldEmail.setText("");
-                    jTextFieldEmail.setForeground(Color.BLACK);
-                }
-            }
 
-            @Override
-            public void focusLost(FocusEvent e) {
-                if (jTextFieldEmail.getText().isEmpty()) {
-                    jTextFieldEmail.setText("exemplo@email.com");
-                    jTextFieldEmail.setForeground(Color.BLACK);
-                }
-            }
-        });
         gbc.gridx = 0;
         gbc.gridy = 7;
         gbc.insets = new Insets(0, 0, 20, 100);
@@ -385,7 +353,7 @@ public class CadastrarFuncionario extends JPanel {
         jButtonCancelar.setFont(new Font("Cormorant Garamond Bold", 1, 18));
         jButtonCancelar.setText("Cancelar");
         jButtonCancelar.setFocusPainted(false);
-        jButtonCancelar.setBorder(new EmptyBorder(5,20,5,20));
+        jButtonCancelar.setBorder(new EmptyBorder(5, 20, 5, 20));
         jButtonCancelar.addActionListener(e -> {
             this.reset();
             CardLayout cl = (CardLayout) mainPanel.getLayout();
@@ -402,7 +370,7 @@ public class CadastrarFuncionario extends JPanel {
             public void actionPerformed(ActionEvent e) {
                 if (id == null) {
                     createEmployee();
-                } else  {
+                } else {
                     editEmployee();
                 }
             }
@@ -415,8 +383,8 @@ public class CadastrarFuncionario extends JPanel {
         jPanelButtons.setPreferredSize(new Dimension(1200, 50));
         jPanelButtons.add(jButtonCancelar);
         jPanelButtons.add(jButtonCadastrar);
-        jPanelButtons.setLayout(new FlowLayout(FlowLayout.RIGHT,10,10));
-        jPanelButtons.setBorder(new EmptyBorder(-10,10,10,140));
+        jPanelButtons.setLayout(new FlowLayout(FlowLayout.RIGHT, 10, 10));
+        jPanelButtons.setBorder(new EmptyBorder(-10, 10, 10, 140));
 
         jPanel.add(jPanelButtons);
 
@@ -436,7 +404,11 @@ public class CadastrarFuncionario extends JPanel {
                 throw new IllegalArgumentException("Informe o e-mail do Funcionário!");
             }
 
-            if(jTextFieldRua.getText().isBlank()||jTextFieldBairro.getText().isBlank()||jTextFieldNumero.getText().isBlank()||jTextFieldCidade.getText().isBlank()){
+            if (jTextFieldCidade.getText().isBlank() || jTextFieldCidade.getText().equals("Cidade:")) {
+                throw new IllegalArgumentException("Informe nome de cidade!");
+            }
+
+            if (jTextFieldRua.getText().isBlank() || jTextFieldBairro.getText().isBlank() || jTextFieldNumero.getText().isBlank()) {
                 throw new IllegalArgumentException("Todos os campos de Endereço devem ser informados!");
             }
 
@@ -530,7 +502,7 @@ public class CadastrarFuncionario extends JPanel {
         }
     }
 
-    private void editEmployee(){
+    private void editEmployee() {
         try {
             String name = jTextFieldNome.getText();
             if (name == null || name.trim().isEmpty() || name.equals("Nome do Funcionário")) {
@@ -542,7 +514,12 @@ public class CadastrarFuncionario extends JPanel {
                 throw new IllegalArgumentException("Informe o e-mail do Funcionário!");
             }
 
-            if(jTextFieldRua.getText().isBlank()||jTextFieldBairro.getText().isBlank()||jTextFieldNumero.getText().isBlank()||jTextFieldCidade.getText().isBlank()){
+            if (jTextFieldCidade.getText().isBlank() || jTextFieldCidade.getText().equals("Cidade:")) {
+                throw new IllegalArgumentException("Informe nome de cidade!");
+            }
+
+
+            if (jTextFieldRua.getText().isBlank() || jTextFieldBairro.getText().isBlank() || jTextFieldNumero.getText().isBlank()) {
                 throw new IllegalArgumentException("Todos os campos de Endereço devem ser informados!");
             }
 
@@ -556,7 +533,7 @@ public class CadastrarFuncionario extends JPanel {
             String cpf = jTextFieldCPF.getText();
             String dataString = jTextFieldDataNascimento.getText();
             String password = jTextFieldSenha.getText();
-            if(password.isBlank() || password.trim().isBlank()){
+            if (password.isBlank() || password.trim().isBlank()) {
                 throw new IllegalArgumentException("Informe a senha do funcionário!");
             }
 
@@ -571,7 +548,7 @@ public class CadastrarFuncionario extends JPanel {
 
             // making the request
             String urlAPI = this.dotenv.get("API_HOST");
-            URL url = new URL(urlAPI + "/employee/"+this.id);
+            URL url = new URL(urlAPI + "/employee/" + this.id);
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
             connection.setRequestMethod("PUT");
             connection.setRequestProperty("Content-Type", "application/json");
@@ -624,10 +601,10 @@ public class CadastrarFuncionario extends JPanel {
         }
     }
 
-    private void getEmployee(){
+    private void getEmployee() {
         try {
             String urlAPI = this.dotenv.get("API_HOST");
-            URL url = new URL(urlAPI + "/employee/"+this.id);
+            URL url = new URL(urlAPI + "/employee/" + this.id);
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
             connection.setRequestMethod("GET");
 
@@ -671,17 +648,15 @@ public class CadastrarFuncionario extends JPanel {
                 }
 
 
-
                 connection.disconnect();
             }
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             JOptionPane.showOptionDialog(rootPane,
-                    "Não foi possivel carregar os dados do funcionário!\n"+e.getMessage(),
+                    "Não foi possivel carregar os dados do funcionário!\n" + e.getMessage(),
                     "Funcionário Não Encontrado",
                     JOptionPane.DEFAULT_OPTION,
                     JOptionPane.ERROR_MESSAGE,
-                    null,null,null);
+                    null, null, null);
         }
     }
 
@@ -692,7 +667,7 @@ public class CadastrarFuncionario extends JPanel {
         this.jLabelCadastro.setText("Editar Funcionário");
     }
 
-    public void reset(){
+    public void reset() {
         jTextFieldNome.setText(null);
         jTextFieldTelefone.setText(null);
         jTextFieldEmail.setText(null);
@@ -706,6 +681,11 @@ public class CadastrarFuncionario extends JPanel {
         jTextFieldSenha.setText(null);
         this.jButtonCadastrar.setText("Cadastrar");
         this.jLabelCadastro.setText("Cadastrar Funcionário");
+
+        jTextFieldCPF.repaint();
+        jTextFieldCPF.revalidate();
+        jTextFieldNumero.repaint();
+        jTextFieldNumero.revalidate();
     }
 
 

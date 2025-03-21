@@ -126,23 +126,7 @@ public class CadastrarFornecedor extends JPanel {
         jTextFieldNome.setPreferredSize(fieldSize);
         jTextFieldNome.setForeground(Color.BLACK);
         jTextFieldNome.setText("Nome do Fornecedor");
-        jTextFieldNome.addFocusListener(new FocusAdapter() { // adicionar um evento ao clicar no campo
-            @Override
-            public void focusGained(FocusEvent e) { // clicou
-                if (jTextFieldNome.getText().equals("Nome do Fornecedor")) {
-                    jTextFieldNome.setText("");
-                    jTextFieldNome.setForeground(Color.BLACK);
-                }
-            }
 
-            @Override
-            public void focusLost(FocusEvent e) { // clicou em outra coisa
-                if (jTextFieldNome.getText().isEmpty()) {
-                    jTextFieldNome.setText("Nome do Fornecedor");
-                    jTextFieldNome.setForeground(Color.BLACK);
-                }
-            }
-        });
         gbc.gridx = 0;
         gbc.gridy = 1;
         gbc.insets = new Insets(0, 0, 20, 100);
@@ -199,23 +183,7 @@ public class CadastrarFornecedor extends JPanel {
         jTextFieldEmail.setPreferredSize(fieldSize);
         jTextFieldEmail.setForeground(Color.BLACK);
         jTextFieldEmail.setText("email@gmail.com");
-        jTextFieldEmail.addFocusListener(new FocusAdapter() {
-            @Override
-            public void focusGained(FocusEvent e) {
-                if (jTextFieldEmail.getText().equals("email@gmail.com")) {
-                    jTextFieldEmail.setText("");
-                    jTextFieldEmail.setForeground(Color.BLACK);
-                }
-            }
 
-            @Override
-            public void focusLost(FocusEvent e) {
-                if (jTextFieldEmail.getText().isEmpty()) {
-                    jTextFieldEmail.setText("email@gmail.com");
-                    jTextFieldEmail.setForeground(Color.BLACK);
-                }
-            }
-        });
         gbc.gridx = 1;
         gbc.gridy = 3;
         gbc.insets = new Insets(0, 0, 20, 0);
@@ -236,21 +204,7 @@ public class CadastrarFornecedor extends JPanel {
         jTextFieldEndereco.setPreferredSize(fieldSize);
         jTextFieldEndereco.setForeground(Color.BLACK);
         jTextFieldEndereco.setText("Rua, Bairro, Número, Cidade-UF");
-        jTextFieldEndereco.addFocusListener(new java.awt.event.FocusListener() {
-            @Override
-            public void focusGained(java.awt.event.FocusEvent evt) {
-                if (jTextFieldEndereco.getText().equals("Rua, Bairro, Número, Cidade-UF")) {
-                    jTextFieldEndereco.setText("");
-                }
-            }
 
-            @Override
-            public void focusLost(java.awt.event.FocusEvent evt) {
-                if (jTextFieldEndereco.getText().isEmpty()) {
-                    jTextFieldEndereco.setText("Rua, Bairro, Número, Cidade-UF");
-                }
-            }
-        });
         gbc.gridx = 0;
         gbc.gridy = 5;
         gbc.insets = new Insets(0, 0, 20, 100);
