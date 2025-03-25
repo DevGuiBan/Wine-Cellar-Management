@@ -17,8 +17,6 @@ public class SaleDTO {
     private BigDecimal discount;
     private PaymentMethod paymentMethod;
 
-
-
     @Data
     public static class SaleProductDTO {
         private Long productId;

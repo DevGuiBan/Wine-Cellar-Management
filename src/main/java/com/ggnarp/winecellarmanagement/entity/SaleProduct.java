@@ -19,12 +19,10 @@ public class SaleProduct {
 
     @ManyToOne
     @JoinColumn(name = "sale_id", nullable = false)
-    @JsonIgnore
     private Sale sale;
 
     @ManyToOne
     @JoinColumn(name = "product_id", nullable = false)
-    @JsonBackReference
     private Product product;
 
     @Column(nullable = false)
