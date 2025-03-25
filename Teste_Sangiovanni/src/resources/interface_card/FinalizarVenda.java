@@ -1,6 +1,9 @@
 package resources.interface_card;
 
+import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+import io.github.cdimascio.dotenv.Dotenv;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -8,8 +11,12 @@ import javax.swing.border.MatteBorder;
 import javax.swing.table.*;
 import javax.swing.text.MaskFormatter;
 import java.awt.*;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.time.MonthDay;
 import java.time.format.DateTimeFormatter;
@@ -20,6 +27,8 @@ public class FinalizarVenda extends JPanel {
     private Client client;
     private ArrayList<Product> products = new ArrayList<>();
     private JFrame rootPane;
+    private Dotenv dotenv;
+    private JanelaPrincipal frame;
 
     public void setClient(Client client) {
         this.client = client;
@@ -27,18 +36,101 @@ public class FinalizarVenda extends JPanel {
     }
 
     public double getValorTotal() {
-        return Double.parseDouble(this.jLabelValorTotal.getText().replace("R$","").trim());
+        return Double.parseDouble(this.jLabelValorTotal.getText().replace("R$", "").trim());
+    }
+
+    public void makeSale() {
+
+        try {
+            JsonObject jsonData = new JsonObject();
+            jsonData.addProperty("clientId", this.client.getId());
+            String discount = this.jLabelDescontoTabela.getText().replace("-R$", "").trim().replace(",",".");
+            jsonData.addProperty("discount", Double.parseDouble(discount));
+            String totalValue = this.jLabelValorTotal.getText().replace("R$", "").trim().replace(",",".");
+            jsonData.addProperty("totalPrice", Double.parseDouble(totalValue));
+            jsonData.addProperty("paymentMethod", client.getPayment());
+            LocalDate hojeData = LocalDate.now();
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+            String dataFormatada = hojeData.format(formatter);
+            jsonData.addProperty("saleDate", dataFormatada);
+
+            JsonArray jsonProducts = new JsonArray();
+            for (Product product : products) {
+                JsonObject jsonProduct = new JsonObject();
+                jsonProduct.addProperty("productId", product.getId());
+                jsonProduct.addProperty("quantity", product.getQuantity());
+                jsonProducts.add(jsonProduct);
+            }
+            jsonData.add("products", jsonProducts);
+
+            // making the request
+            String urlAPI = this.dotenv.get("API_HOST");
+            URL url = new URL(urlAPI + "/sale");
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.setRequestMethod("POST");
+            connection.setRequestProperty("Content-Type", "application/json");
+            connection.setDoOutput(true);
+
+            // send the request with json
+            try (OutputStream os = connection.getOutputStream()) {
+                byte[] input = jsonData.toString().getBytes(StandardCharsets.UTF_8);
+                os.write(input, 0, input.length);
+            }
+
+            int statusCode = connection.getResponseCode();
+            StringBuilder response = new StringBuilder();
+
+            if (statusCode >= 200 && statusCode < 300) {
+                frame.showCard("listar_vendas");
+                JOptionPane.showMessageDialog(this.rootPane,
+                        "A venda foi realizada com Sucesso!",
+                        "Venda Realizada",
+                        JOptionPane.INFORMATION_MESSAGE);
+            } else {
+                try (BufferedReader br = new BufferedReader(new InputStreamReader(connection.getErrorStream(), StandardCharsets.UTF_8))) {
+                    String responseLine;
+                    while ((responseLine = br.readLine()) != null) {
+                        response.append(responseLine.trim());
+                    }
+                }
+
+                try {
+                    JsonObject err = JsonParser.parseString(response.toString()).getAsJsonObject();
+
+                    String errorMessage = (err.has("message") && !err.get("message").isJsonNull())
+                            ? err.get("message").getAsString()
+                            : response.toString();
+
+                    JOptionPane.showMessageDialog(this.rootPane,
+                            "Não foi possível finalizar a venda. Verifique os dados e tente novamente!\n" + errorMessage,
+                            "Erro ao Finalizar a Venda",
+                            JOptionPane.ERROR_MESSAGE);
+                } catch (Exception jsonException) {
+                    JOptionPane.showMessageDialog(this.rootPane,
+                            "Erro inesperado ao processar a resposta da API.\nCódigo: " + statusCode + "\nResposta: " + response,
+                            "Erro ao Finalizar a Venda",
+                            JOptionPane.ERROR_MESSAGE);
+                }
+            }
+
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this.rootPane, e.getMessage());
+        }
+
+
     }
 
     public void setProducts(ArrayList<Product> prods) {
         this.products = prods;
         jTable.getColumn("Remover").setCellRenderer(new ButtonRendererEndSale());
-        jTable.getColumn("Remover").setCellEditor(new ButtonEditorEndSale(jTable,this.rootPane , this.products, this));
+        jTable.getColumn("Remover").setCellEditor(new ButtonEditorEndSale(jTable, this.rootPane, this.products, this));
         loadProducts();
     }
 
-    public FinalizarVenda(JFrame frame) {
+    public FinalizarVenda(JFrame frame, JanelaPrincipal RootFrame) {
         this.rootPane = frame;
+        this.frame = RootFrame;
+        this.dotenv = Dotenv.load();
         initComponents();
     }
 
@@ -47,15 +139,14 @@ public class FinalizarVenda extends JPanel {
         jLabelPagamento.setText(client.getPayment());
         DateTimeFormatter inputFormatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
 
-        LocalDate aniversario = LocalDate.parse(client.getData().replace("/","-"), inputFormatter);
+        LocalDate aniversario = LocalDate.parse(client.getData().replace("/", "-"), inputFormatter);
 
         MonthDay hoje = MonthDay.from(LocalDate.now());
         MonthDay aniversarioMd = MonthDay.from(aniversario);
 
-        if(hoje.equals(aniversarioMd)){
+        if (hoje.equals(aniversarioMd)) {
             jLabelDesconto.setText("Aplicado!");
-        }
-        else{
+        } else {
             jLabelDesconto.setText("Não Aplicado");
         }
 
@@ -89,10 +180,10 @@ public class FinalizarVenda extends JPanel {
         }
         jLabelValorTotal.setText("R$ " + valorTotal);
 
-        if(jLabelDesconto.getText().equals("Aplicado!")){
-            double desconto = valorTotal*0.10;
-            jLabelDescontoTabela.setText("-R$ "+desconto);
-        }else{
+        if (jLabelDesconto.getText().equals("Aplicado!")) {
+            double desconto = valorTotal * 0.10;
+            jLabelDescontoTabela.setText("-R$ " + desconto);
+        } else {
             jLabelDescontoTabela.setText("-R$ 00,00");
         }
     }
@@ -221,7 +312,7 @@ public class FinalizarVenda extends JPanel {
         }
 
         jTable.getColumn("Remover").setCellRenderer(new ButtonRendererEndSale());
-        jTable.getColumn("Remover").setCellEditor(new ButtonEditorEndSale(jTable,this.rootPane , this.products, this));
+        jTable.getColumn("Remover").setCellEditor(new ButtonEditorEndSale(jTable, this.rootPane, this.products, this));
 
         jScrollPaneTable.setViewportView(jTable);
         jScrollPaneTable.setBackground(Color.WHITE);
@@ -422,7 +513,7 @@ class ButtonEditorEndSale extends AbstractCellEditor implements TableCellEditor 
 
 
                 } catch (Exception ex) {
-                    JOptionPane.showMessageDialog(this.frame, "Ocorreu um erro ao remover o Produto "+ex.getMessage());
+                    JOptionPane.showMessageDialog(this.frame, "Ocorreu um erro ao remover o Produto " + ex.getMessage());
                 }
             }
 

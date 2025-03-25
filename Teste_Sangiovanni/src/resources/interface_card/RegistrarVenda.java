@@ -35,7 +35,7 @@ public class RegistrarVenda extends JPanel {
         // cards
         cardProdutos = new ProdutoVenda(frame);
         cardClientes = new ClienteVenda(frame);
-        cardFinalizarVenda = new FinalizarVenda(frame);
+        cardFinalizarVenda = new FinalizarVenda(frame,janelaPrincipal);
 
         jSeparator = new JSeparator();
 
@@ -179,6 +179,8 @@ public class RegistrarVenda extends JPanel {
             }else if(cardClientes.isVisible()){
                 jButtonCadastrar.setText("Finalizar Venda");
                 this.jButtonFinalizarVendaCardActionEvent(evt);
+            }else if(cardFinalizarVenda.isVisible()){
+                this.makeSale(evt);
             }
 
         });
@@ -331,6 +333,10 @@ public class RegistrarVenda extends JPanel {
         cardFinalizarVenda.setClient(cardClientes.getClientDAO());
         cardFinalizarVenda.setProducts(cardProdutos.getProductsList());
         this.showCard("finalizar_venda");
+    }
+
+    private void makeSale(java.awt.event.ActionEvent evt){
+        cardFinalizarVenda.makeSale();
     }
 
     // componentes que vão ser usados na tela, só o essencial e com os nomes certinhos
