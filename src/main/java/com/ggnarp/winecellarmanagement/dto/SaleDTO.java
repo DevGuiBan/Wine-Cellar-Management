@@ -1,6 +1,10 @@
 package com.ggnarp.winecellarmanagement.dto;
 
 import com.ggnarp.winecellarmanagement.entity.PaymentMethod;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Null;
+import jakarta.validation.constraints.Positive;
 import lombok.Data;
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -9,12 +13,19 @@ import java.util.UUID;
 
 @Data
 public class SaleDTO {
+    @Null
     private Long id;
+
     private UUID clientId;
+
     private List<SaleProductDTO> products;
+
     private LocalDate saleDate;
+
     private BigDecimal totalPrice;
+
     private BigDecimal discount;
+
     private PaymentMethod paymentMethod;
 
 

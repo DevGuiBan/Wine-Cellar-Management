@@ -13,6 +13,7 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.time.format.DateTimeFormatter;
 import java.util.Objects;
 
 public class ListarVendas extends JPanel {
@@ -98,7 +99,7 @@ public class ListarVendas extends JPanel {
         jtable.setModel(new javax.swing.table.DefaultTableModel(
                 new Object[][]{},
                 new String[]{
-                        "Código", "Produto(s)", "Cliente", "Data", "Método de Pagamento", "Total","Ações"
+                        "Código", "Cliente", "Data", "Método de Pagamento", "Total","Ações"
                 }
         ));
 
@@ -179,15 +180,15 @@ public class ListarVendas extends JPanel {
                     for (int i = 0; i < sales.size(); i++) {
                         JsonObject sale = sales.get(i).getAsJsonObject();
                         String id = sale.get("id").getAsString();
-                        String product = sale.has("productName") ? sale.get("productName").getAsString() : sale.get("productId").getAsString();
-                        String client = sale.has("clientName") ? sale.get("clientName").getAsString() : sale.get("clientId").getAsString();
                         JsonObject clientDTO = sale.get("client").getAsJsonObject();
                         String clientName = clientDTO.get("name").getAsString();
-                        String date = sale.get("purchaseDate").getAsString();
+                        String date = sale.get("saleDate").getAsString();
+                        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+                        String dateFormated = date.formatted(formatter);
                         String paymentMethod = sale.get("paymentMethod").getAsString();
-                        String totalValue = sale.get("totalValue").getAsString();
+                        String totalValue = sale.get("totalPrice").getAsString();
 
-                        tableModel.addRow(new Object[]{id, product, clientName, date, paymentMethod, totalValue, "Ações"});
+                        tableModel.addRow(new Object[]{id, clientName, dateFormated, paymentMethod, totalValue, "Ações"});
                     }
                 }
             } else {
@@ -226,7 +227,7 @@ class ButtonRendererProductVenda extends JPanel implements TableCellRenderer {
         this.editButton.setContentAreaFilled(false);
         this.editButton.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
 
-        this.deleteButton.setIcon(new javax.swing.ImageIcon(Objects.requireNonNull(getClass().getResource("/resources/images/excluir.png"))));
+        this.deleteButton.setIcon(new javax.swing.ImageIcon(Objects.requireNonNull(getClass().getResource("/resources/images/Archive.png"))));
         this.deleteButton.setBackground(Color.WHITE);
         this.deleteButton.setBorder(null);
         this.deleteButton.setContentAreaFilled(false);
@@ -277,7 +278,7 @@ class ButtonEditorProductVenda extends AbstractCellEditor implements TableCellEd
         this.editButton.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
 
         this.deleteButton.setIcon(new javax.swing.ImageIcon(Objects.requireNonNull(
-                getClass().getResource("/resources/images/excluir.png"))));
+                getClass().getResource("/resources/images/Archive.png"))));
         this.deleteButton.setBackground(new java.awt.Color(255, 255, 255));
         this.deleteButton.setForeground(new java.awt.Color(128, 0, 32));
         this.deleteButton.setFocusPainted(false);
