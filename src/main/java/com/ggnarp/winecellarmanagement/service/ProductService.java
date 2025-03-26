@@ -1,6 +1,7 @@
 package com.ggnarp.winecellarmanagement.service;
 
 import com.ggnarp.winecellarmanagement.dto.ProductDTO;
+import com.ggnarp.winecellarmanagement.dto.UpdateMassiveDTO;
 import com.ggnarp.winecellarmanagement.entity.Product;
 import com.ggnarp.winecellarmanagement.entity.ProductType;
 import com.ggnarp.winecellarmanagement.entity.Supplier;
@@ -11,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.ResourceAccessException;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -206,5 +208,18 @@ public class ProductService {
                 .stream()
                 .map(this::mapToDTO)
                 .collect(Collectors.toList());
+    }
+
+    public void updateStockMassive(UpdateMassiveDTO updateDTO){
+        try{
+            for(Integer idProd:updateDTO.getProductsIds()){
+                Product prod = productRepository.findById(idProd.longValue());
+                int quantity = updateDTO.getQuantity()+prod.getQuantity();
+                prod.setQuantity(quantity);
+                productRepository.save(prod);
+            }
+        } catch (Exception e) {
+            throw new ResourceAccessException("Erro ao atualizar o estoque dos produtos!");
+        }
     }
 }

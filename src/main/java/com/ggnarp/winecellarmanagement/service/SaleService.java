@@ -93,6 +93,8 @@ public class SaleService {
             SaleDTO.SaleProductDTO spDTO = new SaleDTO.SaleProductDTO();
             spDTO.setProductId(sp.getProduct().getId());
             spDTO.setQuantity(sp.getQuantity());
+            spDTO.setName(sp.getProduct().getName());
+            spDTO.setPrice(sp.getProduct().getPrice());
             return spDTO;
         }).toList();
 

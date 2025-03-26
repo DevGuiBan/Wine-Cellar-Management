@@ -1,6 +1,7 @@
 package com.ggnarp.winecellarmanagement.controller;
 
 import com.ggnarp.winecellarmanagement.dto.ProductDTO;
+import com.ggnarp.winecellarmanagement.dto.UpdateMassiveDTO;
 import com.ggnarp.winecellarmanagement.entity.Product;
 import com.ggnarp.winecellarmanagement.service.ProductService;
 import jakarta.validation.Valid;
@@ -20,20 +21,6 @@ public class ProductController {
 
     public ProductController(ProductService productService) {
         this.productService = productService;
-    }
-
-    @PostMapping
-    public ResponseEntity<?> create(@RequestBody @Valid ProductDTO productDTO) {
-        try{
-            Product product = productService.save(productDTO);
-            return ResponseEntity.status(HttpStatus.CREATED).body(product);
-        }
-        catch(Exception e){
-            Map<String, String> errorResponse = new HashMap<>();
-            errorResponse.put("error", "Produto não criado");
-            errorResponse.put("message", e.getMessage());
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
-        }
     }
 
     @GetMapping
@@ -204,6 +191,34 @@ public class ProductController {
             errorResponse.put("error", "Erro na pesquisa do produto");
             errorResponse.put("message", e.getMessage());
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
+        }
+    }
+
+    @PostMapping
+    public ResponseEntity<?> create(@RequestBody @Valid ProductDTO productDTO) {
+        try{
+            Product product = productService.save(productDTO);
+            return ResponseEntity.status(HttpStatus.CREATED).body(product);
+        }
+        catch(Exception e){
+            Map<String, String> errorResponse = new HashMap<>();
+            errorResponse.put("error", "Produto não criado");
+            errorResponse.put("message", e.getMessage());
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
+        }
+    }
+
+    @PostMapping("/stock")
+    public ResponseEntity<?> updateStockMassive(@RequestBody @Valid UpdateMassiveDTO updateDTO){
+        try{
+            productService.updateStockMassive(updateDTO);
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+        }
+        catch(Exception e){
+            Map<String, String> errorResponse = new HashMap<>();
+            errorResponse.put("error", "Produto não criado");
+            errorResponse.put("message", e.getMessage());
+            return ResponseEntity.status(HttpStatus.FAILED_DEPENDENCY).body(errorResponse);
         }
     }
 

@@ -35,5 +35,7 @@ public class SaleDTO {
     public static class SaleProductDTO {
         private Long productId;
         private int quantity;
+        private String name;
+        private BigDecimal price;
     }
 }
