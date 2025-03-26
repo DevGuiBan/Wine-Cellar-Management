@@ -26,6 +26,8 @@ public class ListarProduto extends JPanel {
     private final JRootPane rootPane;
     private final JPanel mainPanel;
     private final CadastrarProduto cadastrarProduto;
+    private javax.swing.JButton jButtonAtualizarEstoque;
+
 
     public ListarProduto(JRootPane rootPane,JPanel mainPanel, CadastrarProduto cardProduto){
         this.dotenv = Dotenv.load();
@@ -37,13 +39,22 @@ public class ListarProduto extends JPanel {
         getProduct();
     }
 
+
+
+
+    //INIT POINT
+
+
+
+
     private void initComponents() {
 
-        // iniciar Componentes
+        // Declarando os componentes
         jPanelTopoTabela = new javax.swing.JPanel();
         jPanelTabela = new javax.swing.JPanel();
         jButtonCadastrar = new javax.swing.JButton();
         jButtonFiltrar = new javax.swing.JButton();
+        jButtonAtualizarEstoque = new javax.swing.JButton(); // Correção na declaração
         pesquisaProduto = new javax.swing.JTextField();
         jtable = new javax.swing.JTable();
         jScrollPane = new javax.swing.JScrollPane();
@@ -51,15 +62,16 @@ public class ListarProduto extends JPanel {
 
         setBackground(new java.awt.Color(243, 243, 223));
         setPreferredSize(new Dimension(1366, 650));
-        add(jPanel4,"painel_principal");
-
+        add(jPanel4, "painel_principal");
 
         jPanel4.setBackground(new java.awt.Color(255, 255, 255));
         jPanel4.setPreferredSize(new Dimension(1200, 600));
 
-        jPanelTopoTabela.setPreferredSize(new Dimension(1200, 100));
+        // Configuração do painel superior
+        jPanelTopoTabela.setPreferredSize(new Dimension(1300, 100));
         jPanelTopoTabela.setBackground(new java.awt.Color(255, 255, 255));
-        jPanelTopoTabela.setLayout(new FlowLayout(FlowLayout.LEFT, 30, 30));
+        jPanelTopoTabela.setLayout(new FlowLayout(FlowLayout.LEFT, 10, 10));
+
 
         pesquisaProduto.setBackground(new java.awt.Color(240, 240, 240));
         pesquisaProduto.setFont(new Font("Cormorant Garamond", Font.BOLD, 14));
@@ -83,9 +95,26 @@ public class ListarProduto extends JPanel {
                 }
             }
         });
+
         jPanelTopoTabela.add(pesquisaProduto);
 
         jPanelTopoTabela.add(Box.createHorizontalStrut(500));
+
+        jButtonAtualizarEstoque.setFont(new java.awt.Font("Cormorant Garamond", Font.BOLD, 20));
+        jButtonAtualizarEstoque.setIcon(new javax.swing.ImageIcon(Objects.requireNonNull(getClass().getResource("/resources/images/bulk_update.png"))));
+        jButtonAtualizarEstoque.setText("Cadastrar Produto");
+        jButtonAtualizarEstoque.setBorder(null);
+        jButtonAtualizarEstoque.setContentAreaFilled(false);
+        jButtonAtualizarEstoque.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        jButtonAtualizarEstoque.setPreferredSize(new java.awt.Dimension(200, 40));
+        jButtonAtualizarEstoque.addActionListener(e -> {
+            CardLayout cl = (CardLayout) mainPanel.getLayout();
+            cadastrarProduto.atualizarDados();
+            cl.show(mainPanel, "atualizar_produtos");
+        });
+
+        jPanelTopoTabela.add(jButtonAtualizarEstoque);
+
 
         jButtonCadastrar.setFont(new java.awt.Font("Cormorant Garamond", Font.BOLD, 20));
         jButtonCadastrar.setIcon(new javax.swing.ImageIcon(Objects.requireNonNull(getClass().getResource("/resources/images/criar.png"))));
@@ -114,7 +143,12 @@ public class ListarProduto extends JPanel {
             JFrame frame = (JFrame) SwingUtilities.getWindowAncestor(rootPane);
             abrirDialogoFiltro(frame);
         });
+
         jPanelTopoTabela.add(jButtonFiltrar);
+
+
+        //ENDPOINT
+
 
         jPanelTabela.setPreferredSize(new Dimension(1145, 450));
         jPanelTabela.setBackground(new java.awt.Color(255, 255, 255));
