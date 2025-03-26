@@ -65,7 +65,7 @@ public class Login extends JFrame {
         rightPanel.setBackground(new Color(128, 0, 32));
 
         JLabel loginLabel = new JLabel("Login");
-        loginLabel.setFont(new Font("Cormorant Infant", Font.BOLD, 38));
+        loginLabel.setFont(new Font("Cormorant Infant", Font.BOLD, 50));
         loginLabel.setForeground(Color.WHITE);
 
         JPanel formPanel = new JPanel(new GridBagLayout());
@@ -74,25 +74,25 @@ public class Login extends JFrame {
         Dimension fieldSize = new Dimension(250, 30);
 
         JLabel email = new JLabel("Email: ");
-        email.setFont(new Font("Cormorant Infant", Font.PLAIN, 18));
+        email.setFont(new Font("Cormorant Infant", Font.PLAIN, 20));
         email.setForeground(Color.WHITE);
         textoEmail = new JTextField();
-        textoEmail.setFont(new Font("Cormorant Infant", Font.PLAIN, 18));
+        textoEmail.setFont(new Font("Cormorant Infant", Font.PLAIN, 20));
         textoEmail.setPreferredSize(fieldSize);
 
         JLabel senha = new JLabel("Senha: ");
-        senha.setFont(new Font("Cormorant Infant", Font.PLAIN, 18));
+        senha.setFont(new Font("Cormorant Infant", Font.PLAIN, 20));
         senha.setForeground(Color.WHITE);
         textoSenha = new JPasswordField();
-        textoSenha.setFont(new Font("Cormorant Infant", Font.PLAIN, 18));
+        textoSenha.setFont(new Font("Cormorant Infant", Font.PLAIN, 20));
         textoSenha.setPreferredSize(fieldSize);
 
         JLabel esqueciSenha = new JLabel("Esqueci minha senha");
-        esqueciSenha.setFont(new Font("Cormorant Infant", Font.PLAIN, 14));
+        esqueciSenha.setFont(new Font("Cormorant Infant", Font.PLAIN, 18));
         esqueciSenha.setForeground(new Color(255, 235, 43));
 
         JButton btnEntrar = new JButton("Entrar");
-        btnEntrar.setFont(new Font("Cormorant Infant", Font.BOLD, 18));
+        btnEntrar.setFont(new Font("Cormorant Infant", Font.BOLD, 20));
         btnEntrar.setForeground(Color.BLACK);
         btnEntrar.setBackground(new Color(255, 235, 43));
         btnEntrar.setPreferredSize(fieldSize);
@@ -101,7 +101,7 @@ public class Login extends JFrame {
         });
 
         JButton btnCadastrar = new JButton("Cadastrar-se");
-        btnCadastrar.setFont(new Font("Cormorant Infant", Font.BOLD, 18));
+        btnCadastrar.setFont(new Font("Cormorant Infant", Font.BOLD, 20));
         btnCadastrar.setForeground(Color.WHITE);
         btnCadastrar.setBackground(new Color(128, 0, 32));
         btnCadastrar.setBorder(BorderFactory.createLineBorder(new Color(255, 235, 43), 2));

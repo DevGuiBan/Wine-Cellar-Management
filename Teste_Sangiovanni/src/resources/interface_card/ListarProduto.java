@@ -633,7 +633,7 @@ public class ListarProduto extends JPanel {
         try {
             String urlAPI = this.dotenv.get("API_HOST");
             String urlString = urlAPI + "/product/get/SupProdT?supplier=" + URLEncoder.encode(supplierName, StandardCharsets.UTF_8)
-                                        +"&prod_t="+URLEncoder.encode(prodTName, StandardCharsets.UTF_8);
+                    +"&prod_t="+URLEncoder.encode(prodTName, StandardCharsets.UTF_8);
             URL url = new URL(urlString);
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
             connection.setRequestMethod("GET");
@@ -794,8 +794,8 @@ public class ListarProduto extends JPanel {
         try {
             String urlAPI = this.dotenv.get("API_HOST");
             String urlString = urlAPI + "/product/get/SupQuaProdT?supplier=" + URLEncoder.encode(supplierName, StandardCharsets.UTF_8)
-                                        +"&quantity="+URLEncoder.encode(quantity, StandardCharsets.UTF_8)
-                                        +"&prod_t="+URLEncoder.encode(prodTName, StandardCharsets.UTF_8);
+                    +"&quantity="+URLEncoder.encode(quantity, StandardCharsets.UTF_8)
+                    +"&prod_t="+URLEncoder.encode(prodTName, StandardCharsets.UTF_8);
             URL url = new URL(urlString);
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
             connection.setRequestMethod("GET");
@@ -1188,7 +1188,7 @@ class ButtonEditorProduct_ extends AbstractCellEditor implements TableCellEditor
     }
 
 
-        @Override
+    @Override
     public Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected, int row, int column) {
         currentRow = row;
         return panel;
