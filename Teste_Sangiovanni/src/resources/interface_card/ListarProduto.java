@@ -52,12 +52,30 @@ public class ListarProduto extends JPanel {
         jScrollPane = new javax.swing.JScrollPane();
         jPanel4 = new JPanel();
 
+        JButton jButtonProx = new javax.swing.JButton("Próximo");
+        JButton jButtonCancel = new javax.swing.JButton("Cancelar");
+
+
+        jButtonProx.setFont(new Font("Cormorant Garamond", Font.BOLD, 18));
+        jButtonProx.setPreferredSize(new Dimension(120, 40));
+        jButtonProx.setVisible(false); // Oculto no início
+
+        jButtonCancel.setFont(new Font("Cormorant Garamond", Font.BOLD, 18));
+        jButtonCancel.setPreferredSize(new Dimension(120, 40));
+        jButtonCancel.setVisible(false); // Oculto no início
+
+        jPanelTopoTabela.add(jButtonCancel);
+        jPanelTopoTabela.add(jButtonProx);
+
+
         setBackground(new java.awt.Color(243, 243, 223));
         setPreferredSize(new Dimension(1366, 650));
         add(jPanel4, "painel_principal");
 
         jPanel4.setBackground(new java.awt.Color(255, 255, 255));
         jPanel4.setPreferredSize(new Dimension(1200, 600));
+
+
 
         // Configuração do painel superior
         jPanelTopoTabela.setPreferredSize(new Dimension(1300, 100));
@@ -134,12 +152,25 @@ public class ListarProduto extends JPanel {
         jButtonFiltrar.addActionListener(evt -> {
             JFrame frame = (JFrame) SwingUtilities.getWindowAncestor(rootPane);
             abrirDialogoFiltro(frame);
+            atualizarTabelaParaSelecao();
+
         });
+
 
         jPanelTopoTabela.add(jButtonFiltrar);
         jButtonAtualizarEstoque.addActionListener(e -> {
             atualizarTabelaParaSelecao();
+            jButtonProx.setVisible(true);
+            jButtonCancel.setVisible(true);
         });
+
+        jButtonCancel.addActionListener(e -> {
+            restaurarTabelaOriginal();
+            jButtonProx.setVisible(false);
+            jButtonCancel.setVisible(false);
+        });
+
+
 
 
 
@@ -203,6 +234,7 @@ public class ListarProduto extends JPanel {
 
     // FUNÇÃO ATUALIZAR ESTOQUE INICIO
 
+
     private void atualizarTabelaParaSelecao() {
         DefaultTableModel modelo = (DefaultTableModel) jtable.getModel();
 
@@ -232,6 +264,21 @@ public class ListarProduto extends JPanel {
 
 
    //FUNÇÃO ADICINONAR ESTOQUE FIM
+
+    private void restaurarTabelaOriginal() {
+        DefaultTableModel modelo = (DefaultTableModel) jtable.getModel();
+
+        int colunaSelecionar = jtable.getColumn("Selecionar").getModelIndex();
+
+        TableColumnModel columnModel = jtable.getColumnModel();
+        columnModel.getColumn(colunaSelecionar).setHeaderValue("Ações");
+
+        columnModel.getColumn(colunaSelecionar).setCellRenderer(new ButtonRendererProduct_());
+        columnModel.getColumn(colunaSelecionar).setCellEditor(new ButtonEditorProduct_(jtable, rootPane, dotenv.get("API_HOST"), cadastrarProduto, mainPanel));
+
+        jtable.getTableHeader().repaint();
+    }
+
 
     private void loadSupplier(JComboBox<Supplier> cbSupplier){
         try {
@@ -1150,7 +1197,7 @@ class ButtonEditorProduct_ extends AbstractCellEditor implements TableCellEditor
     private final JFrame frame;
     private final String APIURL;
 
-    public ButtonEditorProduct_(JTable table,JRootPane rootPane,String APIURL,CadastrarProduto card,JPanel mainPanel) {
+    public ButtonEditorProduct_(JTable table, JRootPane rootPane, String APIURL, CadastrarProduto card, JPanel mainPanel) {
         this.table = table;
         this.frame = (JFrame) SwingUtilities.getWindowAncestor(rootPane);
         this.APIURL = APIURL;
@@ -1183,7 +1230,7 @@ class ButtonEditorProduct_ extends AbstractCellEditor implements TableCellEditor
 
         editButton.addActionListener(evt -> {
             int cellIndex = table.getSelectedRow();
-            Object cellValue = table.getValueAt(cellIndex,0);
+            Object cellValue = table.getValueAt(cellIndex, 0);
             card.setId(cellValue.toString());
             CardLayout cl = (CardLayout) mainPanel.getLayout();
             cl.show(mainPanel, "cadastrar_produto");
@@ -1191,7 +1238,7 @@ class ButtonEditorProduct_ extends AbstractCellEditor implements TableCellEditor
         });
 
         deleteButton.addActionListener(e -> {
-            String[] options = {"Cancelar","Excluir"};
+            String[] options = {"Cancelar", "Excluir"};
             int confirmation = JOptionPane.showOptionDialog(table,
                     "Deseja excluir o produto? Essa ação não poderá ser desfeita. ",
                     "Deletar Produto",
@@ -1201,12 +1248,12 @@ class ButtonEditorProduct_ extends AbstractCellEditor implements TableCellEditor
                     options,
                     options[0]);
             if (confirmation == 1) {
-                try{
+                try {
                     int cellIndex = table.getSelectedRow();
                     if (table.isEditing()) {
                         table.getCellEditor().stopCellEditing();
                     }
-                    Object cellValue = table.getValueAt(cellIndex,0);
+                    Object cellValue = table.getValueAt(cellIndex, 0);
                     BigInteger id_product = new BigInteger(cellValue.toString());
                     URL url = new URL(this.APIURL + "/product/" + id_product);
                     HttpURLConnection connection = (HttpURLConnection) url.openConnection();
@@ -1214,7 +1261,7 @@ class ButtonEditorProduct_ extends AbstractCellEditor implements TableCellEditor
                     connection.setRequestMethod("DELETE");
 
                     int responseCode = connection.getResponseCode();
-                    if(responseCode==HttpURLConnection.HTTP_NO_CONTENT || responseCode == HttpURLConnection.HTTP_OK){
+                    if (responseCode == HttpURLConnection.HTTP_NO_CONTENT || responseCode == HttpURLConnection.HTTP_OK) {
                         ((DefaultTableModel) table.getModel()).removeRow(currentRow);
                         JOptionPane.showOptionDialog(this.frame,
                                 "O produto foi deletado com sucesso",
@@ -1224,8 +1271,7 @@ class ButtonEditorProduct_ extends AbstractCellEditor implements TableCellEditor
                                 null,
                                 null,
                                 null);
-                    }
-                    else{
+                    } else {
                         JOptionPane.showOptionDialog(this.frame,
                                 "Ocorreu um erro no servidor ao deletar o produto",
                                 "Erro ao deletar produto",
@@ -1236,10 +1282,9 @@ class ButtonEditorProduct_ extends AbstractCellEditor implements TableCellEditor
                                 null);
                     }
                 } catch (Exception ex) {
-                    JOptionPane.showMessageDialog(this.frame,ex.getMessage());
+                    JOptionPane.showMessageDialog(this.frame, ex.getMessage());
                 }
-            }
-            else{
+            } else {
                 stopCellEditing();
             }
 
@@ -1258,3 +1303,4 @@ class ButtonEditorProduct_ extends AbstractCellEditor implements TableCellEditor
         return null;
     }
 }
+
