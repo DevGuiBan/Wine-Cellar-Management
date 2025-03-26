@@ -1,5 +1,6 @@
 package com.ggnarp.winecellarmanagement.dto;
 
+import com.ggnarp.winecellarmanagement.entity.Client;
 import com.ggnarp.winecellarmanagement.entity.PaymentMethod;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -17,6 +18,8 @@ public class SaleDTO {
     private Long id;
 
     private UUID clientId;
+
+    private Client client;
 
     private List<SaleProductDTO> products;
 

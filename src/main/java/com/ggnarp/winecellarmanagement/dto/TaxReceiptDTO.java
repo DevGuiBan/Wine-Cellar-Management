@@ -17,7 +17,7 @@ public class TaxReceiptDTO {
     @NotNull(message = "O id dá venda não pode ser Nulo!")
     private Long idSale;
 
-    private Optional<Sale> sale;
+    private SaleDTO sale;
 
     private String enterpiseName;
 

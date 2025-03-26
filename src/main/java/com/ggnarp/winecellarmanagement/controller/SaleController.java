@@ -31,7 +31,7 @@ public class SaleController {
     }
 
     @GetMapping
-    public ResponseEntity<List<Sale>> listSales() {
+    public ResponseEntity<?> listSales() {
         return ResponseEntity.ok(saleService.listSales());
     }
 

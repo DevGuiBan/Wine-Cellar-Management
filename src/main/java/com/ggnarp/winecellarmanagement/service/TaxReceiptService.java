@@ -1,13 +1,16 @@
 package com.ggnarp.winecellarmanagement.service;
+import com.ggnarp.winecellarmanagement.entity.Sale;
 import org.springframework.stereotype.Service;
 
 import com.ggnarp.winecellarmanagement.entity.TaxReceipt;
 import com.ggnarp.winecellarmanagement.dto.TaxReceiptDTO;
 import com.ggnarp.winecellarmanagement.repository.TaxReceiptRepository;
 import com.ggnarp.winecellarmanagement.repository.SaleRepository;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.security.SecureRandom;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -15,10 +18,12 @@ import java.util.stream.IntStream;
 public class TaxReceiptService {
     private final TaxReceiptRepository taxReceiptRepository;
     private final SaleRepository saleRepository;
+    private final SaleService saleService;
 
-    public TaxReceiptService(TaxReceiptRepository taxReceiptRepository, SaleRepository saleRepository) {
+    public TaxReceiptService(TaxReceiptRepository taxReceiptRepository, SaleRepository saleRepository,SaleService saleService) {
         this.taxReceiptRepository = taxReceiptRepository;
         this.saleRepository = saleRepository;
+        this.saleService = saleService;
     }
 
     public List<TaxReceiptDTO> listAll() throws Exception {
@@ -39,7 +44,8 @@ public class TaxReceiptService {
                 dto.setCCF("120289");
                 dto.setCDD("124857");
                 dto.setTax(0.2);
-                dto.setSale(saleRepository.findById(TR.getIdSale()));
+                Optional<Sale> saleOpt = saleRepository.findByIdWithProducts(TR.getIdSale());
+                saleOpt.ifPresent(sale -> dto.setSale(saleService.convertToDTO(sale).orElse(null)));
                 return dto;
             }).collect(Collectors.toList());
         } catch (Exception e) {
@@ -65,7 +71,8 @@ public class TaxReceiptService {
                 dto.setCCF("120289");
                 dto.setCDD("124857");
                 dto.setTax(0.2);
-                dto.setSale(saleRepository.findById(TR.getIdSale()));
+                Optional<Sale> saleOpt = saleRepository.findByIdWithProducts(TR.getIdSale());
+                saleOpt.ifPresent(sale -> dto.setSale(saleService.convertToDTO(sale).orElse(null)));
                 return dto;
             }).collect(Collectors.toList());
         } catch (Exception e) {

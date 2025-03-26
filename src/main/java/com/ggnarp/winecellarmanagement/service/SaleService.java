@@ -8,10 +8,12 @@ import com.ggnarp.winecellarmanagement.entity.SaleProduct;
 import com.ggnarp.winecellarmanagement.repository.ClientRepository;
 import com.ggnarp.winecellarmanagement.repository.ProductRepository;
 import com.ggnarp.winecellarmanagement.repository.SaleRepository;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.ResourceAccessException;
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -77,8 +79,35 @@ public class SaleService {
         return saleRepository.save(sale);
     }
 
-    public List<Sale> listSales() {
-        return saleRepository.findAll();
+    public Optional<SaleDTO> convertToDTO(Sale sale) {
+        SaleDTO dto = new SaleDTO();
+        dto.setId(sale.getId());
+        dto.setClientId(sale.getClient().getId());
+        dto.setClient(sale.getClient());
+        dto.setSaleDate(sale.getSaleDate());
+        dto.setTotalPrice(sale.getTotalPrice());
+        dto.setDiscount(sale.getDiscount());
+        dto.setPaymentMethod(sale.getPaymentMethod());
+
+        List<SaleDTO.SaleProductDTO> productDTOs = sale.getSaleProducts().stream().map(sp -> {
+            SaleDTO.SaleProductDTO spDTO = new SaleDTO.SaleProductDTO();
+            spDTO.setProductId(sp.getProduct().getId());
+            spDTO.setQuantity(sp.getQuantity());
+            return spDTO;
+        }).toList();
+
+        dto.setProducts(productDTOs);
+
+        return Optional.of(dto);
+    }
+
+    @Transactional(readOnly = true)
+    public List<Optional<SaleDTO>> listSales() {
+        return saleRepository.findAll().stream().map(sale->{
+            Optional<SaleDTO> saleDTO = Optional.of(new SaleDTO());
+            saleDTO = convertToDTO(sale);
+            return saleDTO;
+        }).collect(Collectors.toList());
     }
 
     public Sale updateSale(Long id, SaleDTO saleDTO) {
