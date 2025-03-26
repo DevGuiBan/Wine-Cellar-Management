@@ -50,7 +50,7 @@ public class RecuperarSenha {
         rightPanel.setBackground(new Color(128, 0, 32));
 
         JLabel titulo = new JLabel("Recuperar Senha");
-        titulo.setFont(new Font("Cormorant Infant", Font.BOLD, 38));
+        titulo.setFont(new Font("Cormorant Infant", Font.BOLD, 50));
         titulo.setForeground(Color.WHITE);
 
         JPanel formPanel = new JPanel(new GridBagLayout());
@@ -59,14 +59,14 @@ public class RecuperarSenha {
         Dimension fieldSize = new Dimension(250, 30);
 
         JLabel email = new JLabel("Email: ");
-        email.setFont(new Font("Cormorant Infant", Font.PLAIN, 18));
+        email.setFont(new Font("Cormorant Infant", Font.PLAIN, 23));
         email.setForeground(Color.WHITE);
         JTextField textoEmail = new JTextField();
-        textoEmail.setFont(new Font("Cormorant Infant", Font.PLAIN, 18));
+        textoEmail.setFont(new Font("Cormorant Infant", Font.PLAIN, 20));
         textoEmail.setPreferredSize(fieldSize);
 
         JButton btnEnviar = new JButton("Enviar");
-        btnEnviar.setFont(new Font("Cormorant Infant", Font.BOLD, 18));
+        btnEnviar.setFont(new Font("Cormorant Infant", Font.BOLD, 25));
         btnEnviar.setForeground(Color.BLACK);
         btnEnviar.setBackground(new Color(255, 235, 43));
         btnEnviar.setPreferredSize(fieldSize);
