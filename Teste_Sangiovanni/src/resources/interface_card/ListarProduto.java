@@ -29,7 +29,7 @@ public class ListarProduto extends JPanel {
     private javax.swing.JButton jButtonAtualizarEstoque;
 
 
-    public ListarProduto(JRootPane rootPane,JPanel mainPanel, CadastrarProduto cardProduto){
+    public ListarProduto(JRootPane rootPane, JPanel mainPanel, CadastrarProduto cardProduto) {
         this.dotenv = Dotenv.load();
         this.rootPane = rootPane;
         this.mainPanel = mainPanel;
@@ -131,7 +131,7 @@ public class ListarProduto extends JPanel {
         jButtonFiltrar.setContentAreaFilled(false);
         jButtonFiltrar.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         jButtonFiltrar.setPreferredSize(new java.awt.Dimension(90, 40));
-        jButtonFiltrar.addActionListener(evt->{
+        jButtonFiltrar.addActionListener(evt -> {
             JFrame frame = (JFrame) SwingUtilities.getWindowAncestor(rootPane);
             abrirDialogoFiltro(frame);
         });
@@ -142,6 +142,7 @@ public class ListarProduto extends JPanel {
         });
 
 
+
         jPanelTabela.setPreferredSize(new Dimension(1145, 450));
         jPanelTabela.setBackground(new java.awt.Color(255, 255, 255));
         jPanelTabela.setLayout(new BorderLayout());
@@ -149,7 +150,7 @@ public class ListarProduto extends JPanel {
         jtable.setModel(new javax.swing.table.DefaultTableModel(
                 new Object[][]{},
                 new String[]{
-                        "Código", "Nome", "Fornecedor","Tipo de Produto", "Preço Unitário", "Qtd. em Estoque", "Ações"
+                        "Código", "Nome", "Fornecedor", "Tipo de Produto", "Preço Unitário", "Qtd. em Estoque", "Ações"
                 }
         ));
 
@@ -162,14 +163,14 @@ public class ListarProduto extends JPanel {
 
         jtable.getColumnModel().getColumn(0).setCellRenderer(centerRenderer);
 
-        jtable.setFont(new java.awt.Font("Cormorant Infant",Font.BOLD,14));
+        jtable.setFont(new java.awt.Font("Cormorant Infant", Font.BOLD, 14));
         jtable.setShowGrid(false);
         jtable.setIntercellSpacing(new Dimension(0, 0));
         jtable.setRowHeight(30);
         jtable.setFocusable(false);
 
         JTableHeader header = jtable.getTableHeader();
-        header.setFont(new java.awt.Font("Cormorant Garamond",Font.BOLD,18));
+        header.setFont(new java.awt.Font("Cormorant Garamond", Font.BOLD, 18));
         header.setBackground(Color.WHITE);
         header.setForeground(new java.awt.Color(128, 0, 32));
         header.setBorder(javax.swing.BorderFactory.createMatteBorder(0, 0, 2, 0, new java.awt.Color(128, 0, 32)));
@@ -185,7 +186,7 @@ public class ListarProduto extends JPanel {
         }
 
         jtable.getColumn("Ações").setCellRenderer(new ButtonRendererProduct_());
-        jtable.getColumn("Ações").setCellEditor(new ButtonEditorProduct_(jtable, rootPane,this.dotenv.get("API_HOST"),cadastrarProduto,mainPanel));
+        jtable.getColumn("Ações").setCellEditor(new ButtonEditorProduct_(jtable, rootPane, this.dotenv.get("API_HOST"), cadastrarProduto, mainPanel));
 
         jScrollPane.setViewportView(jtable);
         jScrollPane.setBorder(javax.swing.BorderFactory.createMatteBorder(2, 2, 2, 2, new java.awt.Color(128, 0, 32)));
@@ -205,23 +206,17 @@ public class ListarProduto extends JPanel {
     private void atualizarTabelaParaSelecao() {
         DefaultTableModel modelo = (DefaultTableModel) jtable.getModel();
 
+        int colunaAcoes = jtable.getColumn("Ações").getModelIndex();
 
-        if (!modelo.getColumnName(modelo.getColumnCount() - 1).equals("Selecionar")) {
+        TableColumnModel columnModel = jtable.getColumnModel();
+        columnModel.getColumn(colunaAcoes).setHeaderValue("Selecionar");
 
-            modelo.setColumnIdentifiers(new String[]{
-                    "Código", "Nome", "Fornecedor", "Tipo de Produto", "Preço Unitário", "Qtd. em Estoque", "Selecionar"
-            });
+        columnModel.getColumn(colunaAcoes).setCellRenderer(new CheckBoxRenderer());
+        columnModel.getColumn(colunaAcoes).setCellEditor(new DefaultCellEditor(new JCheckBox()));
 
-
-            jtable.getColumn("Selecionar").setCellRenderer(new CheckBoxRenderer());
-            jtable.getColumn("Selecionar").setCellEditor(new DefaultCellEditor(new JCheckBox()));
-
-
-            modelo.fireTableStructureChanged();
-        }
-
-
+        jtable.getTableHeader().repaint();
     }
+
 
     class CheckBoxRenderer extends JCheckBox implements TableCellRenderer {
         public CheckBoxRenderer() {
