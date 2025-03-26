@@ -39,14 +39,6 @@ public class ListarProduto extends JPanel {
         getProduct();
     }
 
-
-
-
-    //INIT POINT
-
-
-
-
     private void initComponents() {
 
         // Declarando os componentes
@@ -145,9 +137,9 @@ public class ListarProduto extends JPanel {
         });
 
         jPanelTopoTabela.add(jButtonFiltrar);
-
-
-        //ENDPOINT
+        jButtonAtualizarEstoque.addActionListener(e -> {
+            atualizarTabelaParaSelecao();
+        });
 
 
         jPanelTabela.setPreferredSize(new Dimension(1145, 450));
@@ -207,6 +199,44 @@ public class ListarProduto extends JPanel {
 
         getProduct();
     }
+
+    // FUNÇÃO ATUALIZAR ESTOQUE INICIO
+
+    private void atualizarTabelaParaSelecao() {
+        DefaultTableModel modelo = (DefaultTableModel) jtable.getModel();
+
+
+        if (!modelo.getColumnName(modelo.getColumnCount() - 1).equals("Selecionar")) {
+
+            modelo.setColumnIdentifiers(new String[]{
+                    "Código", "Nome", "Fornecedor", "Tipo de Produto", "Preço Unitário", "Qtd. em Estoque", "Selecionar"
+            });
+
+
+            jtable.getColumn("Selecionar").setCellRenderer(new CheckBoxRenderer());
+            jtable.getColumn("Selecionar").setCellEditor(new DefaultCellEditor(new JCheckBox()));
+
+
+            modelo.fireTableStructureChanged();
+        }
+
+
+    }
+
+    class CheckBoxRenderer extends JCheckBox implements TableCellRenderer {
+        public CheckBoxRenderer() {
+            setHorizontalAlignment(SwingConstants.CENTER);
+        }
+
+        @Override
+        public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+            setSelected(value != null && (boolean) value);
+            return this;
+        }
+    }
+
+
+   //FUNÇÃO ADICINONAR ESTOQUE FIM
 
     private void loadSupplier(JComboBox<Supplier> cbSupplier){
         try {
