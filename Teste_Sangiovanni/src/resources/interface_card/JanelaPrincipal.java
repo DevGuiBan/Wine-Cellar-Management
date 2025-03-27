@@ -29,10 +29,11 @@ public class JanelaPrincipal extends javax.swing.JFrame {
         jButton5 = new JButton();
 
         // Paineis dos cards
+        cardVisualizarCupom = new VisualizarCupomPosCompra(this);
         cardCadastroProdutos = new CadastrarProduto(cardPanel, this.rootPane);
         cardCadastroFornecedores = new CadastrarFornecedor(cardPanel, this.rootPane);
         cardCadastrarClientes = new CadastrarCliente(cardPanel, this.rootPane);
-        cardRegistrarVenda = new RegistrarVenda(cardPanel, this);
+        cardRegistrarVenda = new RegistrarVenda(cardPanel, this,cardVisualizarCupom);
         cardListarProdutos = new ListarProduto(this.rootPane, cardPanel, cardCadastroProdutos);
         cardListarFornecedores = new ListarFornecedor(this.rootPane, cardPanel, cardCadastroFornecedores);
         cardListarVendas = new ListarVendas(this.rootPane, cardPanel);
@@ -254,6 +255,7 @@ public class JanelaPrincipal extends javax.swing.JFrame {
         cardPanel.add(cardRegistrarVenda, "registrar_venda");
         cardPanel.add(cardCadastroFuncionario, "cadastrar_funcionario");
         cardPanel.add(cardListarFuncionario, "listar_Funcionario");
+        cardPanel.add(cardVisualizarCupom,"visualizar_cupom");
 
         // Adicionar cardPanel ao sul do jPanel1
         jPanel1.add(cardPanel, BorderLayout.SOUTH);
@@ -409,5 +411,6 @@ public class JanelaPrincipal extends javax.swing.JFrame {
     private RegistrarVenda cardRegistrarVenda;
     private CadastrarFuncionario cardCadastroFuncionario;
     private ListarFuncionario cardListarFuncionario;
+    private VisualizarCupomPosCompra cardVisualizarCupom;
 }
 

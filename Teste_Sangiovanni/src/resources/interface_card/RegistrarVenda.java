@@ -13,7 +13,7 @@ import java.net.URL;
 import java.util.Objects;
 
 public class RegistrarVenda extends JPanel {
-    public RegistrarVenda(JPanel mainPanel, JanelaPrincipal janelaPrincipal) {
+    public RegistrarVenda(JPanel mainPanel, JanelaPrincipal janelaPrincipal, VisualizarCupomPosCompra cupom) {
         // inicialização de variáveis
         JFrame frame = (JFrame) SwingUtilities.getWindowAncestor(janelaPrincipal);
 
@@ -35,7 +35,7 @@ public class RegistrarVenda extends JPanel {
         // cards
         cardProdutos = new ProdutoVenda(frame);
         cardClientes = new ClienteVenda(frame);
-        cardFinalizarVenda = new FinalizarVenda(frame,janelaPrincipal);
+        cardFinalizarVenda = new FinalizarVenda(frame,janelaPrincipal,cupom);
 
         jSeparator = new JSeparator();
 

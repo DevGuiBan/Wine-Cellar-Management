@@ -46,7 +46,7 @@ public class TaxReceiptService {
                 dto.setCDD("124857");
                 dto.setTax(0.2);
                 Optional<Sale> saleOpt = saleRepository.findByIdWithProducts(TR.getIdSale());
-                saleOpt.ifPresent(sale -> dto.setSale(saleService.convertToDTO(sale).orElse(null)));
+                saleOpt.ifPresent(sale -> dto.setSale(saleService.convertToDTO(sale)));
                 return dto;
             }).collect(Collectors.toList());
         } catch (Exception e) {
@@ -73,7 +73,7 @@ public class TaxReceiptService {
             dto.setCDD("124857");
             dto.setTax(0.2);
             Optional<Sale> saleOpt = saleRepository.findByIdWithProducts(TR.getIdSale());
-            saleOpt.ifPresent(sale -> dto.setSale(saleService.convertToDTO(sale).orElse(null)));
+            saleOpt.ifPresent(sale -> dto.setSale(saleService.convertToDTO(sale)));
             return dto;
 
         } catch (Exception e) {

@@ -29,6 +29,7 @@ public class FinalizarVenda extends JPanel {
     private JFrame rootPane;
     private Dotenv dotenv;
     private JanelaPrincipal frame;
+    private VisualizarCupomPosCompra cupom;
 
     public void setClient(Client client) {
         this.client = client;
@@ -113,7 +114,8 @@ public class FinalizarVenda extends JPanel {
                             JOptionPane.WARNING_MESSAGE);
                 }
 
-                frame.showCard("listar_vendas");
+                cupom.carregarCupom(saleId);
+                frame.showCard("visualizar_cupom");
 
             } else {
                 try (BufferedReader br = new BufferedReader(new InputStreamReader(connection.getErrorStream(), StandardCharsets.UTF_8))) {
@@ -163,7 +165,6 @@ public class FinalizarVenda extends JPanel {
         }
     }
 
-
     public void setProducts(ArrayList<Product> prods) {
         this.products = prods;
         jTable.getColumn("Remover").setCellRenderer(new ButtonRendererEndSale());
@@ -171,10 +172,11 @@ public class FinalizarVenda extends JPanel {
         loadProducts();
     }
 
-    public FinalizarVenda(JFrame frame, JanelaPrincipal RootFrame) {
+    public FinalizarVenda(JFrame frame, JanelaPrincipal RootFrame, VisualizarCupomPosCompra telaCupom) {
         this.rootPane = frame;
         this.frame = RootFrame;
         this.dotenv = Dotenv.load();
+        this.cupom = telaCupom;
         initComponents();
     }
 
