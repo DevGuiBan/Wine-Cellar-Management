@@ -40,19 +40,21 @@ public class FinalizarVenda extends JPanel {
     }
 
     public void makeSale() {
-
         try {
             JsonObject jsonData = new JsonObject();
             jsonData.addProperty("clientId", this.client.getId());
-            String discount = this.jLabelDescontoTabela.getText().replace("-R$", "").trim().replace(",",".");
+
+            String discount = this.jLabelDescontoTabela.getText().replace("-R$", "").trim().replace(",", ".");
             jsonData.addProperty("discount", Double.parseDouble(discount));
-            String totalValue = this.jLabelValorTotal.getText().replace("R$", "").trim().replace(",",".");
+
+            String totalValue = this.jLabelValorTotal.getText().replace("R$", "").trim().replace(",", ".");
             jsonData.addProperty("totalPrice", Double.parseDouble(totalValue));
+
             jsonData.addProperty("paymentMethod", client.getPayment());
+
             LocalDate hojeData = LocalDate.now();
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-            String dataFormatada = hojeData.format(formatter);
-            jsonData.addProperty("saleDate", dataFormatada);
+            jsonData.addProperty("saleDate", hojeData.format(formatter));
 
             JsonArray jsonProducts = new JsonArray();
             for (Product product : products) {
@@ -63,15 +65,15 @@ public class FinalizarVenda extends JPanel {
             }
             jsonData.add("products", jsonProducts);
 
-            // making the request
             String urlAPI = this.dotenv.get("API_HOST");
             URL url = new URL(urlAPI + "/sale");
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+
             connection.setRequestMethod("POST");
             connection.setRequestProperty("Content-Type", "application/json");
             connection.setDoOutput(true);
 
-            // send the request with json
+            // Enviar a requisição com JSON
             try (OutputStream os = connection.getOutputStream()) {
                 byte[] input = jsonData.toString().getBytes(StandardCharsets.UTF_8);
                 os.write(input, 0, input.length);
@@ -81,11 +83,38 @@ public class FinalizarVenda extends JPanel {
             StringBuilder response = new StringBuilder();
 
             if (statusCode >= 200 && statusCode < 300) {
+                try (BufferedReader br = new BufferedReader(new InputStreamReader(connection.getInputStream(), StandardCharsets.UTF_8))) {
+                    String responseLine;
+                    while ((responseLine = br.readLine()) != null) {
+                        response.append(responseLine.trim());
+                    }
+                }
+
+                JsonObject jsonResponse = JsonParser.parseString(response.toString()).getAsJsonObject();
+                String saleId = jsonResponse.has("id") ? jsonResponse.get("id").getAsString() : null;
+
+                if (saleId != null) {
+                    // Chamar API para gerar cupom fiscal
+                    if (generateTaxReceipt(urlAPI, saleId)) {
+                        JOptionPane.showMessageDialog(this.rootPane,
+                                "A venda foi realizada com sucesso!\nID da Venda: " + saleId + "\nCupom fiscal gerado!",
+                                "Venda Realizada",
+                                JOptionPane.INFORMATION_MESSAGE);
+                    } else {
+                        JOptionPane.showMessageDialog(this.rootPane,
+                                "Venda realizada, mas houve um erro ao gerar o cupom fiscal.",
+                                "Aviso",
+                                JOptionPane.WARNING_MESSAGE);
+                    }
+                } else {
+                    JOptionPane.showMessageDialog(this.rootPane,
+                            "Venda realizada, mas não foi possível obter o ID da venda.",
+                            "Aviso",
+                            JOptionPane.WARNING_MESSAGE);
+                }
+
                 frame.showCard("listar_vendas");
-                JOptionPane.showMessageDialog(this.rootPane,
-                        "A venda foi realizada com Sucesso!",
-                        "Venda Realizada",
-                        JOptionPane.INFORMATION_MESSAGE);
+
             } else {
                 try (BufferedReader br = new BufferedReader(new InputStreamReader(connection.getErrorStream(), StandardCharsets.UTF_8))) {
                     String responseLine;
@@ -94,31 +123,46 @@ public class FinalizarVenda extends JPanel {
                     }
                 }
 
-                try {
-                    JsonObject err = JsonParser.parseString(response.toString()).getAsJsonObject();
+                JsonObject err = JsonParser.parseString(response.toString()).getAsJsonObject();
+                String errorMessage = err.has("message") && !err.get("message").isJsonNull()
+                        ? err.get("message").getAsString()
+                        : response.toString();
 
-                    String errorMessage = (err.has("message") && !err.get("message").isJsonNull())
-                            ? err.get("message").getAsString()
-                            : response.toString();
-
-                    JOptionPane.showMessageDialog(this.rootPane,
-                            "Não foi possível finalizar a venda. Verifique os dados e tente novamente!\n" + errorMessage,
-                            "Erro ao Finalizar a Venda",
-                            JOptionPane.ERROR_MESSAGE);
-                } catch (Exception jsonException) {
-                    JOptionPane.showMessageDialog(this.rootPane,
-                            "Erro inesperado ao processar a resposta da API.\nCódigo: " + statusCode + "\nResposta: " + response,
-                            "Erro ao Finalizar a Venda",
-                            JOptionPane.ERROR_MESSAGE);
-                }
+                JOptionPane.showMessageDialog(this.rootPane,
+                        "Não foi possível finalizar a venda. Verifique os dados e tente novamente!\n" + errorMessage,
+                        "Erro ao Finalizar a Venda",
+                        JOptionPane.ERROR_MESSAGE);
             }
 
         } catch (Exception e) {
-            JOptionPane.showMessageDialog(this.rootPane, e.getMessage());
+            JOptionPane.showMessageDialog(this.rootPane, "Erro inesperado: " + e.getMessage(), "Erro", JOptionPane.ERROR_MESSAGE);
         }
-
-
     }
+
+    /**
+     * Gera o cupom fiscal para uma venda específica.
+     *
+     * @param urlAPI  URL base da API
+     * @param saleId  ID da venda
+     * @return true se o cupom fiscal for gerado com sucesso, false caso contrário
+     */
+    private boolean generateTaxReceipt(String urlAPI, String saleId) {
+        try {
+            URL urlTax = new URL(urlAPI + "/sale/tax-receipt/" + saleId);
+            HttpURLConnection connectionTax = (HttpURLConnection) urlTax.openConnection();
+            connectionTax.setRequestMethod("POST");
+            connectionTax.setRequestProperty("Content-Type", "application/json");
+            connectionTax.setDoOutput(true);
+
+            int statusCodeTax = connectionTax.getResponseCode();
+
+            return statusCodeTax >= 200 && statusCodeTax < 300;
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this.rootPane, "Erro ao gerar o cupom fiscal: " + e.getMessage(), "Erro", JOptionPane.ERROR_MESSAGE);
+            return false;
+        }
+    }
+
 
     public void setProducts(ArrayList<Product> prods) {
         this.products = prods;

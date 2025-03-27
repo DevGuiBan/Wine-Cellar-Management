@@ -19,13 +19,13 @@ public class TaxReceiptDTO {
 
     private SaleDTO sale;
 
-    private String enterpiseName;
+    private String enterpriseName;
 
     private String address;
 
     private String cityState;
 
-    private String cpnj;
+    private String cnpj;
 
     private String dateOpenCnpj;
 

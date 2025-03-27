@@ -108,11 +108,11 @@ public class ListarProduto extends JPanel {
 
         jPanelTopoTabela.add(pesquisaProduto);
 
-        jPanelTopoTabela.add(Box.createHorizontalStrut(500));
+        jPanelTopoTabela.add(Box.createHorizontalStrut(200));
 
         jButtonAtualizarEstoque.setFont(new java.awt.Font("Cormorant Garamond", Font.BOLD, 20));
         jButtonAtualizarEstoque.setIcon(new javax.swing.ImageIcon(Objects.requireNonNull(getClass().getResource("/resources/images/bulk_update.png"))));
-        jButtonAtualizarEstoque.setText("Cadastrar Produto");
+        jButtonAtualizarEstoque.setText("Atualizar Estoque");
         jButtonAtualizarEstoque.setBorder(null);
         jButtonAtualizarEstoque.setContentAreaFilled(false);
         jButtonAtualizarEstoque.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));

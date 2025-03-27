@@ -301,6 +301,7 @@ public class JanelaPrincipal extends javax.swing.JFrame {
         CardLayout cl = (CardLayout) cardPanel.getLayout();
         switch (cardName) {
             case "listar_vendas":
+                cardListarVendas.atualizarDados();
                 cl.show(cardPanel, cardName);
                 break;
             case "listar_clientes":

@@ -7,5 +7,5 @@ import java.util.List;
 import java.util.UUID;
 
 public interface TaxReceiptRepository extends JpaRepository<TaxReceipt, UUID> {
-    List<TaxReceipt> findByIdSale(Long idSale);
+    TaxReceipt findByIdSale(Long idSale);
 }
