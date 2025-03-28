@@ -23,26 +23,26 @@ public class EmployeeService {
     }
 
     public Employee save(EmployeeDTO employerDTO) {
-        if(this.employeeRepository.existsByEmail(employerDTO.getEmail())) {
+        if (this.employeeRepository.existsByEmail(employerDTO.getEmail())) {
             throw new IllegalArgumentException("Já existe um funcionário cadastrado com esse e-mail");
         }
-        if(this.employeeRepository.existsByCpf(employerDTO.getCpf())) {
+        if (this.employeeRepository.existsByCpf(employerDTO.getCpf())) {
             throw new IllegalArgumentException("Já existe um funcionário cadastrado com esse cpf");
         }
-        if(this.employeeRepository.existsByPhoneNumber(employerDTO.getPhoneNumber())) {
+        if (this.employeeRepository.existsByPhoneNumber(employerDTO.getPhoneNumber())) {
             throw new IllegalArgumentException("Já existe um funcionário cadastrado com esse número de telefone");
         }
-        if(employerDTO.getDateBirth().equals(" / / ")){
+        if (employerDTO.getDateBirth().equals(" / / ")) {
             throw new IllegalArgumentException("A data de nascimento não pode ser vázia!");
         }
 
-        if (employerDTO.getName().isBlank()){
+        if (employerDTO.getName().isBlank()) {
             throw new IllegalArgumentException("O nome do Funcionário não pode ser vázio");
         }
-        if(employerDTO.getEmail().isBlank()){
+        if (employerDTO.getEmail().isBlank()) {
             throw new IllegalArgumentException("O e-mail do Funcionário não pode ser vázio");
         }
-        if(employerDTO.getPassword().isBlank()){
+        if (employerDTO.getPassword().isBlank()) {
             throw new IllegalArgumentException("A senha do Funcionário não pode ser vázia");
         }
 
@@ -93,42 +93,57 @@ public class EmployeeService {
                         String regex = "^(.+?), (.+?), (\\d+), (.+)-([A-Z]{2})$";
                         Pattern pattern = Pattern.compile(regex);
                         Matcher matcher = pattern.matcher(employerDTO.getAddress());
-                        if(matcher.matches()){
+                        if (matcher.matches()) {
                             existingEmployee.setAddress(employerDTO.getAddress());
-                        }else{
+                        } else {
                             throw new IllegalArgumentException("O Endereço deve ser no formato Rua, Bairro, Número, Cidade-UF");
                         }
 
                     }
                     if (employerDTO.getPhoneNumber() != null && !employerDTO.getPhoneNumber().isBlank()) {
-                        if(!this.employeeRepository.existsByPhoneNumber(employerDTO.getPhoneNumber())) {
+                        Employee emp = employeeRepository.findByPhoneNumber(employerDTO.getPhoneNumber());
+                        if (this.employeeRepository.existsByPhoneNumber(employerDTO.getPhoneNumber())) {
+                            if (!emp.getId().equals(existingEmployee.getId())) {
+                                throw new IllegalArgumentException("Já existe um funcionário ou gerente com este número de telefone.");
+                            }
                             existingEmployee.setPhoneNumber(employerDTO.getPhoneNumber());
                         }
-
                     }
                     if (employerDTO.getEmail() != null && !employerDTO.getEmail().isBlank()) {
-                        if(!this.employeeRepository.existsByEmail(employerDTO.getEmail())){
+                        Employee emp = employeeRepository.findByEmail(employerDTO.getEmail());
+                        if (this.employeeRepository.existsByEmail(employerDTO.getEmail())) {
+                            if (emp.getId().equals(existingEmployee.getId())) {
+                                throw new IllegalArgumentException("Já existe um funcionário ou gerente com esse e-mail.");
+                            }
                             existingEmployee.setEmail(employerDTO.getEmail());
                         }
-
                     }
-                    if(employerDTO.getDateBirth()!= null && !employerDTO.getDateBirth().isBlank()){
-                        if(" / / ".equals(employerDTO.getDateBirth())){
+                    if (employerDTO.getDateBirth() != null && !employerDTO.getDateBirth().isBlank()) {
+                        if (" / / ".equals(employerDTO.getDateBirth())) {
                             throw new IllegalArgumentException("A data não pode ser vázia!");
-                        }else {
-                            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-                            LocalDate data = LocalDate.parse(employerDTO.getDateBirth(), formatter);
-                            existingEmployee.setDateBirth(data);
+                        } else {
+                            try {
+                                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+                                LocalDate data = LocalDate.parse(employerDTO.getDateBirth(), formatter);
+                                existingEmployee.setDateBirth(data);
+                            } catch (Exception e) {
+                                throw new IllegalArgumentException("Insira uma data de Nascimento Válida");
+                            }
+
                         }
 
                     }
-                    if(employerDTO.getCpf() != null && !employerDTO.getCpf().isBlank()){
-                        if(!employerDTO.getCpf().equals(existingEmployee.getCpf())) {
+                    if (employerDTO.getCpf() != null && !employerDTO.getCpf().isBlank()) {
+                        Employee emp = employeeRepository.findByCpf(employerDTO.getCpf());
+                        if (employerDTO.getCpf().equals(existingEmployee.getCpf())) {
+                            if (!emp.getId().equals(existingEmployee.getId())) {
+                                throw new IllegalArgumentException("Já existe um funcionário ou gerente com este CPF.");
+                            }
                             existingEmployee.setCpf(employerDTO.getCpf());
                         }
                     }
 
-                    if(employerDTO.getPassword() != null && !employerDTO.getPassword().isBlank()){
+                    if (employerDTO.getPassword() != null && !employerDTO.getPassword().isBlank()) {
                         existingEmployee.setPassword(employerDTO.getPassword());
                     }
 
@@ -164,7 +179,7 @@ public class EmployeeService {
         }).collect(Collectors.toList());
     }
 
-    public List<EmployeeDTO> listAllByAdress(String adress){
+    public List<EmployeeDTO> listAllByAdress(String adress) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
         return employeeRepository.searchEmployeeByAddress(adress).stream().map(employee -> {
@@ -172,7 +187,7 @@ public class EmployeeService {
             dto.setName(employee.getName());
             dto.setEmail(employee.getEmail());
             dto.setPhoneNumber(employee.getPhoneNumber());
-            dto.setAddress(employee.getAddress().replace(":",""));
+            dto.setAddress(employee.getAddress().replace(":", ""));
             dto.setId(employee.getId());
             String dataFormatada = employee.getDateBirth().format(formatter);
             dto.setDateBirth(dataFormatada);
@@ -199,10 +214,6 @@ public class EmployeeService {
             dto.setCpf(employee.getCpf());
             return dto;
         }).collect(Collectors.toList());
-    }
-
-    public boolean login(String email,String password){
-        return this.employeeRepository.existsByEmailAndPassword(email, password);
     }
 
 }

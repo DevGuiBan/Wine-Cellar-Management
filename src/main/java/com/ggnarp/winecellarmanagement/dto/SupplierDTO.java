@@ -21,7 +21,7 @@ public class SupplierDTO {
 
     @NotBlank(message = "O número de telefone é necessário")
     @Pattern(regexp = "^\\(?\\d{2}\\)?\\s?(9?\\d{4})-?\\d{4}$",message = "O número de telefone deve ser no formato (99) 99999-9999")
-    private String phone_number;
+    private String phoneNumber;
 
     @NotBlank(message = "É necessário um e-mail para realizar o cadastro!")
     @Email(message = "O e-mail precisa ser válido")

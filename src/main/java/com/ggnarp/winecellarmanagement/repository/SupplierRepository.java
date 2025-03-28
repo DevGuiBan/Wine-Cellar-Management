@@ -2,6 +2,8 @@ package com.ggnarp.winecellarmanagement.repository;
 
 import com.ggnarp.winecellarmanagement.dto.SupplierProductCountDTO;
 import com.ggnarp.winecellarmanagement.entity.Supplier;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -22,13 +24,20 @@ public interface SupplierRepository extends JpaRepository<Supplier, UUID> {
     List<SupplierProductCountDTO> countProductsBySupplier();
 
     @Query("SELECT p.supplier.id, p.supplier.name, p.supplier.address, p.supplier.cnpj, " +
-            "p.supplier.email, p.supplier.phone_number, COUNT(p) " +
+            "p.supplier.email, p.supplier.phoneNumber, COUNT(p) " +
             "FROM Product p " +
             "GROUP BY p.supplier.id, p.supplier.name, p.supplier.address, p.supplier.cnpj, " +
-            "p.supplier.email, p.supplier.phone_number " +
+            "p.supplier.email, p.supplier.phoneNumber " +
             "HAVING COUNT(p) >= :quantity " +
             "ORDER BY p.supplier.name")
     List<Object[]> countProductsBySupplierBigThan(@Param("quantity") Long quantity);
 
 
+    boolean existsByPhoneNumber(String phoneNumber);
+
+    Supplier findByCnpj(String cnpj);
+
+    Supplier findByPhoneNumber(String phoneNumber);
+
+    Supplier findByEmail(String email);
 }

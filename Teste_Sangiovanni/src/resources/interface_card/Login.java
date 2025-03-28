@@ -174,12 +174,7 @@ public class Login extends JFrame {
             String urlAPI = this.dotenv.get("API_HOST");
 
             // Tentando login como Manager
-            boolean isLogged = tryLogin(urlAPI + "/managers/login", jsonString);
-
-            // Se o login do Manager falhar, tenta login como Employee
-            if (!isLogged) {
-                isLogged = tryLogin(urlAPI + "/employee/login", jsonString);
-            }
+            boolean isLogged = tryLogin(urlAPI + "/auth/login", jsonString);
 
             // Verificando se o login foi bem-sucedido
             if (isLogged) {

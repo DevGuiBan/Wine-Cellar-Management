@@ -67,7 +67,7 @@ public class ListarFornecedor extends JPanel {
                     String email = supplier.get("email").getAsString();
                     String cnpj = supplier.get("cnpj").getAsString();
                     String address = supplier.get("address").getAsString();
-                    String phone = supplier.get("phone_number").getAsString();
+                    String phone = supplier.get("phoneNumber").getAsString();
 
                     Long count = 0L;
                     for (SupplierCount sc : counts) {

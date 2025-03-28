@@ -114,23 +114,33 @@ public class ClientService {
 
                     }
                     if (clientDTO.getPhoneNumber() != null && !clientDTO.getPhoneNumber().isBlank()) {
-                        if(!this.clientRepository.existsClientByPhoneNumber(clientDTO.getPhoneNumber())) {
+                        Client cli = clientRepository.findByPhoneNumber(clientDTO.getPhoneNumber());
+                        if(this.clientRepository.existsClientByPhoneNumber(clientDTO.getPhoneNumber())) {
+                            if(!cli.getId().equals(existingClient.getId())){
+                                throw new IllegalArgumentException("Já existe um cliente com este número de telefone.");
+                            }
                             existingClient.setPhoneNumber(clientDTO.getPhoneNumber());
                         }
 
                     }
                     if (clientDTO.getEmail() != null && !clientDTO.getEmail().isBlank()) {
-                        if(!this.clientRepository.existsByEmail(clientDTO.getEmail())){
+                        Client cli = clientRepository.findByEmail(clientDTO.getEmail());
+                        if(this.clientRepository.existsByEmail(clientDTO.getEmail())){
+                            if(!cli.getId().equals(existingClient.getId())){
+                                throw new IllegalArgumentException("Já existe um cliente com este endereço de e-mail.");
+                            }
                             existingClient.setEmail(clientDTO.getEmail());
                         }
                         else if (clientDTO.getEmail().equals("email@gmail.com")){
-                            throw new IllegalArgumentException("Insirá um endereço de e-mail válido!");
+                            throw new IllegalArgumentException("Insira um endereço de e-mail válido!");
                         }
                         else{
                             String[] parts = clientDTO.getEmail().split("@");
                             boolean result = parts.length == 2 && !parts[1].isEmpty();
                             if(!result){
                                 throw new IllegalArgumentException("Insirá um endereço de e-mail válido!");
+                            }else{
+                                existingClient.setEmail(clientDTO.getEmail());
                             }
                         }
 
@@ -139,14 +149,23 @@ public class ClientService {
                         if(" / / ".equals(clientDTO.getDateBirth())){
                             throw new IllegalArgumentException("A data não pode ser vázia!");
                         }else {
-                            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-                            LocalDate data = LocalDate.parse(clientDTO.getDateBirth(), formatter);
-                            existingClient.setDateBirth(data);
+                            try{
+                                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+                                LocalDate data = LocalDate.parse(clientDTO.getDateBirth(), formatter);
+                                existingClient.setDateBirth(data);
+                            } catch (Exception e) {
+                                throw new IllegalArgumentException("Insira uma data de Nascimento Válida.");
+                            }
+
                         }
 
                     }
                     if(clientDTO.getCpf() != null && !clientDTO.getCpf().isBlank()){
-                        if(!clientDTO.getCpf().equals(existingClient.getCpf())) {
+                        Client cli = clientRepository.findByCpf(clientDTO.getCpf());
+                        if(clientDTO.getCpf().equals(existingClient.getCpf())) {
+                            if(!cli.getId().equals(existingClient.getId())){
+                                throw new IllegalArgumentException("Já existe um cliente com este CPF.");
+                            }
                             existingClient.setCpf(clientDTO.getCpf());
                         }
                     }

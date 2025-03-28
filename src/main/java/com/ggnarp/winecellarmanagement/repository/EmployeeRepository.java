@@ -30,4 +30,9 @@ public interface EmployeeRepository extends JpaRepository<Employee, UUID> {
 
     boolean existsByEmailAndPassword(String email, String password);
 
+    Employee findByPhoneNumber(String phoneNumber);
+
+    Employee findByEmail(String email);
+
+    Employee findByCpf(String cpf);
 }

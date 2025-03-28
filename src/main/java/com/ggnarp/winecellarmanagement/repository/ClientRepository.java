@@ -28,4 +28,10 @@ public interface ClientRepository extends JpaRepository<Client, UUID> {
     List<Client> searchClientByDateAndAddress(@Param("startDate") LocalDate startDate,
                                                   @Param("endDate") LocalDate endDate,
                                                   @Param("termo") String termo);
+
+    Client findByPhoneNumber(String phoneNumber);
+
+    Client findByEmail(String email);
+
+    Client findByCpf(String cpf);
 }
