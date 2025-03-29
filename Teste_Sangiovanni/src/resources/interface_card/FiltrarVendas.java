@@ -1,3 +1,5 @@
+package resources.interface_card;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;

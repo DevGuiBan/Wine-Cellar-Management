@@ -14,7 +14,8 @@ import java.util.UUID;
 public interface ManagerRepository extends JpaRepository<Manager, UUID> {
     boolean existsByEmail(String email);
     boolean existsByCpf(String cpf);
-    boolean existsByEmailAndPassword(String email, String password);
+
+    Manager findByEmailAndPassword(String email, String password);
 
     Manager findByCpf(@NotNull(message = "O CPF não pode ser um valor nulo") @NotBlank(message = "O CPF não pode ser vázio!") @Pattern(regexp = "^\\d{3}\\.\\d{3}\\.\\d{3}-\\d{2}$",message = "O CPF desse ser no formato 000.000.000-00!") String cpf);
 

@@ -1,34 +1,37 @@
 package resources.interface_card;
 
+import com.google.gson.JsonObject;
+
 import javax.swing.*;
 import java.awt.*;
 import java.util.Objects;
 
 public class JanelaPrincipal extends javax.swing.JFrame {
-
+    private JsonObject user;
     public JanelaPrincipal() {
         initComponents();
     }
 
-    @SuppressWarnings("unchecked")
+    public JanelaPrincipal(JsonObject user) {
+        this.user = user;
+        initComponents();
+    }
+
     private void initComponents() {
-        // Painel principal
 
         jPanel1 = new javax.swing.JPanel();
 
-        // Painéis adicionais
-        jPanel2 = new javax.swing.JPanel(); // Painel superior com título
-        jPanel3 = new javax.swing.JPanel(); // Painel com botões
-        cardPanel = new javax.swing.JPanel(); // Painel com CardLayout
+        jPanel2 = new javax.swing.JPanel();
+        jPanel3 = new javax.swing.JPanel();
+        cardPanel = new javax.swing.JPanel();
 
-        // Botões para alternar os cards
         jButton1 = new javax.swing.JButton();
         jButton2 = new javax.swing.JButton();
         jButton3 = new javax.swing.JButton();
         jButton4 = new JButton();
         jButton5 = new JButton();
+        jButton6 = new JButton();
 
-        // Paineis dos cards
         cardVisualizarCupom = new VisualizarCupomPosCompra(this);
         cardCadastroProdutos = new CadastrarProduto(cardPanel, this.rootPane);
         cardCadastroFornecedores = new CadastrarFornecedor(cardPanel, this.rootPane);
@@ -40,37 +43,28 @@ public class JanelaPrincipal extends javax.swing.JFrame {
         cardListarClientes = new ListarCliente(this.rootPane, cardPanel, cardCadastrarClientes);
         cardCadastroFuncionario = new CadastrarFuncionario(cardPanel, this.rootPane);
         cardListarFuncionario = new ListarFuncionario(this.rootPane, cardPanel, cardCadastroFuncionario);
+        cardPerfilGerente = new PerfilGerente(cardPanel,this.rootPane,user);
 
-        // Labels
         jLabel1 = new javax.swing.JLabel();
 
-        // Configurando a janela
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setMinimumSize(new java.awt.Dimension(1366, 770));
         setBackground(new java.awt.Color(243, 243, 223));
         getContentPane().setLayout(new BorderLayout());
         setIconImage(new ImageIcon(Objects.requireNonNull(getClass().getResource("/resources/images/icon.png"))).getImage());
 
-        // Configuração do painel principal
         jPanel1.setLayout(new BorderLayout());
 
-        //COMEÇO DO BOTAO
-
-
-        // Criando o painel principal (jPanel2)
         JPanel jPanel2 = new JPanel(new BorderLayout());
         jPanel2.setBackground(new Color(243, 243, 223));
         jPanel2.setBorder(BorderFactory.createEmptyBorder(0, 20, 0, 20));
 
-
         JPanel jPanelSuperior = new JPanel(new GridBagLayout());
         jPanelSuperior.setBackground(new Color(243, 243, 223));
-
 
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.fill = GridBagConstraints.HORIZONTAL;
 
-        // Criando o painel do título
         JPanel jPanelTitulo = new JPanel();
         jPanelTitulo.setBackground(new Color(243, 243, 223));
 
@@ -80,23 +74,19 @@ public class JanelaPrincipal extends javax.swing.JFrame {
 
         jPanelTitulo.add(jLabel1);
 
-        // Ajustando GridBagConstraints para o título
-        gbc.gridx = 0; // Coluna 0
-        gbc.gridy = 0; // Linha 0
-        gbc.gridwidth = 2; // O título ocupa as duas colunas disponíveis
-        gbc.anchor = GridBagConstraints.CENTER; // Alinha no centro
-        gbc.weightx = 1;  // O título ocupa o espaço disponível
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.gridwidth = 2;
+        gbc.anchor = GridBagConstraints.CENTER;
+        gbc.weightx = 1;
         jPanelSuperior.add(jPanelTitulo, gbc);
 
-        // Criando o painel do botão de sair
         JPanel jPanelBotaoWrapper = new JPanel();
         jPanelBotaoWrapper.setBackground(new Color(243, 243, 223));
 
-        // Definindo um tamanho preferido maior para o botão de sair
         JButton botaoSair = new JButton("Sair");
 
-        // Carregar e redimensionar a imagem do ícone
-        String caminhoIcone = "../images/sair.png"; // Substitua pelo caminho correto
+        String caminhoIcone = "../images/sair.png";
         ImageIcon iconeRedimensionado = null;
 
         try {
@@ -108,42 +98,35 @@ public class JanelaPrincipal extends javax.swing.JFrame {
         }
 
         if (iconeRedimensionado != null) {
-            botaoSair.setIcon(iconeRedimensionado); // Adiciona a imagem no botão
-            botaoSair.setHorizontalTextPosition(SwingConstants.LEFT); // Texto antes da imagem
+            botaoSair.setIcon(iconeRedimensionado);
+            botaoSair.setHorizontalTextPosition(SwingConstants.LEFT);
         }
 
-        // Estilizando o botão diretamente
         botaoSair.setFont(new Font("Arial", Font.BOLD, 14));
-        botaoSair.setForeground(new Color(128, 0, 32)); // Cor vinho
-        botaoSair.setBackground(new Color(243, 243, 223)); // Fundo igual ao painel
+        botaoSair.setForeground(new Color(128, 0, 32));
+        botaoSair.setBackground(new Color(243, 243, 223));
         botaoSair.setFocusPainted(false);
         botaoSair.setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 10));
-        botaoSair.setContentAreaFilled(false); // Remove o fundo do botão
+        botaoSair.setContentAreaFilled(false);
 
-        // Definindo um tamanho preferido para o botão para garantir que ele seja largo o suficiente
-        botaoSair.setPreferredSize(new Dimension(120, 40)); // Ajuste a largura conforme necessário
+        botaoSair.setPreferredSize(new Dimension(120, 40));
 
-        // Adicionando o ActionListener ao botão para torná-lo funcional
         botaoSair.addActionListener(e -> exibirModalConfirmacao());
 
         jPanelBotaoWrapper.add(botaoSair);
 
-        // Ajustando GridBagConstraints para o botão
-        gbc.gridx = 2; // Coluna 2 (botão à direita)
-        gbc.gridy = 0; // Linha 0 (mesma linha do título)
-        gbc.gridwidth = 1; // Ocupa uma coluna
-        gbc.anchor = GridBagConstraints.EAST; // Alinha à direita
-        gbc.weightx = 0;  // O botão ocupa apenas o espaço necessário
+        gbc.gridx = 2;
+        gbc.gridy = 0;
+        gbc.gridwidth = 1;
+        gbc.anchor = GridBagConstraints.EAST;
+        gbc.weightx = 0;
         jPanelSuperior.add(jPanelBotaoWrapper, gbc);
 
-        // Adicionando o painel superior ao painel principal
         jPanel2.add(jPanelSuperior, BorderLayout.NORTH);
 
-        // Adicionando jPanel2 ao painel principal existente (supondo que jPanel1 já exista)
         jPanel1.add(jPanel2, BorderLayout.NORTH);
 
 
-        // Painel de botões (jPanel3)
         jPanel3.setBackground(new java.awt.Color(128, 0, 32));
         jPanel3.setPreferredSize(new java.awt.Dimension(1366, 40)); // Altura reduzida
         jPanel3.setLayout(new FlowLayout(FlowLayout.LEFT, 50, 5));
@@ -224,18 +207,37 @@ public class JanelaPrincipal extends javax.swing.JFrame {
             }
         });
 
+        jButton6.setBackground(new java.awt.Color(128, 0, 32));
+        jButton6.setFont(new java.awt.Font("Cormorant Garamond SemiBold", 0, 18)); // NOI18N
+        jButton6.setForeground(new java.awt.Color(225, 255, 255));
+        jButton6.setIcon(new javax.swing.ImageIcon(Objects.requireNonNull(getClass().getResource("/resources/images/perfil.png")))); // NOI18N
+        jButton6.setText("Perfil");
+        jButton6.setBorder(null);
+        jButton6.setFocusable(false);
+        jButton6.setContentAreaFilled(false);
+        jButton6.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        jButton6.setPreferredSize(new java.awt.Dimension(180, 35));
+        jButton6.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton6ActionPerformed(evt);
+            }
+        });
+
         // Botões para alternar os cards
         jButton1.addActionListener(evt -> showCard("listar_produtos"));
         jButton2.addActionListener(evt -> showCard("listar_fonecedores"));
         jButton3.addActionListener(evt -> showCard("listar_vendas"));
         jButton4.addActionListener(evt -> showCard("listar_clientes"));
         jButton5.addActionListener(evt -> showCard("listar_Funcionario"));
+        jButton6.addActionListener(evt -> showCard("perfil_gerente"));
 
         jPanel3.add(jButton1);
         jPanel3.add(jButton2);
         jPanel3.add(jButton3);
         jPanel3.add(jButton4);
         jPanel3.add(jButton5);
+        jPanel3.add(Box.createHorizontalStrut(200));
+        jPanel3.add(jButton6);
 
         // Adicionando jPanel3 ao centro do jPanel1
         jPanel1.add(jPanel3, BorderLayout.CENTER);
@@ -256,6 +258,7 @@ public class JanelaPrincipal extends javax.swing.JFrame {
         cardPanel.add(cardCadastroFuncionario, "cadastrar_funcionario");
         cardPanel.add(cardListarFuncionario, "listar_Funcionario");
         cardPanel.add(cardVisualizarCupom,"visualizar_cupom");
+        cardPanel.add(cardPerfilGerente,"perfil_gerente");
 
         // Adicionar cardPanel ao sul do jPanel1
         jPanel1.add(cardPanel, BorderLayout.SOUTH);
@@ -298,7 +301,6 @@ public class JanelaPrincipal extends javax.swing.JFrame {
         }
     }
 
-    // Método para alternar o card visível
     public void showCard(String cardName) {
         CardLayout cl = (CardLayout) cardPanel.getLayout();
         switch (cardName) {
@@ -338,6 +340,7 @@ public class JanelaPrincipal extends javax.swing.JFrame {
         jButton3.setForeground(Color.WHITE);
         jButton4.setForeground(Color.WHITE);
         jButton5.setForeground(Color.WHITE);
+        jButton6.setForeground(Color.WHITE);
     }
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {
@@ -346,6 +349,7 @@ public class JanelaPrincipal extends javax.swing.JFrame {
         jButton3.setForeground(Color.WHITE);
         jButton4.setForeground(Color.WHITE);
         jButton5.setForeground(Color.WHITE);
+        jButton6.setForeground(Color.WHITE);
     }
 
     private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {
@@ -354,6 +358,7 @@ public class JanelaPrincipal extends javax.swing.JFrame {
         jButton3.setForeground(new java.awt.Color(225, 235, 43));
         jButton4.setForeground(Color.WHITE);
         jButton5.setForeground(Color.WHITE);
+        jButton6.setForeground(Color.WHITE);
     }
 
     private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {
@@ -362,6 +367,7 @@ public class JanelaPrincipal extends javax.swing.JFrame {
         jButton3.setForeground(Color.WHITE);
         jButton4.setForeground(new java.awt.Color(225, 235, 43));
         jButton5.setForeground(Color.WHITE);
+        jButton6.setForeground(Color.WHITE);
     }
 
     private void jButton5ActionPerformed(java.awt.event.ActionEvent evt) {
@@ -370,6 +376,16 @@ public class JanelaPrincipal extends javax.swing.JFrame {
         jButton3.setForeground(Color.WHITE);
         jButton4.setForeground(Color.WHITE);
         jButton5.setForeground(new java.awt.Color(225, 235, 43));
+        jButton6.setForeground(Color.WHITE);
+    }
+
+    private void jButton6ActionPerformed(java.awt.event.ActionEvent evt) {
+        jButton1.setForeground(Color.WHITE);
+        jButton2.setForeground(Color.WHITE);
+        jButton3.setForeground(Color.WHITE);
+        jButton4.setForeground(Color.WHITE);
+        jButton5.setForeground(Color.WHITE);
+        jButton6.setForeground(new java.awt.Color(225, 235, 43));
     }
 
     private void logout() {
@@ -393,6 +409,7 @@ public class JanelaPrincipal extends javax.swing.JFrame {
     private javax.swing.JButton jButton3;
     private javax.swing.JButton jButton4;
     private javax.swing.JButton jButton5;
+    private javax.swing.JButton jButton6;
 
     private javax.swing.JLabel jLabel1;
 
@@ -412,5 +429,6 @@ public class JanelaPrincipal extends javax.swing.JFrame {
     private CadastrarFuncionario cardCadastroFuncionario;
     private ListarFuncionario cardListarFuncionario;
     private VisualizarCupomPosCompra cardVisualizarCupom;
+    private PerfilGerente cardPerfilGerente;
 }
 
