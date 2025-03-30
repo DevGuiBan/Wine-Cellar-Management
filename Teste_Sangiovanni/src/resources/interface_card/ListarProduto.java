@@ -158,6 +158,7 @@ public class ListarProduto extends JPanel {
 
 
         jPanelTopoTabela.add(jButtonFiltrar);
+
         jButtonAtualizarEstoque.addActionListener(e -> {
             atualizarTabelaParaSelecao();
             jButtonProx.setVisible(true);
@@ -170,9 +171,7 @@ public class ListarProduto extends JPanel {
             jButtonCancel.setVisible(false);
         });
 
-
-
-
+        jPanelTopoTabela.add(jButtonCancel);
 
         jPanelTabela.setPreferredSize(new Dimension(1145, 450));
         jPanelTabela.setBackground(new java.awt.Color(255, 255, 255));
