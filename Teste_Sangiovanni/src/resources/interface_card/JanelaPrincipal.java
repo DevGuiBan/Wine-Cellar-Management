@@ -43,7 +43,7 @@ public class JanelaPrincipal extends javax.swing.JFrame {
         cardListarClientes = new ListarCliente(this.rootPane, cardPanel, cardCadastrarClientes);
         cardCadastroFuncionario = new CadastrarFuncionario(cardPanel, this.rootPane);
         cardListarFuncionario = new ListarFuncionario(this.rootPane, cardPanel, cardCadastroFuncionario);
-        cardPerfilGerente = new PerfilGerente(cardPanel,this.rootPane,user);
+        cardPerfil = new Perfil(cardPanel,this.rootPane,user);
 
         jLabel1 = new javax.swing.JLabel();
 
@@ -258,7 +258,7 @@ public class JanelaPrincipal extends javax.swing.JFrame {
         cardPanel.add(cardCadastroFuncionario, "cadastrar_funcionario");
         cardPanel.add(cardListarFuncionario, "listar_Funcionario");
         cardPanel.add(cardVisualizarCupom,"visualizar_cupom");
-        cardPanel.add(cardPerfilGerente,"perfil_gerente");
+        cardPanel.add(cardPerfil,"perfil_gerente");
 
         // Adicionar cardPanel ao sul do jPanel1
         jPanel1.add(cardPanel, BorderLayout.SOUTH);
@@ -429,6 +429,6 @@ public class JanelaPrincipal extends javax.swing.JFrame {
     private CadastrarFuncionario cardCadastroFuncionario;
     private ListarFuncionario cardListarFuncionario;
     private VisualizarCupomPosCompra cardVisualizarCupom;
-    private PerfilGerente cardPerfilGerente;
+    private Perfil cardPerfil;
 }
 
