@@ -137,4 +137,12 @@ public class EmployeeController {
         }
     }
 
+    @GetMapping("/search")
+    public ResponseEntity<List<Employee>> searchEmployee(@RequestParam(required = false) String name,
+                                                         @RequestParam(required = false) String email,
+                                                         @RequestParam(required = false) String cpf) {
+        List<Employee> employees = employeeService.searchEmployee(name, email, cpf);
+        return ResponseEntity.ok(employees);
+    }
+
 }

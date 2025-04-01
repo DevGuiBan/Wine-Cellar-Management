@@ -137,4 +137,12 @@ public class ClientController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
         }
     }
+
+    @GetMapping("/search")
+    public ResponseEntity<List<Client>> searchClients(@RequestParam(required = false) String name,
+                                                      @RequestParam(required = false) String email,
+                                                      @RequestParam(required = false) String cpf) {
+        List<Client> clients = clientService.searchClient(name, email, cpf);
+        return ResponseEntity.ok(clients);
+    }
 }
