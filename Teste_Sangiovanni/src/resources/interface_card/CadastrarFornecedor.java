@@ -220,7 +220,7 @@ public class CadastrarFornecedor extends JPanel {
         jLabelRua.setForeground(Color.BLACK);
         gbc.gridx = 1;
         gbc.gridy = 0;
-        gbc.inserts = new Inserts(0, 0, 0, 100);
+        gbc.insets = new Insets(0, 0, 0, 100);
         jPanelContent.add(jLabelRua, gbc);
 
         jTextFieldRua.setBackground(Color.WHITE);
@@ -228,12 +228,31 @@ public class CadastrarFornecedor extends JPanel {
         jTextFieldRua.setBorder(new MatteBorder(2, 2, 2, 2, new Color(128, 0, 32)));
         jTextFieldRua.setPreferredSize(fieldSize);
         jTextFieldRua.setForeground(Color.BLACK);
+        jTextFieldRua.setText("");
         gbc.gridx = 1;
         gbc.gridy = 1;
-        gbc.insets = new Inserts(0, 0, 20, 100);
+        gbc.insets = new Insets(0, 0, 20, 100);
         jPanelContent.add(jTextFieldRua, gbc);
 
+        jLabelBairro.setFont(new Font("Cormorant Garamond", 1, 18));
+        jLabelBairro.setText("Bairro:");
+        jLabelBairro.setForeground(Color.BLACK);
+        jLabelBairro.setBackground(Color.WHITE);
+        gbc.gridx = 1;
+        gbc.gridy = 2;
+        gbc.insets = new Insets(0, 0, 0, 100);
+        jPanelContent.add(jLabelBairro, gbc);
 
+        jTextFieldBairro.setBackground(Color.WHITE);
+        jTextFieldBairro.setFont(new Font("Cormorant Infant", 1, 18));
+        jTextFieldBairro.setBorder(new MatteBorder(2, 2, 2, 2, new Color(128, 0, 32)));
+        jTextFieldBairro.setPreferredsize(fieldSize);
+        jTextFIeldBairro.setForeground(Color.BLACK);
+        jTextFieldBairro.setText("");
+        gbc.gridx = 1;
+        gbc.gridy = 3;
+        gbc.insets = new Insets(0, 0, 20, 100);
+        jPanelContent.add(jTextFieldBairro, gbc);
 
         jButtonCancelar.setBackground(new Color(225, 225, 200));
         jButtonCancelar.setFont(new Font("Cormorant Garamond Bold", 1, 18));
