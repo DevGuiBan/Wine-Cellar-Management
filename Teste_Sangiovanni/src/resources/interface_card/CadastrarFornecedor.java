@@ -125,7 +125,7 @@ public class CadastrarFornecedor extends JPanel {
         jTextFieldNome.setFont(new Font("Cormorant Garamond", 1, 18));
         jTextFieldNome.setPreferredSize(fieldSize);
         jTextFieldNome.setForeground(Color.BLACK);
-        jTextFieldNome.setText("Nome do Fornecedor");
+        jTextFieldNome.setText("");
 
         gbc.gridx = 0;
         gbc.gridy = 1;
@@ -182,7 +182,7 @@ public class CadastrarFornecedor extends JPanel {
         jTextFieldEmail.setBorder(new MatteBorder(2, 2, 2, 2, new Color(128, 0, 32)));
         jTextFieldEmail.setPreferredSize(fieldSize);
         jTextFieldEmail.setForeground(Color.BLACK);
-        jTextFieldEmail.setText("email@gmail.com");
+        jTextFieldEmail.setText("");
 
         gbc.gridx = 1;
         gbc.gridy = 3;
@@ -203,7 +203,7 @@ public class CadastrarFornecedor extends JPanel {
         jTextFieldEndereco.setBorder(new MatteBorder(2, 2, 2, 2, new Color(128, 0, 32)));
         jTextFieldEndereco.setPreferredSize(fieldSize);
         jTextFieldEndereco.setForeground(Color.BLACK);
-        jTextFieldEndereco.setText("Rua, Bairro, Número, Cidade-UF");
+        jTextFieldEndereco.setText("");
 
         gbc.gridx = 0;
         gbc.gridy = 5;

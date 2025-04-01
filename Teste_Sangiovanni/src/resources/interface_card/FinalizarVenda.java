@@ -40,12 +40,22 @@ public class FinalizarVenda extends JPanel {
         return Double.parseDouble(this.jLabelValorTotal.getText().replace("R$", "").trim());
     }
 
+    public void resetInfoSales(){
+        this.client = null;
+        this.products = null;
+        this.jLabelDescontoTabela.setText("Desconto: R$ 00.00");
+        this.jLabelValorTotal.setText("R$ 00.00");
+        jLabelIconCliente.setText("Nome Completo");
+        jLabelFormaPagamento.setText("");
+        jTextFieldData.setText("");
+    }
+
     public void makeSale() {
         try {
             JsonObject jsonData = new JsonObject();
             jsonData.addProperty("clientId", this.client.getId());
 
-            String discount = this.jLabelDescontoTabela.getText().replace("-R$", "").trim().replace(",", ".");
+            String discount = this.jLabelDescontoTabela.getText().replace("Desconto: R$", "").trim().replace(",", ".");
             jsonData.addProperty("discount", Double.parseDouble(discount));
 
             String totalValue = this.jLabelValorTotal.getText().replace("R$", "").trim().replace(",", ".");
@@ -207,7 +217,7 @@ public class FinalizarVenda extends JPanel {
 
     public void setDicount(double valorTotal, double desconto) {
         jLabelValorTotal.setText("R$ " + valorTotal);
-        jLabelDescontoTabela.setText("-R$ " + desconto);
+        jLabelDescontoTabela.setText("Desconto: R$ " + desconto);
     }
 
     public void loadProducts() {
@@ -228,9 +238,9 @@ public class FinalizarVenda extends JPanel {
 
         if (jLabelDesconto.getText().equals("Aplicado!")) {
             double desconto = valorTotal * 0.10;
-            jLabelDescontoTabela.setText("-R$ " + desconto);
+            jLabelDescontoTabela.setText("Desconto: R$ " + desconto);
         } else {
-            jLabelDescontoTabela.setText("-R$ 00,00");
+            jLabelDescontoTabela.setText("Desconto: R$ 00,00");
         }
     }
 
@@ -334,7 +344,7 @@ public class FinalizarVenda extends JPanel {
         jTable.setBackground(Color.WHITE);
         jTable.setRowHeight(30);
         jTable.setFocusable(false);
-        jTable.setPreferredSize(new Dimension(600, 150));
+        jTable.setPreferredSize(new Dimension(650, 150));
 
         DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
         centerRenderer.setHorizontalAlignment(SwingConstants.CENTER);
@@ -367,10 +377,11 @@ public class FinalizarVenda extends JPanel {
 
         jPanelTabelaContentRight.add(jScrollPaneTable);
 
-        jLabelDescontoTabela.setText("-Desconto");
+        jLabelDescontoTabela.setText("");
         jLabelDescontoTabela.setForeground(Color.RED);
+        jLabelDescontoTabela.setBackground(Color.BLACK);
         jLabelDescontoTabela.setFont(new Font("Cormorant Infant Bold", Font.BOLD, 20));
-        jLabelDescontoTabela.setBorder(new EmptyBorder(0, 0, 0, 400));
+        jLabelDescontoTabela.setBorder(new EmptyBorder(0, 0, 0, 250));
 
         jPanelTabelaContentRight.add(jLabelDescontoTabela);
 
@@ -379,6 +390,7 @@ public class FinalizarVenda extends JPanel {
         jLabelTotal.setFont(new Font("Cormorant Garamond", Font.PLAIN, 24));
 
         jLabelValorTotal.setText("R$ 00,00");
+        jLabelValorTotal.setPreferredSize(new Dimension(150,20));
         jLabelValorTotal.setForeground(Color.BLACK);
         jLabelValorTotal.setFont(new Font("Cormorant Infant Bold", Font.BOLD, 24));
 
@@ -386,7 +398,7 @@ public class FinalizarVenda extends JPanel {
         jPanelTabelaContentRight.add(jLabelValorTotal);
 
         jPanelTabelaContent.add(jPanelTabelaContentLeft, BorderLayout.WEST);
-        jPanelTabelaContent.add(jPanelTabelaContentRight, BorderLayout.EAST);
+        jPanelTabelaContent.add(jPanelTabelaContentRight, BorderLayout.CENTER);
         jPanelTabela.add(jPanelTabelaContent);
 
         jPanelInformacoes.setBackground(Color.WHITE);
@@ -439,7 +451,7 @@ public class FinalizarVenda extends JPanel {
         jTextFieldData.setForeground(Color.BLACK);
         jTextFieldData.setFont(new Font("Cormorant Infant Bold", Font.BOLD, 20));
         jTextFieldData.setBackground(new Color(217, 217, 217));
-        jTextFieldData.setPreferredSize(new Dimension(40, 25));
+        jTextFieldData.setPreferredSize(new Dimension(100, 25));
         jTextFieldData.setOpaque(true);
         jTextFieldData.setBorder(new MatteBorder(1, 1, 1, 1, Color.GRAY));
         gbc.gridx = 1;
@@ -464,8 +476,6 @@ public class FinalizarVenda extends JPanel {
     private JLabel jLabelIconCliente;
     private JLabel jLabelValorTotal;
     private JLabel jLabelDescontoTabela;
-
-    private JButton jButtonExcluirProduto;
 
     private JTextField jTextFieldData;
 

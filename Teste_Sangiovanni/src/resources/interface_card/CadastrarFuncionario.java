@@ -141,7 +141,7 @@ public class CadastrarFuncionario extends JPanel {
         jTextFieldNome.setFont(new Font("Cormorant Garamond", 1, 18));
         jTextFieldNome.setPreferredSize(fieldSize);
         jTextFieldNome.setForeground(Color.BLACK);
-        jTextFieldNome.setText("Nome do Funcionário");
+        jTextFieldNome.setText("");
 
         gbc.gridx = 0;
         gbc.gridy = 1;
@@ -162,7 +162,7 @@ public class CadastrarFuncionario extends JPanel {
         jTextFieldCPF.setFont(new Font("Cormorant Infant", Font.BOLD, 18));
         jTextFieldCPF.setBorder(new MatteBorder(2, 2, 2, 2, new Color(128, 0, 32)));
         jTextFieldCPF.setPreferredSize(fieldSize);
-        jTextFieldCPF.setText("000.000.000-00");
+        jTextFieldCPF.setText("");
         gbc.gridx = 0;
         gbc.gridy = 3;
         gbc.insets = new Insets(0, 0, 20, 100);
@@ -181,7 +181,7 @@ public class CadastrarFuncionario extends JPanel {
         jTextFieldTelefone.setFont(new Font("Cormorant Infant", 1, 18));
         jTextFieldTelefone.setForeground(Color.BLACK);
         jTextFieldTelefone.setPreferredSize(fieldSize);
-        jTextFieldTelefone.setText("(00) 00000-0000");
+        jTextFieldTelefone.setText("");
         gbc.gridx = 0;
         gbc.gridy = 5;
         gbc.insets = new Insets(0, 0, 20, 100);
@@ -200,7 +200,7 @@ public class CadastrarFuncionario extends JPanel {
         jTextFieldEmail.setBorder(new MatteBorder(2, 2, 2, 2, new Color(128, 0, 32)));
         jTextFieldEmail.setPreferredSize(fieldSize);
         jTextFieldEmail.setForeground(Color.BLACK);
-        jTextFieldEmail.setText("exemplo@email.com");
+        jTextFieldEmail.setText("");
 
         gbc.gridx = 0;
         gbc.gridy = 7;
@@ -221,7 +221,7 @@ public class CadastrarFuncionario extends JPanel {
         jTextFieldDataNascimento.setBorder(new MatteBorder(2, 2, 2, 2, new Color(128, 0, 32)));
         jTextFieldDataNascimento.setPreferredSize(fieldSize);
         jTextFieldDataNascimento.setForeground(Color.BLACK);
-        jTextFieldDataNascimento.setText("DD/MM/AAAA");
+        jTextFieldDataNascimento.setText("");
         gbc.gridx = 0;
         gbc.gridy = 9;
         gbc.insets = new Insets(0, 0, 20, 100);
@@ -241,7 +241,7 @@ public class CadastrarFuncionario extends JPanel {
         jTextFieldRua.setBorder(new MatteBorder(2, 2, 2, 2, new Color(128, 0, 32)));
         jTextFieldRua.setPreferredSize(fieldSize);
         jTextFieldRua.setForeground(Color.BLACK);
-        jTextFieldRua.setText("Rua");
+        jTextFieldRua.setText("");
         gbc.gridx = 1;
         gbc.gridy = 1;
         gbc.insets = new Insets(0, 0, 20, 100);
@@ -261,7 +261,7 @@ public class CadastrarFuncionario extends JPanel {
         jTextFieldBairro.setBorder(new MatteBorder(2, 2, 2, 2, new Color(128, 0, 32)));
         jTextFieldBairro.setPreferredSize(fieldSize);
         jTextFieldBairro.setForeground(Color.BLACK);
-        jTextFieldBairro.setText("Bairro");
+        jTextFieldBairro.setText("");
         gbc.gridx = 1;
         gbc.gridy = 3;
         gbc.insets = new Insets(0, 0, 20, 100);
@@ -281,7 +281,7 @@ public class CadastrarFuncionario extends JPanel {
         jTextFieldNumero.setBorder(new MatteBorder(2, 2, 2, 2, new Color(128, 0, 32)));
         jTextFieldNumero.setPreferredSize(fieldSize);
         jTextFieldNumero.setForeground(Color.BLACK);
-        jTextFieldNumero.setText("Número");
+        jTextFieldNumero.setText("");
         gbc.gridx = 1;
         gbc.gridy = 5;
         gbc.insets = new Insets(0, 0, 20, 100);
@@ -301,7 +301,7 @@ public class CadastrarFuncionario extends JPanel {
         jTextFieldCidade.setBorder(new MatteBorder(2, 2, 2, 2, new Color(128, 0, 32)));
         jTextFieldCidade.setPreferredSize(fieldSize);
         jTextFieldCidade.setForeground(Color.BLACK);
-        jTextFieldCidade.setText("Cidade:");
+        jTextFieldCidade.setText("");
         gbc.gridx = 1;
         gbc.gridy = 7;
         gbc.insets = new Insets(0, 0, 20, 100);
@@ -343,7 +343,7 @@ public class CadastrarFuncionario extends JPanel {
         jTextFieldSenha.setBorder(new MatteBorder(2, 2, 2, 2, new Color(128, 0, 32)));
         jTextFieldSenha.setPreferredSize(fieldSize);
         jTextFieldSenha.setForeground(Color.BLACK);
-        jTextFieldSenha.setText("Senha");
+        jTextFieldSenha.setText("");
         gbc.gridx = 0;
         gbc.gridy = 11;
         gbc.insets = new Insets(0, 0, 20, 100);

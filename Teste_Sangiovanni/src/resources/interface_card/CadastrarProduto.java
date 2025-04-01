@@ -241,6 +241,7 @@ public class CadastrarProduto extends JPanel {
         jComboBoxProductType.setBackground(new Color(255, 255, 255));
         jComboBoxProductType.setBorder(new MatteBorder(2, 2, 2, 2, new Color(128, 0, 32)));
         jComboBoxProductType.setPreferredSize(fieldSize);
+        jComboBoxProductType.setFont(new Font("Cormorant Garamond", 1, 18));
         jComboBoxProductType.setForeground(Color.BLACK);
         jComboBoxProductType.addItemListener(new ItemListener() {
             @Override

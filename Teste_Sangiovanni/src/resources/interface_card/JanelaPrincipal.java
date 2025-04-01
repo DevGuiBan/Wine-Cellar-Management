@@ -327,6 +327,11 @@ public class JanelaPrincipal extends javax.swing.JFrame {
             case "listar_Funcionario":
                 cardListarFuncionario.atualizarDados();
                 cl.show(cardPanel, cardName);
+                break;
+            case  "visualizar_cupom":
+                cardRegistrarVenda.reset();
+                cl.show(cardPanel, cardName);
+                break;
             default:
                 cl.show(cardPanel, cardName);
                 break;

@@ -161,6 +161,7 @@ public class RegistrarVenda extends JPanel {
         jButtonCancelar.setCursor(new Cursor(Cursor.HAND_CURSOR));
         jButtonCancelar.setMargin(new Insets(10, 20, 10, 20));
         jButtonCancelar.addActionListener(e -> {
+            this.reset();
             janelaPrincipal.showCard("listar_vendas");
         });
 
@@ -215,6 +216,18 @@ public class RegistrarVenda extends JPanel {
     public void showCard(String cardName) {
         CardLayout cl = (CardLayout) jPanelContent.getLayout();
         cl.show(jPanelContent, cardName);
+    }
+
+    public void reset(){
+        cardClientes.resetCLient();
+        cardProdutos.resetListProducts();
+        cardFinalizarVenda.resetInfoSales();
+        jButtonProdutoCard.setForeground(new Color(128, 0, 32));
+        jButtonClienteCard.setForeground(new Color(0, 0, 0));
+        jButtonFinalizarVendaCard.setForeground(new Color(0, 0, 0));
+        jButtonAdicionarCarrinho.setText("Adicionar ao Carrinho");
+        jButtonCadastrar.setText("Próximo");
+        this.showCard("produtos");
     }
 
     private void abrirModal(JFrame parentFrame) {
