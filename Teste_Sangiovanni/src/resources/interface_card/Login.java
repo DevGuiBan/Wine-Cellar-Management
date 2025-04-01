@@ -1,5 +1,6 @@
 package resources.interface_card;
 
+import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import io.github.cdimascio.dotenv.Dotenv;
@@ -18,7 +19,7 @@ public class Login extends JFrame {
 
     private Dotenv dotenv;
 
-    private void initComponents(){
+    private void initComponents() {
         this.setTitle("Login");
         setSize(800, 600);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -96,7 +97,7 @@ public class Login extends JFrame {
         btnEntrar.setForeground(Color.BLACK);
         btnEntrar.setBackground(new Color(255, 235, 43));
         btnEntrar.setPreferredSize(fieldSize);
-        btnEntrar.addActionListener(evt->{
+        btnEntrar.addActionListener(evt -> {
             login();
         });
 
@@ -106,7 +107,7 @@ public class Login extends JFrame {
         btnCadastrar.setBackground(new Color(128, 0, 32));
         btnCadastrar.setBorder(BorderFactory.createLineBorder(new Color(255, 235, 43), 2));
         btnCadastrar.setPreferredSize(fieldSize);
-        btnCadastrar.addActionListener(evt->{
+        btnCadastrar.addActionListener(evt -> {
             cadastrar();
         });
 
@@ -146,12 +147,12 @@ public class Login extends JFrame {
         setVisible(true);
     }
 
-    public Login(){
+    public Login() {
         this.dotenv = Dotenv.load();
         initComponents();
     }
 
-    private void cadastrar(){
+    private void cadastrar() {
         JFrame cadastro = new Cadastro();
         cadastro.setVisible(true);
         this.setVisible(false);
@@ -174,11 +175,12 @@ public class Login extends JFrame {
             String urlAPI = this.dotenv.get("API_HOST");
 
             // Tentando login como Manager
-            boolean isLogged = tryLogin(urlAPI + "/auth/login", jsonString);
+            JsonObject isLogged = tryLogin(urlAPI + "/auth/login", jsonString);
 
             // Verificando se o login foi bem-sucedido
-            if (isLogged) {
-                JFrame frame = new JanelaPrincipal();
+            assert isLogged != null;
+            if (!isLogged.isEmpty()) {
+                JFrame frame = new JanelaPrincipal(isLogged);
                 JOptionPane.showMessageDialog(this.rootPane,
                         "Login realizado com sucesso!",
                         "Sucesso",
@@ -199,7 +201,7 @@ public class Login extends JFrame {
         }
     }
 
-    private boolean tryLogin(String urlString, String jsonString) {
+    private JsonObject tryLogin(String urlString, String jsonString) {
         try {
             // Abrindo conexão HTTP
             URL url = new URL(urlString);
@@ -221,7 +223,14 @@ public class Login extends JFrame {
 
             // Se o login foi bem-sucedido (código 200 OK)
             if (statusCode == HttpURLConnection.HTTP_OK) {
-                return true;
+                BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    response.append(line);
+                }
+                reader.close();
+                JsonObject resp = JsonParser.parseString(response.toString()).getAsJsonObject();
+                return resp.get("user").getAsJsonObject();
             }
 
             // Se não foi bem-sucedido, lê a resposta de erro
@@ -248,14 +257,13 @@ public class Login extends JFrame {
             }
 
             connection.disconnect();
-            return false;
+            return null;
 
         } catch (Exception e) {
             JOptionPane.showMessageDialog(this.rootPane, "Erro ao tentar login: " + e.getMessage(), "Erro", JOptionPane.ERROR_MESSAGE);
-            return false;
+            return null;
         }
     }
-
 
 
     public static void main(String[] args) {

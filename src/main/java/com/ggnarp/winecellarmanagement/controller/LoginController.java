@@ -23,12 +23,12 @@ public class LoginController {
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginRequest loginRequest) {
-        boolean authenticated = loginService.Login(loginRequest);
+        Object authenticated = loginService.Login(loginRequest);
 
-        if (authenticated) {
+        if (authenticated != null) {
             Map<String, Object> successResponse = new HashMap<>();
             successResponse.put("message", "Login realizado com sucesso!");
-            successResponse.put("authenticated", true);
+            successResponse.put("user", authenticated);
             return ResponseEntity.ok(successResponse);
         }
 

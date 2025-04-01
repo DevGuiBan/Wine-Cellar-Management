@@ -1,6 +1,8 @@
 package com.ggnarp.winecellarmanagement.service;
 
 import com.ggnarp.winecellarmanagement.dto.LoginRequest;
+import com.ggnarp.winecellarmanagement.entity.Employee;
+import com.ggnarp.winecellarmanagement.entity.Manager;
 import com.ggnarp.winecellarmanagement.repository.EmployeeRepository;
 import com.ggnarp.winecellarmanagement.repository.ManagerRepository;
 import org.springframework.stereotype.Service;
@@ -15,9 +17,15 @@ public class LoginService {
         this.employeeRepository = employeeRepository;
     }
 
-    public Boolean Login(LoginRequest loginRequest) {
+    public Object Login(LoginRequest loginRequest) {
         try{
-            return employeeRepository.existsByEmailAndPassword(loginRequest.getEmail(), loginRequest.getPassword()) || managerRepository.existsByEmailAndPassword(loginRequest.getEmail(), loginRequest.getPassword());
+            Employee emp =employeeRepository.findByEmailAndPassword(loginRequest.getEmail(),loginRequest.getPassword());
+            if(emp == null){
+                return managerRepository.findByEmailAndPassword(loginRequest.getEmail(), loginRequest.getPassword());
+            }else{
+                return emp;
+            }
+
         } catch (Exception e) {
             throw new IllegalArgumentException("Senha ou E-mail inválidos!");
         }

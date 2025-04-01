@@ -14,6 +14,7 @@ import com.itextpdf.text.pdf.PdfPCell;
 import com.itextpdf.text.pdf.PdfPTable;
 import com.itextpdf.text.pdf.PdfWriter;
 import com.itextpdf.text.Image;
+import com.toedter.calendar.JDateChooser;
 import io.github.cdimascio.dotenv.Dotenv;
 import com.itextpdf.text.Font;
 
@@ -26,6 +27,9 @@ import java.awt.image.BufferedImage;
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import java.text.SimpleDateFormat;
 import java.time.format.DateTimeFormatter;
 import java.util.Objects;
 import java.util.Scanner;
@@ -104,6 +108,7 @@ public class ListarVendas extends JPanel {
         jButtonFiltrar.setContentAreaFilled(false);
         jButtonFiltrar.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         jButtonFiltrar.setPreferredSize(new java.awt.Dimension(90, 40));
+        jButtonFiltrar.addActionListener(evt->filtro());
         jPanelTopoTabela.add(jButtonFiltrar);
 
         jPanelTabela.setPreferredSize(new Dimension(1145, 450));
@@ -219,6 +224,159 @@ public class ListarVendas extends JPanel {
 
     public void atualizarDados() {
         this.getVendas();
+    }
+
+    private void getFuncionariosByDate(String dateIn,String dateOut){
+        try {
+            String urlAPI = this.dotenv.get("API_HOST");
+            String urlString = urlAPI + "/employee/date?start_date=" + URLEncoder.encode(dateIn, StandardCharsets.UTF_8) +
+                    "&end_date=" + URLEncoder.encode(dateOut, StandardCharsets.UTF_8);
+            URL url = new URL(urlString);
+
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.setRequestMethod("GET");
+            connection.setRequestProperty("Content-Type", "application/json");
+            connection.setDoOutput(true);
+
+            int statusCode = connection.getResponseCode();
+            if (statusCode == HttpURLConnection.HTTP_OK) {
+                BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+                StringBuilder response = new StringBuilder();
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    response.append(line);
+                }
+                reader.close();
+
+                JsonArray products = JsonParser.parseString(response.toString()).getAsJsonArray();
+
+                DefaultTableModel tableModel = (DefaultTableModel) jtable.getModel();
+                tableModel.setRowCount(0);
+
+                for (int i = 0; i < products.size(); i++) {
+                    JsonObject product = products.get(i).getAsJsonObject();
+                    String id = product.get("id").getAsString();
+                    String name = product.get("name").getAsString();
+                    String cpf = product.get("cpf").getAsString();
+                    String address = product.get("address").getAsString();
+                    String phone_number = product.get("phoneNumber").getAsString();
+                    String email = product.get("email").getAsString();
+                    String data = product.get("dateBirth").getAsString();
+                    tableModel.addRow(new Object[]{id, name, cpf, address, phone_number, email, data});
+                }
+                connection.disconnect();
+            } else {
+                StringBuilder response = new StringBuilder();
+                try (BufferedReader br = new BufferedReader(new InputStreamReader(connection.getErrorStream(), StandardCharsets.UTF_8))) {
+                    String responseLine;
+                    while ((responseLine = br.readLine()) != null) {
+                        response.append(responseLine.trim());
+                    }
+                }
+
+                try {
+                    JsonObject err = JsonParser.parseString(response.toString()).getAsJsonObject();
+
+                    String errorMessage = (err.has("message") && !err.get("message").isJsonNull())
+                            ? err.get("message").getAsString()
+                            : response.toString();
+
+                    JOptionPane.showMessageDialog(this.rootPane,
+                            "Não foi possível encontrar o funcionário. Verifique os dados e tente novamente!\n" + errorMessage,
+                            "Erro na Pesquisa",
+                            JOptionPane.ERROR_MESSAGE);
+                } catch (Exception jsonException) {
+                    JOptionPane.showMessageDialog(this.rootPane,
+                            "Erro inesperado ao processar a resposta da API.\nCódigo: " + statusCode + "\nResposta: " + response,
+                            "Erro na Pesquisa",
+                            JOptionPane.ERROR_MESSAGE);
+                }
+                JOptionPane.showOptionDialog(rootPane,
+                        "Ocorreu um erro ao carregar os funcionários.",
+                        "Problema no Servidor",
+                        JOptionPane.DEFAULT_OPTION,
+                        JOptionPane.ERROR_MESSAGE,
+                        null,null,null);
+                connection.disconnect();
+            }
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(rootPane, e.getMessage());
+        }
+    }
+
+    private void filtro(){
+        JFrame frame = (JFrame) SwingUtilities.getWindowAncestor(rootPane);
+
+        JDialog dialog = new JDialog(frame, "Filtros", true);
+        dialog.setSize(200, 200);
+        dialog.setLayout(new GridBagLayout());
+        dialog.setLocationRelativeTo(jButtonFiltrar);
+
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.insets = new Insets(5, 5, 5, 5);
+
+        JLabel chkDataNascimento = new JLabel("Período da Venda:");
+        chkDataNascimento.setForeground(Color.BLACK);
+        chkDataNascimento.setFont(new java.awt.Font("Cormorant Garamond", java.awt.Font.BOLD,14));
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.gridwidth = 2;
+        dialog.add(chkDataNascimento, gbc);
+
+        gbc.gridwidth = 1;
+        gbc.gridy = 1;
+        JLabel de = new JLabel("de");
+        de.setFont(new java.awt.Font("Cormorant Garamond", java.awt.Font.BOLD,14));
+        de.setForeground(Color.BLACK);
+        dialog.add(de, gbc);
+        gbc.gridx = 1;
+        JDateChooser dateChooserDe = new JDateChooser();
+        dateChooserDe.setDateFormatString("dd/MM/yyyy");
+        dateChooserDe.setFont(new java.awt.Font("Cormorant Infant", java.awt.Font.BOLD,14));
+        dateChooserDe.setForeground(Color.BLACK);
+        dialog.add(dateChooserDe, gbc);
+
+        gbc.gridx = 0;
+        gbc.gridy = 2;
+        JLabel ate = new JLabel("até");
+        ate.setFont(new java.awt.Font("Cormorant Garamond", java.awt.Font.BOLD,14));
+        ate.setForeground(Color.BLACK);
+        dialog.add(ate, gbc);
+        gbc.gridx = 1;
+        JDateChooser dateChooserAte = new JDateChooser();
+        dateChooserAte.setDateFormatString("dd/MM/yyyy");
+        dateChooserAte.setFont(new java.awt.Font("Cormorant Infant", java.awt.Font.BOLD,14));
+        dateChooserAte.setForeground(Color.BLACK);
+        dialog.add(dateChooserAte, gbc);
+
+        gbc.gridx = 0;
+        gbc.gridy = 3;
+        gbc.gridwidth = 2;
+
+        JButton btnFiltrar = new JButton("Filtrar");
+        btnFiltrar.setBackground(new Color(0, 0, 139));
+        btnFiltrar.setFont(new java.awt.Font("Cormorant Garamond", java.awt.Font.BOLD,16));
+        btnFiltrar.setForeground(Color.WHITE);
+        btnFiltrar.setFocusPainted(false);
+        btnFiltrar.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        dialog.add(btnFiltrar, gbc);
+
+        btnFiltrar.addActionListener(e -> {
+            SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+            String dataDe = dateChooserDe.getDate() != null ? sdf.format(dateChooserDe.getDate()) : "Não selecionado";
+            String dataAte = dateChooserAte.getDate() != null ? sdf.format(dateChooserAte.getDate()) : "Não selecionado";
+
+            if(dataDe.equals("Não selecionado")||dataAte.equals("Não selecionado")){
+                JOptionPane.showMessageDialog(frame,"Informe o perído corretamente!","Erro ao selecionar datas do perído",JOptionPane.ERROR_MESSAGE);
+            }else{
+                getFuncionariosByDate(dataDe,dataAte);
+            }
+
+        });
+
+        dialog.setVisible(true);
+        frame.setVisible(true);
     }
 
     private javax.swing.JTextField pesquisaProduto;
