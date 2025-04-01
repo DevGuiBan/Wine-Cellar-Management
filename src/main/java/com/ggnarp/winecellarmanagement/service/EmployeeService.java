@@ -3,11 +3,14 @@ package com.ggnarp.winecellarmanagement.service;
 import com.ggnarp.winecellarmanagement.dto.EmployeeDTO;
 import com.ggnarp.winecellarmanagement.entity.Employee;
 import com.ggnarp.winecellarmanagement.repository.EmployeeRepository;
+import jakarta.persistence.criteria.Predicate;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.ResourceAccessException;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.regex.Matcher;
@@ -214,6 +217,28 @@ public class EmployeeService {
             dto.setCpf(employee.getCpf());
             return dto;
         }).collect(Collectors.toList());
+    }
+
+    public List<Employee> searchEmployee (String name, String email, String cpf) {
+        Specification<Employee> spec = (root, query, criteriaBuilder) -> {
+            List<Predicate> predicates = new ArrayList<>();
+
+            if(name != null && !name.isBlank()) {
+                predicates.add(criteriaBuilder.like(root.get("name"), "%" + name + "%"));
+            }
+
+            if(email != null && !email.isBlank()) {
+                predicates.add(criteriaBuilder.like(root.get("email"), "%" + email + "%"));
+            }
+
+            if(cpf != null && !cpf.isBlank()) {
+                predicates.add(criteriaBuilder.equal(root.get("cpf"), cpf));
+            }
+
+            return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
+        };
+
+        return employeeRepository.findAll(spec);
     }
 
 }

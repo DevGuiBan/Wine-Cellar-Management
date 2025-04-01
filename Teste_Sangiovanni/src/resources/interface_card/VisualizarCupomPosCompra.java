@@ -39,82 +39,91 @@ public class VisualizarCupomPosCompra extends JPanel {
     }
 
     private void atualizarCupomExibicao() {
-        StringBuilder html = new StringBuilder();
-        html.append("<html><body style='font-family: monospace;'>");
-        html.append("<h3 style='text-align: center;'>CUPOM FISCAL</h3>");
-        html.append("<p>").append(empresa).append("<br>")
-                .append(endereco).append("<br>")
-                .append(cidadeEstado).append("</p>");
-        html.append("<p><strong>CNPJ:</strong> ").append(cnpj)
-                .append(" <strong>Data:</strong> ").append(data)
-                .append(" <strong>Hora:</strong> ").append(hora).append("</p>");
-        html.append("<p><strong>CCF:</strong> ").append(ccf)
-                .append(" <strong>IE:</strong> ").append(ie)
-                .append(" <strong>CDD:</strong> ").append(cdd)
-                .append(" <strong>IM:</strong> ").append(im).append("</p>");
-
-        html.append("<hr><h4>Produtos</h4>");
-        html.append("<table border='1' width='100%' style='border-collapse: collapse;'>");
-        html.append("<tr><th>Item</th><th>Nome</th><th>Qtd</th><th>Preço Unit.</th><th>Total</th></tr>");
+        StringBuilder produtosStr = new StringBuilder();
+        produtosStr.append("<table border='1' width='100%'>");
+        produtosStr.append("<tr><th>Item</th><th>Nome</th><th>Valor Unit.</th><th>Qtd</th><th>Total</th></tr>");
 
         for (int i = 0; i < produtos.size(); i++) {
-            JsonObject produto = produtos.get(i).getAsJsonObject();
-            int qtd = produto.get("quantity").getAsInt();
-            double preco = produto.get("price").getAsDouble();
-            double total = qtd * preco;
+            JsonObject product = produtos.get(i).getAsJsonObject();
+            int quantity = product.get("quantity").getAsInt();
+            double price = product.get("price").getAsDouble();
+            double total = quantity * price;
 
-            html.append("<tr>")
-                    .append("<td>").append(i + 1).append("</td>")
-                    .append("<td>").append(produto.get("name").getAsString()).append("</td>")
-                    .append("<td>").append(qtd).append("</td>")
-                    .append("<td>R$ ").append(preco).append("</td>")
-                    .append("<td>R$ ").append(total).append("</td>")
-                    .append("</tr>");
+            produtosStr.append("<tr>");
+            produtosStr.append("<td>" + (i + 1) + "</td>");
+            produtosStr.append("<td>" + product.get("name").getAsString() + "</td>");
+            produtosStr.append("<td>R$" + String.format("%.2f", price) + "</td>");
+            produtosStr.append("<td>" + quantity + "</td>");
+            produtosStr.append("<td>R$" + String.format("%.2f", total) + "</td>");
+            produtosStr.append("</tr>");
         }
+        produtosStr.append("</table>");
 
-        html.append("</table>");
-        html.append("<p><strong>Total:</strong> R$ ").append(totalPrice)
-                .append(" <strong>Desconto:</strong> R$ ").append(discount)
-                .append(" <strong>Pagamento:</strong> ").append(pagamento).append("</p>");
+        String cupomHtml = "<html><center><b>CUPOM FISCAL</b><br><br>"
+                + empresa + "<br>"
+                + endereco + "<br>"
+                + cidadeEstado + "<br><br>"
+                + "CNPJ: " + cnpj + "    " + data + "<br>"
+                + "Hora: " + hora + "<br>"
+                + "CCF: " + ccf + " - IE: " + ie + " - CDD: " + cdd + "<br>"
+                + "IM: " + im + "<br>"
+                + "------------------------------------------------------------------------------------------------<br>"
+                + produtosStr + "<br>"
+                + "TOTAL: <b>R$" + String.format("%.2f", totalPrice) + "</b><br>"
+                + "DESCONTO: R$" + String.format("%.2f", discount) + "<br>"
+                + "PAGAMENTO: " + pagamento + "<br>"
+                + "----------------------------------------------------------------<br>"
+                + "CÓDIGO DO QR CODE: " + qrCode + "<br>"
+                + "</center></html>";
 
-        html.append("</body></html>");
-        cupomTextPane.setText(html.toString());
-    }
+        cupomTextPane.setText(cupomHtml);
 
-    private void gerarQRCode(String qrCodeText) {
-        if (qrCodeText == null || qrCodeText.trim().isEmpty()) {
-            qrCodeLabel.setText("QR Code inválido");
-            qrCodeLabel.setIcon(null);
-            return;
-        }
-
+        // Geração e exibição do QR Code
         try {
-            int tamanho = 100;
-            BitMatrix matrix = new MultiFormatWriter().encode(qrCodeText, BarcodeFormat.QR_CODE, tamanho, tamanho);
-            BufferedImage qrImage = MatrixToImageWriter.toBufferedImage(matrix);
+            if (qrCode == null || qrCode.trim().isEmpty()) {
+                throw new IllegalArgumentException("Código do QR Code está vazio ou nulo.");
+            }
+
+            BufferedImage qrImage = gerarQRCodePDF(qrCode, 100, 100);
+            if (qrImage == null) {
+                throw new IllegalStateException("Imagem do QR Code não foi gerada.");
+            }
+
+            // Definir a imagem no qrCodeLabel
             qrCodeLabel.setIcon(new ImageIcon(qrImage));
+            qrCodeLabel.setText(""); // Limpar qualquer texto anterior
+            qrCodeLabel.setPreferredSize(new Dimension(100, 100)); // Garantir que o label tenha tamanho suficiente
+
+            // Forçar a atualização da interface
             qrCodeLabel.revalidate();
             qrCodeLabel.repaint();
-            this.revalidate();
-            this.repaint();
-        } catch (WriterException e) {
+        } catch (WriterException | IOException | IllegalArgumentException | IllegalStateException e) {
+            qrCodeLabel.setIcon(null); // Limpar qualquer ícone anterior
+            qrCodeLabel.setText("Erro ao gerar QR Code: " + e.getMessage());
+            qrCodeLabel.revalidate();
+            qrCodeLabel.repaint();
             e.printStackTrace();
-            qrCodeLabel.setText("Erro ao gerar QR Code");
         }
+
+        // Habilitar o botão de impressão
+        imprimirButton.setEnabled(true);
     }
 
     private void inicializarUI() {
         setLayout(new BorderLayout());
         setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
+        // Painel principal para exibição do cupom
         cupomTextPane = new JTextPane();
         cupomTextPane.setContentType("text/html");
         cupomTextPane.setEditable(false);
         cupomTextPane.setBackground(Color.WHITE);
+        cupomTextPane.setText("<html><center><h3>Aguardando carregamento do cupom...</h3></center></html>");
 
         JScrollPane scrollPane = new JScrollPane(cupomTextPane);
         add(scrollPane, BorderLayout.CENTER);
 
+        // Painel para o QR Code
         JPanel qrCodePanel = new JPanel(new BorderLayout());
         qrCodePanel.setBackground(Color.WHITE);
         qrCodeLabel = new JLabel("", SwingConstants.CENTER);
@@ -123,15 +132,18 @@ public class VisualizarCupomPosCompra extends JPanel {
         qrCodePanel.add(qrCodeLabel, BorderLayout.CENTER);
         add(qrCodePanel, BorderLayout.SOUTH);
 
+        // Painel de botões
         JPanel buttonPanel = new JPanel();
+        buttonPanel.setBackground(Color.WHITE);
+
         imprimirButton = new JButton("Imprimir");
+        imprimirButton.setEnabled(false);
         imprimirButton.addActionListener(evt -> {
             try {
                 gerarPDF();
-            } catch (DocumentException e) {
-                throw new RuntimeException(e);
-            } catch (IOException e) {
-                throw new RuntimeException(e);
+                JOptionPane.showMessageDialog(rootPane, "PDF gerado com sucesso!");
+            } catch (DocumentException | IOException e) {
+                JOptionPane.showMessageDialog(rootPane, "Erro ao gerar PDF: " + e.getMessage());
             }
         });
 
@@ -141,6 +153,10 @@ public class VisualizarCupomPosCompra extends JPanel {
         buttonPanel.add(imprimirButton);
         buttonPanel.add(salvarVoltarButton);
         add(buttonPanel, BorderLayout.PAGE_END);
+
+        // Forçar a atualização da interface
+        revalidate();
+        repaint();
     }
 
     public void carregarCupom(String id) {
@@ -170,7 +186,6 @@ public class VisualizarCupomPosCompra extends JPanel {
         this.discount = sale.get("discount").getAsDouble();
         this.produtos = sale.getAsJsonArray("products");
 
-        gerarQRCode(qrCode);
         atualizarCupomExibicao();
     }
 

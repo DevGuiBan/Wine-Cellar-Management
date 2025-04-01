@@ -9,6 +9,8 @@ import com.ggnarp.winecellarmanagement.entity.SaleProduct;
 import com.ggnarp.winecellarmanagement.repository.ClientRepository;
 import com.ggnarp.winecellarmanagement.repository.ProductRepository;
 import com.ggnarp.winecellarmanagement.repository.SaleRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.ResourceAccessException;
@@ -21,11 +23,13 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
+import jakarta.persistence.criteria.Predicate;
 import java.util.stream.Collectors;
 
 @Service
 public class SaleService {
 
+    @Autowired
     private final SaleRepository saleRepository;
     private final ClientRepository clientRepository;
     private final ProductRepository productRepository;
@@ -252,5 +256,26 @@ public class SaleService {
         }
     }
 
+    public List<Sale> searchSales(Long saleId, String clientName, String productName) {
 
+        Specification<Sale> spec = (root, query, criteriaBuilder) -> {
+            List<Predicate> predicates = new ArrayList<>();
+
+            if (saleId != null) {
+                predicates.add(criteriaBuilder.equal(root.get("id"), saleId));
+            }
+
+            if (clientName != null && !clientName.isEmpty()) {
+                predicates.add(criteriaBuilder.like(root.get("client").get("name"), "%" + clientName + "%"));
+            }
+
+            if (productName != null && !productName.isEmpty()) {
+                predicates.add(criteriaBuilder.like(root.get("product").get("name"), "%" + productName + "%"));
+            }
+
+            return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
+        };
+
+        return saleRepository.findAll(spec);
+    }
 }

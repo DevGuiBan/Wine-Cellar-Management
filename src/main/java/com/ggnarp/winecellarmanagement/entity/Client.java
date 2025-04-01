@@ -31,7 +31,6 @@ public class Client {
     @Column(nullable = false)
     private String address;
 
-
     @Column(nullable = false,name = "date_brith")
     private LocalDate dateBirth;
 

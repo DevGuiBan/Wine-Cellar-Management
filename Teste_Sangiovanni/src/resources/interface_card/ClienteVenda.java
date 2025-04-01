@@ -52,6 +52,14 @@ public class ClienteVenda extends JPanel {
         return this.client;
     }
 
+    public void resetCLient(){
+        this.client.reset();
+        jComboBoxName.setSelectedIndex(0);
+        jTextFieldDataNascimento.setText("");
+        jComboBoxMetodoPagamento.setSelectedIndex(0);
+        jComboBoxCPF.setSelectedIndex(0);
+    }
+
     private void initComponents() {
         // inicialização de variáveis
         jLabelCPF = new JLabel();

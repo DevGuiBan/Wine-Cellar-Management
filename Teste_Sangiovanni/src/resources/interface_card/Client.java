@@ -51,6 +51,13 @@ public class Client {
         return name;
     }
 
+    public void reset(){
+        this.id = null;
+        this.data = null;
+        this.payment = null;
+        this.name = null;
+    }
+
     public String data(){
         return "name: " + name + ", id: " + id + ", data: " + data + ", payment: " + payment;
     }

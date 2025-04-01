@@ -2,10 +2,11 @@ package com.ggnarp.winecellarmanagement.repository;
 
 import com.ggnarp.winecellarmanagement.entity.Product;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
 import java.util.List;
 
-public interface ProductRepository extends JpaRepository<Product, Long> {
+public interface ProductRepository extends JpaRepository<Product, Long>, JpaSpecificationExecutor<Product> {
     Product findById(long id);
 
     List<Product> findProductBySupplier_NameOrderByNameAsc(String supplierName);

@@ -129,6 +129,13 @@ public class ProdutoVenda extends JPanel {
         add(jPanelContent);
     }
 
+    public void resetListProducts(){
+        this.productData.clear();
+        this.jComboBoxProduct.setSelectedIndex(0);
+        this.jTextFildQtdValorUnitario.setText("");
+        this.jSpinnerQuantidade.setValue(0);
+    }
+
     private void getProducts(){
         try {
             String urlAPI = this.dotenv.get("API_HOST");

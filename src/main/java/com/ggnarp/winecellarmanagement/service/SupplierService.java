@@ -4,9 +4,12 @@ import com.ggnarp.winecellarmanagement.dto.SupplierDTO;
 import com.ggnarp.winecellarmanagement.dto.SupplierProductCountDTO;
 import com.ggnarp.winecellarmanagement.entity.Supplier;
 import com.ggnarp.winecellarmanagement.repository.SupplierRepository;
+import jakarta.persistence.criteria.Predicate;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.ResourceAccessException;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -161,4 +164,31 @@ public class SupplierService {
                 (String) row[3], (String) row[4], (String) row[5], (Long) row[6]
         )).collect(Collectors.toList());
     }
+
+    public List<Supplier> searchSuppliers(UUID supplierId, String name, String email, String cnpj) {
+        Specification<Supplier> spec = (root, query, criteriaBuilder) -> {
+            List<Predicate> predicates = new ArrayList<>();
+
+            if (supplierId != null) {
+                predicates.add(criteriaBuilder.equal(root.get("id"), supplierId));
+            }
+
+            if (name != null && !name.isEmpty()) {
+                predicates.add(criteriaBuilder.like(root.get("name"), "%" + name + "%"));
+            }
+
+            if (email != null && !email.isEmpty()) {
+                predicates.add(criteriaBuilder.like(root.get("email"), "%" + email + "%"));
+            }
+
+            if (cnpj != null && !cnpj.isEmpty()) {
+                predicates.add(criteriaBuilder.equal(root.get("cnpj"), cnpj));
+            }
+
+            return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
+        };
+
+        return supplierRepository.findAll(spec);
+    }
+
 }

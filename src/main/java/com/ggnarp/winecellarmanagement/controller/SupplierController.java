@@ -135,4 +135,13 @@ public class SupplierController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
         }
     }
+
+    @GetMapping("/search")
+    public ResponseEntity<List<Supplier>> searchSuppliers(@RequestParam(required = false) UUID supplierId,
+                                                          @RequestParam(required = false) String name,
+                                                          @RequestParam(required = false) String email,
+                                                          @RequestParam(required = false) String cnpj) {
+        List<Supplier> suppliers = supplierService.searchSuppliers(supplierId, name, email, cnpj);
+        return ResponseEntity.ok(suppliers);
+    }
 }

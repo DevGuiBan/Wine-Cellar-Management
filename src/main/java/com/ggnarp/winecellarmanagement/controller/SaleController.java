@@ -66,4 +66,12 @@ public class SaleController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Erro ao excluir a venda: " + e.getMessage());
         }
     }
+
+    @GetMapping("/search")
+    public ResponseEntity<List<Sale>> searchSales(@RequestParam(required = false) Long saleId,
+                                                  @RequestParam(required = false) String clientName,
+                                                  @RequestParam(required = false) String productName) {
+        List<Sale> sales = saleService.searchSales(saleId, clientName, productName);
+        return ResponseEntity.ok(sales);
+    }
 }
