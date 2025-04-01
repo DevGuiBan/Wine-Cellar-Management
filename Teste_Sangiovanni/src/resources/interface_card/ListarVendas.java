@@ -18,9 +18,12 @@ import com.toedter.calendar.JDateChooser;
 import io.github.cdimascio.dotenv.Dotenv;
 import com.itextpdf.text.Font;
 
+import javax.swing.Timer;
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import javax.swing.table.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -30,7 +33,9 @@ import java.net.URL;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.Objects;
 import java.util.Scanner;
 
@@ -83,6 +88,25 @@ public class ListarVendas extends JPanel {
                 }
             }
         });
+
+        timer.setRepeats(false);
+        pesquisaProduto.getDocument().addDocumentListener(new DocumentListener() {
+            @Override
+            public void insertUpdate(DocumentEvent e) {
+                timer.restart();
+            }
+
+            @Override
+            public void removeUpdate(DocumentEvent e) {
+                timer.restart();
+            }
+
+            @Override
+            public void changedUpdate(DocumentEvent e) {
+                timer.restart();
+            }
+        });
+
         jPanelTopoTabela.add(pesquisaProduto);
 
         jPanelTopoTabela.add(Box.createHorizontalStrut(500));
@@ -108,7 +132,7 @@ public class ListarVendas extends JPanel {
         jButtonFiltrar.setContentAreaFilled(false);
         jButtonFiltrar.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         jButtonFiltrar.setPreferredSize(new java.awt.Dimension(90, 40));
-        jButtonFiltrar.addActionListener(evt->filtro());
+        jButtonFiltrar.addActionListener(evt -> filtro());
         jPanelTopoTabela.add(jButtonFiltrar);
 
         jPanelTabela.setPreferredSize(new Dimension(1145, 450));
@@ -226,7 +250,90 @@ public class ListarVendas extends JPanel {
         this.getVendas();
     }
 
-    private void getFuncionariosByDate(String dateIn,String dateOut){
+    private void searchSales(Long saleId, String clientName, String productName) {
+        try {
+            String urlAPI = this.dotenv.get("API_HOST");
+            // Construindo a URL com os parâmetros de busca
+            StringBuilder urlBuilder = new StringBuilder(urlAPI + "/sale/search");
+            urlBuilder.append("?");
+            boolean hasParam = false;
+
+            if (saleId != null) {
+                urlBuilder.append("saleId=").append(saleId);
+                hasParam = true;
+            }
+            if (clientName != null && !clientName.isEmpty()) {
+                if (hasParam) urlBuilder.append("&");
+                urlBuilder.append("clientName=").append(URLEncoder.encode(clientName, "UTF-8"));
+                hasParam = true;
+            }
+            if (productName != null && !productName.isEmpty()) {
+                if (hasParam) urlBuilder.append("&");
+                urlBuilder.append("productName=").append(URLEncoder.encode(productName, "UTF-8"));
+            }
+
+            URL url = new URL(urlBuilder.toString());
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.setRequestMethod("GET");
+
+            int responseCode = connection.getResponseCode();
+            if (responseCode == HttpURLConnection.HTTP_OK) {
+                try (BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()))) {
+                    StringBuilder response = new StringBuilder();
+                    String line;
+                    while ((line = reader.readLine()) != null) {
+                        response.append(line);
+                    }
+
+                    JsonArray sales = JsonParser.parseString(response.toString()).getAsJsonArray();
+
+                    DefaultTableModel tableModel = (DefaultTableModel) jtable.getModel();
+                    tableModel.setRowCount(0); // Limpa a tabela antes de adicionar novos dados
+
+                    for (int i = 0; i < sales.size(); i++) {
+                        JsonObject sale = sales.get(i).getAsJsonObject();
+                        String id = sale.get("id").getAsString();
+                        JsonObject clientDTO = sale.get("client").getAsJsonObject();
+                        String saleClientName = clientDTO.get("name").getAsString();
+                        String date = sale.get("saleDate").getAsString();
+                        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+                        String dateFormatted;
+                        try {
+                            // Tenta parsear a data presumindo que ela vem em formato ISO (ex.: 2025-04-01)
+                            LocalDate parsedDate = LocalDate.parse(date);
+                            dateFormatted = parsedDate.format(formatter);
+                        } catch (DateTimeParseException e) {
+                            dateFormatted = date; // Usa o valor original se não puder formatar
+                        }
+                        String paymentMethod = sale.get("paymentMethod").getAsString();
+                        String totalValue = sale.get("totalPrice").getAsString();
+
+                        tableModel.addRow(new Object[]{id, saleClientName, dateFormatted, paymentMethod, totalValue, "Ações"});
+                    }
+                    connection.disconnect();
+                }
+            } else {
+                JOptionPane.showMessageDialog(rootPane,
+                        "Erro ao buscar vendas: Código " + responseCode,
+                        "Problema na Busca",
+                        JOptionPane.ERROR_MESSAGE);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(rootPane, "Erro na busca: " + e.getMessage());
+        }
+    }
+
+    private void filterSales() {
+        String searchText = pesquisaProduto.getText().trim();
+        if (searchText.equals("Pesquisar Venda") || searchText.isEmpty()) {
+            getVendas();
+        } else {
+            searchSales(null, searchText, null);
+        }
+    }
+
+    private void getFuncionariosByDate(String dateIn, String dateOut) {
         try {
             String urlAPI = this.dotenv.get("API_HOST");
             String urlString = urlAPI + "/employee/date?start_date=" + URLEncoder.encode(dateIn, StandardCharsets.UTF_8) +
@@ -296,7 +403,7 @@ public class ListarVendas extends JPanel {
                         "Problema no Servidor",
                         JOptionPane.DEFAULT_OPTION,
                         JOptionPane.ERROR_MESSAGE,
-                        null,null,null);
+                        null, null, null);
                 connection.disconnect();
             }
         } catch (Exception e) {
@@ -304,7 +411,7 @@ public class ListarVendas extends JPanel {
         }
     }
 
-    private void filtro(){
+    private void filtro() {
         JFrame frame = (JFrame) SwingUtilities.getWindowAncestor(rootPane);
 
         JDialog dialog = new JDialog(frame, "Filtros", true);
@@ -318,7 +425,7 @@ public class ListarVendas extends JPanel {
 
         JLabel chkDataNascimento = new JLabel("Período da Venda:");
         chkDataNascimento.setForeground(Color.BLACK);
-        chkDataNascimento.setFont(new java.awt.Font("Cormorant Garamond", java.awt.Font.BOLD,14));
+        chkDataNascimento.setFont(new java.awt.Font("Cormorant Garamond", java.awt.Font.BOLD, 14));
         gbc.gridx = 0;
         gbc.gridy = 0;
         gbc.gridwidth = 2;
@@ -327,26 +434,26 @@ public class ListarVendas extends JPanel {
         gbc.gridwidth = 1;
         gbc.gridy = 1;
         JLabel de = new JLabel("de");
-        de.setFont(new java.awt.Font("Cormorant Garamond", java.awt.Font.BOLD,14));
+        de.setFont(new java.awt.Font("Cormorant Garamond", java.awt.Font.BOLD, 14));
         de.setForeground(Color.BLACK);
         dialog.add(de, gbc);
         gbc.gridx = 1;
         JDateChooser dateChooserDe = new JDateChooser();
         dateChooserDe.setDateFormatString("dd/MM/yyyy");
-        dateChooserDe.setFont(new java.awt.Font("Cormorant Infant", java.awt.Font.BOLD,14));
+        dateChooserDe.setFont(new java.awt.Font("Cormorant Infant", java.awt.Font.BOLD, 14));
         dateChooserDe.setForeground(Color.BLACK);
         dialog.add(dateChooserDe, gbc);
 
         gbc.gridx = 0;
         gbc.gridy = 2;
         JLabel ate = new JLabel("até");
-        ate.setFont(new java.awt.Font("Cormorant Garamond", java.awt.Font.BOLD,14));
+        ate.setFont(new java.awt.Font("Cormorant Garamond", java.awt.Font.BOLD, 14));
         ate.setForeground(Color.BLACK);
         dialog.add(ate, gbc);
         gbc.gridx = 1;
         JDateChooser dateChooserAte = new JDateChooser();
         dateChooserAte.setDateFormatString("dd/MM/yyyy");
-        dateChooserAte.setFont(new java.awt.Font("Cormorant Infant", java.awt.Font.BOLD,14));
+        dateChooserAte.setFont(new java.awt.Font("Cormorant Infant", java.awt.Font.BOLD, 14));
         dateChooserAte.setForeground(Color.BLACK);
         dialog.add(dateChooserAte, gbc);
 
@@ -356,7 +463,7 @@ public class ListarVendas extends JPanel {
 
         JButton btnFiltrar = new JButton("Filtrar");
         btnFiltrar.setBackground(new Color(0, 0, 139));
-        btnFiltrar.setFont(new java.awt.Font("Cormorant Garamond", java.awt.Font.BOLD,16));
+        btnFiltrar.setFont(new java.awt.Font("Cormorant Garamond", java.awt.Font.BOLD, 16));
         btnFiltrar.setForeground(Color.WHITE);
         btnFiltrar.setFocusPainted(false);
         btnFiltrar.setCursor(new Cursor(Cursor.HAND_CURSOR));
@@ -367,10 +474,10 @@ public class ListarVendas extends JPanel {
             String dataDe = dateChooserDe.getDate() != null ? sdf.format(dateChooserDe.getDate()) : "Não selecionado";
             String dataAte = dateChooserAte.getDate() != null ? sdf.format(dateChooserAte.getDate()) : "Não selecionado";
 
-            if(dataDe.equals("Não selecionado")||dataAte.equals("Não selecionado")){
-                JOptionPane.showMessageDialog(frame,"Informe o perído corretamente!","Erro ao selecionar datas do perído",JOptionPane.ERROR_MESSAGE);
-            }else{
-                getFuncionariosByDate(dataDe,dataAte);
+            if (dataDe.equals("Não selecionado") || dataAte.equals("Não selecionado")) {
+                JOptionPane.showMessageDialog(frame, "Informe o perído corretamente!", "Erro ao selecionar datas do perído", JOptionPane.ERROR_MESSAGE);
+            } else {
+                getFuncionariosByDate(dataDe, dataAte);
             }
 
         });
@@ -387,6 +494,7 @@ public class ListarVendas extends JPanel {
     private javax.swing.JPanel jPanel4;
     private javax.swing.JButton jButtonCadastrar;
     private javax.swing.JButton jButtonFiltrar;
+    private final Timer timer = new Timer(300, e -> filterSales());
 }
 
 class ButtonRendererProductVenda extends JPanel implements TableCellRenderer {

@@ -7,6 +7,8 @@ import com.google.gson.JsonParser;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import javax.swing.table.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -14,6 +16,9 @@ import java.awt.event.ActionListener;
 import java.math.BigInteger;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.Objects;
 import com.google.gson.JsonObject;
 import java.net.HttpURLConnection;
@@ -88,6 +93,25 @@ public class ListarProduto extends JPanel {
                 }
             }
         });
+
+        timer.setRepeats(false);
+        pesquisaProduto.getDocument().addDocumentListener(new DocumentListener() {
+            @Override
+            public void insertUpdate(DocumentEvent e) {
+                timer.restart();
+            }
+
+            @Override
+            public void removeUpdate(DocumentEvent e) {
+                timer.restart();
+            }
+
+            @Override
+            public void changedUpdate(DocumentEvent e) {
+                timer.restart();
+            }
+        });
+
         jPanelTopoTabela.add(pesquisaProduto);
 
         jPanelTopoTabela.add(Box.createHorizontalStrut(300));
@@ -300,6 +324,86 @@ public class ListarProduto extends JPanel {
 
         jtable.getTableHeader().repaint();
         jtable.repaint();
+    }
+
+    private void searchProduct(String prodId, String name) {
+        try {
+            String urlAPI = this.dotenv.get("API_HOST");
+            // Construindo a URL com os parâmetros de busca
+            StringBuilder urlBuilder = new StringBuilder(urlAPI + "/product/search");
+            urlBuilder.append("?");
+            boolean hasParam = false;
+
+            if (prodId != null && !prodId.isEmpty()) {
+                if (hasParam) urlBuilder.append("&");
+                urlBuilder.append("productId=").append(URLEncoder.encode(prodId, "UTF-8"));
+                hasParam = true;
+            }
+
+            if (name != null && !name.isEmpty()) {
+                if (hasParam) urlBuilder.append("&");
+                urlBuilder.append("productName=").append(URLEncoder.encode(name, "UTF-8"));
+                hasParam = true;
+            }
+
+            URL url = new URL(urlBuilder.toString());
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.setRequestMethod("GET");
+
+            int responseCode = connection.getResponseCode();
+            if (responseCode == HttpURLConnection.HTTP_OK) {
+                try (BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()))) {
+                    StringBuilder response = new StringBuilder();
+                    String line;
+                    while ((line = reader.readLine()) != null) {
+                        response.append(line);
+                    }
+
+                    JsonArray products = JsonParser.parseString(response.toString()).getAsJsonArray();
+
+                    DefaultTableModel tableModel = (DefaultTableModel) jtable.getModel();
+                    tableModel.setRowCount(0); // Limpa a tabela antes de adicionar novos dados
+
+                    for (int i = 0; i < products.size(); i++) {
+                        JsonObject product = products.get(i).getAsJsonObject();
+                        BigInteger id = product.get("id").getAsBigInteger();
+                        String nameP = product.get("name").getAsString();
+                        JsonObject supplier = product.get("supplier").getAsJsonObject();
+                        JsonObject prodT = product.get("productType").getAsJsonObject();
+                        String product_type = prodT.get("name").getAsString();
+                        String supplierName = supplier.get("name").getAsString();
+                        String quantity = product.get("quantity").getAsString();
+                        String price = product.get("price").getAsString();
+
+                        tableModel.addRow(new Object[]{id, nameP, supplierName,product_type, price,quantity});
+                    }
+                    connection.disconnect();
+                }
+            } else {
+                JOptionPane.showMessageDialog(rootPane,
+                        "Erro ao buscar produtos: Código " + responseCode,
+                        "Problema na Busca",
+                        JOptionPane.ERROR_MESSAGE);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(rootPane, "Erro na busca: " + e.getMessage());
+        }
+    }
+
+    private void filterSales() {
+        String searchText = pesquisaProduto.getText().trim();
+        if (searchText.equals("Pesquisar produto") || searchText.isEmpty()) {
+            getProduct();
+        } else {
+            if(searchText.matches(".*\\d.*")) {
+                searchProduct(searchText, null);
+            }else{
+                searchProduct(null, searchText);
+            }
+
+
+        }
     }
 
     class CheckBoxRenderer extends JCheckBox implements TableCellRenderer {
@@ -1222,6 +1326,7 @@ public class ListarProduto extends JPanel {
     private javax.swing.JPanel jPanel4;
     private javax.swing.JButton jButtonCadastrar;
     private javax.swing.JButton jButtonFiltrar;
+    private final Timer timer = new Timer(300, e -> filterSales());
 }
 
 class ButtonRendererProduct_ extends JPanel implements TableCellRenderer {

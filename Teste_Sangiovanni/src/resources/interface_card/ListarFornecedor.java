@@ -6,12 +6,15 @@ import com.google.gson.JsonParser;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import javax.swing.table.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+import java.math.BigInteger;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
@@ -138,6 +141,24 @@ public class ListarFornecedor extends JPanel {
                 if (pesquisaProduto.getText().isEmpty()) {
                     pesquisaProduto.setText("Pesquisar Fornecedor");
                 }
+            }
+        });
+
+        timer.setRepeats(false);
+        pesquisaProduto.getDocument().addDocumentListener(new DocumentListener() {
+            @Override
+            public void insertUpdate(DocumentEvent e) {
+                timer.restart();
+            }
+
+            @Override
+            public void removeUpdate(DocumentEvent e) {
+                timer.restart();
+            }
+
+            @Override
+            public void changedUpdate(DocumentEvent e) {
+                timer.restart();
             }
         });
         jPanelTopoTabela.add(pesquisaProduto);
@@ -456,6 +477,107 @@ public class ListarFornecedor extends JPanel {
         dialog.setVisible(true);
     }
 
+    private void searchSupplier(String supId, String name,String email, String cnpj) {
+        try {
+            String urlAPI = this.dotenv.get("API_HOST");
+            // Construindo a URL com os parâmetros de busca
+            StringBuilder urlBuilder = new StringBuilder(urlAPI + "/supplier/search");
+            urlBuilder.append("?");
+            boolean hasParam = false;
+
+            if (supId != null && !supId.isEmpty()) {
+                if (hasParam) urlBuilder.append("&");
+                urlBuilder.append("supplierId=").append(URLEncoder.encode(supId, "UTF-8"));
+                hasParam = true;
+            }
+
+            if (name != null && !name.isEmpty()) {
+                if (hasParam) urlBuilder.append("&");
+                urlBuilder.append("name=").append(URLEncoder.encode(name, "UTF-8"));
+                hasParam = true;
+            }
+
+            if (email != null && !email.isEmpty()) {
+                if (hasParam) urlBuilder.append("&");
+                urlBuilder.append("email=").append(URLEncoder.encode(email, "UTF-8"));
+                hasParam = true;
+            }
+
+            if (cnpj != null && !cnpj.isEmpty()) {
+                if (hasParam) urlBuilder.append("&");
+                urlBuilder.append("cnpj=").append(URLEncoder.encode(cnpj, "UTF-8"));
+            }
+
+            URL url = new URL(urlBuilder.toString());
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.setRequestMethod("GET");
+
+            int responseCode = connection.getResponseCode();
+            if (responseCode == HttpURLConnection.HTTP_OK) {
+                try (BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()))) {
+                    StringBuilder response = new StringBuilder();
+                    String line;
+                    while ((line = reader.readLine()) != null) {
+                        response.append(line);
+                    }
+
+                    JsonArray suppliers = JsonParser.parseString(response.toString()).getAsJsonArray();
+
+                    DefaultTableModel tableModel = (DefaultTableModel) jtable.getModel();
+                    tableModel.setRowCount(0);
+                    ArrayList<SupplierCount> counts = getSupplierCount();
+
+                    for (int i = 0; i < suppliers.size(); i++) {
+                        JsonObject supplier = suppliers.get(i).getAsJsonObject();
+                        String id = supplier.get("id").getAsString();
+                        String nameS = supplier.get("name").getAsString();
+                        String emailS = supplier.get("email").getAsString();
+                        String cnpjS = supplier.get("cnpj").getAsString();
+                        String address = supplier.get("address").getAsString();
+                        String phone = supplier.get("phoneNumber").getAsString();
+
+                        Long count = 0L;
+                        for (SupplierCount sc : counts) {
+                            if (sc.getSupplierName().equals(nameS)) {
+                                count = sc.getProductCount();
+                                break;
+                            }
+                        }
+
+                        tableModel.addRow(new Object[]{id, nameS, emailS, cnpjS, address, phone, count});
+                    }
+                    connection.disconnect();
+                }
+            } else {
+                JOptionPane.showMessageDialog(rootPane,
+                        "Erro ao buscar produtos: Código " + responseCode,
+                        "Problema na Busca",
+                        JOptionPane.ERROR_MESSAGE);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(rootPane, "Erro na busca: " + e.getMessage());
+        }
+    }
+
+    private void filterSales() {
+        String searchText = pesquisaProduto.getText().trim();
+        if (searchText.equals("Pesquisar Fornecedor") || searchText.isEmpty()) {
+            getSupplier();
+        } else {
+            if(searchText.contains(".")){
+                searchSupplier(null, null, null,searchText);
+            }else if(searchText.contains("@")){
+                searchSupplier(null, null, searchText,null);
+            }else if(searchText.matches(".*\\d.*")){
+                searchSupplier(searchText, null, null,null);
+            }else{
+                searchSupplier(null, searchText, null,null);
+            }
+
+        }
+    }
+
     // Declaração de variáveis
     private javax.swing.JButton jButtonCadastrar;
     private javax.swing.JButton jButtonFiltrar;
@@ -465,6 +587,7 @@ public class ListarFornecedor extends JPanel {
     private javax.swing.JTextField pesquisaProduto;
     private javax.swing.JTable jtable;
     private javax.swing.JScrollPane jScrollPane;
+    private final Timer timer = new Timer(300, e -> filterSales());
 }
 
 class ButtonRendererSupplier extends JPanel implements TableCellRenderer {
