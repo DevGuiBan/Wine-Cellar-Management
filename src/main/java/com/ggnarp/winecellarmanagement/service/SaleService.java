@@ -256,10 +256,14 @@ public class SaleService {
         }
     }
 
-    public List<Sale> searchSales(String clientName, String productName) {
+    public List<Sale> searchSales(Long saleId, String clientName, String productName) {
 
         Specification<Sale> spec = (root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();
+
+            if (saleId != null) {
+                predicates.add(criteriaBuilder.equal(root.get("id"), saleId));
+            }
 
             if (clientName != null && !clientName.isEmpty()) {
                 predicates.add(criteriaBuilder.like(root.get("client").get("name"), "%" + clientName + "%"));

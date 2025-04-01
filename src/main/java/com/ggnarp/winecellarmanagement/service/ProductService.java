@@ -8,9 +8,12 @@ import com.ggnarp.winecellarmanagement.entity.Supplier;
 import com.ggnarp.winecellarmanagement.repository.ProductRepository;
 import com.ggnarp.winecellarmanagement.repository.ProductTypeRepository;
 import com.ggnarp.winecellarmanagement.repository.SupplierRepository;
+import jakarta.persistence.criteria.Predicate;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.ResourceAccessException;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -222,4 +225,23 @@ public class ProductService {
             throw new ResourceAccessException("Erro ao atualizar o estoque dos produtos!");
         }
     }
+
+    public List<Product> searchProducts(Long productId, String productName) {
+        Specification<Product> spec = (root, query, criteriaBuilder) -> {
+            List<Predicate> predicates = new ArrayList<>();
+
+            if (productId != null) {
+                predicates.add(criteriaBuilder.equal(root.get("id"), productId));
+            }
+
+            if (productName != null && !productName.isEmpty()) {
+                predicates.add(criteriaBuilder.like(root.get("name"), "%" + productName + "%"));
+            }
+
+            return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
+        };
+
+        return productRepository.findAll(spec);
+    }
+
 }

@@ -68,9 +68,10 @@ public class SaleController {
     }
 
     @GetMapping("/search")
-    public ResponseEntity<List<Sale>> searchSales(@RequestParam(required = false) String clientName,
+    public ResponseEntity<List<Sale>> searchSales(@RequestParam(required = false) Long saleId,
+                                                  @RequestParam(required = false) String clientName,
                                                   @RequestParam(required = false) String productName) {
-        List<Sale> sales = saleService.searchSales(clientName, productName);
+        List<Sale> sales = saleService.searchSales(saleId, clientName, productName);
         return ResponseEntity.ok(sales);
     }
 }
