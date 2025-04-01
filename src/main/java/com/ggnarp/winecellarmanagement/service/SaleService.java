@@ -1,5 +1,6 @@
 package com.ggnarp.winecellarmanagement.service;
 
+import com.ggnarp.winecellarmanagement.dto.ReportDTO;
 import com.ggnarp.winecellarmanagement.dto.SaleDTO;
 import com.ggnarp.winecellarmanagement.entity.Client;
 import com.ggnarp.winecellarmanagement.entity.Product;
@@ -11,9 +12,13 @@ import com.ggnarp.winecellarmanagement.repository.SaleRepository;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.ResourceAccessException;
+
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -79,7 +84,7 @@ public class SaleService {
         return saleRepository.save(sale);
     }
 
-    public Optional<SaleDTO> convertToDTO(Sale sale) {
+    public SaleDTO convertToDTO(Sale sale) {
         SaleDTO dto = new SaleDTO();
         dto.setId(sale.getId());
         dto.setClientId(sale.getClient().getId());
@@ -100,13 +105,13 @@ public class SaleService {
 
         dto.setProducts(productDTOs);
 
-        return Optional.of(dto);
+        return dto;
     }
 
     @Transactional(readOnly = true)
-    public List<Optional<SaleDTO>> listSales() {
-        return saleRepository.findAll().stream().map(sale->{
-            Optional<SaleDTO> saleDTO = Optional.of(new SaleDTO());
+    public List<SaleDTO> listSales() {
+        return saleRepository.findAll().stream().map(sale -> {
+            SaleDTO saleDTO = new SaleDTO();
             saleDTO = convertToDTO(sale);
             return saleDTO;
         }).collect(Collectors.toList());
@@ -175,4 +180,77 @@ public class SaleService {
         }
         saleRepository.deleteById(id);
     }
+
+    @Transactional(readOnly = true)
+    public ReportDTO generateReports(String dateIn, String dateOut) {
+        try {
+            try {
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+                LocalDate date_in = LocalDate.parse(dateIn, formatter);
+                LocalDate date_out = LocalDate.parse(dateOut, formatter);
+
+                List<SaleDTO> sales = saleRepository.findBySaleDateBetween(date_in, date_out)
+                        .stream()
+                        .map(this::convertToDTO)
+                        .toList();
+
+                if (sales.isEmpty()) {
+                    throw new IllegalArgumentException("Não foi possível encontrar vendas nesse recorte de tempo.");
+                }
+
+                List<ReportDTO.SaleReportDTO> saleReportList = sales.stream()
+                        .flatMap(sale -> sale.getProducts().stream())
+                        .collect(Collectors.groupingBy(
+                                SaleDTO.SaleProductDTO::getName,
+                                Collectors.collectingAndThen(
+                                        Collectors.toList(),
+                                        saleProducts -> {
+                                            int totalQuantity = saleProducts.stream().mapToInt(SaleDTO.SaleProductDTO::getQuantity).sum();
+                                            BigDecimal totalSum = saleProducts.stream()
+                                                    .map(sp -> sp.getPrice().multiply(BigDecimal.valueOf(sp.getQuantity())))
+                                                    .reduce(BigDecimal.ZERO, BigDecimal::add);
+                                            ReportDTO.SaleReportDTO reportDTO = new ReportDTO.SaleReportDTO();
+                                            reportDTO.setName(saleProducts.get(0).getName());
+                                            reportDTO.setQuantity(totalQuantity);
+                                            reportDTO.setTotalSum(totalSum);
+                                            return reportDTO;
+                                        }
+                                )
+                        ))
+                        .values()
+                        .stream()
+                        .sorted(Comparator.comparingInt(ReportDTO.SaleReportDTO::getQuantity).reversed())
+                        .collect(Collectors.toList());
+
+                BigDecimal totalSalesAmount = sales.stream()
+                        .map(SaleDTO::getTotalPrice)
+                        .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+                long daysWithSales = sales.stream()
+                        .map(SaleDTO::getSaleDate)
+                        .distinct()
+                        .count();
+
+                BigDecimal avgSale = daysWithSales > 0 ? totalSalesAmount.divide(BigDecimal.valueOf(daysWithSales), BigDecimal.ROUND_HALF_UP) : BigDecimal.ZERO;
+
+                long totalDays = ChronoUnit.DAYS.between(date_in, date_out) + 1;
+                BigDecimal avgSaleTotal = totalSalesAmount.divide(BigDecimal.valueOf(totalDays), BigDecimal.ROUND_HALF_UP);
+
+                ReportDTO reportDTO = new ReportDTO();
+                reportDTO.setSales(saleReportList);
+                reportDTO.setAvgSale(avgSale);
+                reportDTO.setAvgSaleTotal(avgSaleTotal);
+
+                return reportDTO;
+
+            } catch (Exception e) {
+                throw new IllegalArgumentException("Insira uma data válida para gerar o relatório!");
+            }
+
+        } catch (Exception e) {
+            throw new ResourceAccessException("Ocorreu um erro ao pesquisar as vendas.\n" + e.getMessage());
+        }
+    }
+
+
 }

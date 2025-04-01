@@ -28,6 +28,11 @@ public interface EmployeeRepository extends JpaRepository<Employee, UUID> {
                                                   @Param("endDate") LocalDate endDate,
                                                   @Param("termo") String termo);
 
-    boolean existsByEmailAndPassword(String email, String password);
+    Employee findByEmailAndPassword(String email, String password);
 
+    Employee findByPhoneNumber(String phoneNumber);
+
+    Employee findByEmail(String email);
+
+    Employee findByCpf(String cpf);
 }

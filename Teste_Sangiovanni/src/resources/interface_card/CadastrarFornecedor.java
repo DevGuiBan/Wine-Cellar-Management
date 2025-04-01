@@ -294,7 +294,7 @@ public class CadastrarFornecedor extends JPanel {
                 JsonObject suppliers = JsonParser.parseString(response.toString()).getAsJsonObject();
 
                 jTextFieldNome.setText(suppliers.get("name").getAsString());
-                jTextFieldTelefone.setText(suppliers.get("phone_number").getAsString());
+                jTextFieldTelefone.setText(suppliers.get("phoneNumber").getAsString());
                 jTextFieldEmail.setText(suppliers.get("email").getAsString());
                 jTextFieldCPNJ.setText(suppliers.get("cnpj").getAsString());
                 jTextFieldEndereco.setText(suppliers.get("address").getAsString());
@@ -350,7 +350,7 @@ public class CadastrarFornecedor extends JPanel {
             jsonData.addProperty("email", email);
             jsonData.addProperty("observation", observation);
             jsonData.addProperty("address", address);
-            jsonData.addProperty("phone_number", phone_number);
+            jsonData.addProperty("phoneNumber", phone_number);
 
             // making the request
             String urlAPI = this.dotenv.get("API_HOST");
@@ -424,7 +424,7 @@ public class CadastrarFornecedor extends JPanel {
             jsonData.addProperty("email", email);
             jsonData.addProperty("observation", observation);
             jsonData.addProperty("address", address);
-            jsonData.addProperty("phone_number", phone_number);
+            jsonData.addProperty("phoneNumber", phone_number);
 
             // making the request
             String urlAPI = this.dotenv.get("API_HOST");

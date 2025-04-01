@@ -66,16 +66,22 @@ public class ManagerService {
             manager.setName(managerDTO.getName());
         }
         if (!managerDTO.getEmail().isBlank()) {
-            if (!managerDTO.getEmail().equals(manager.getEmail()) && managerRepository.existsByEmail(managerDTO.getEmail())) {
-                throw new IllegalArgumentException("Já existe um Gerente cadastrado com esse e-mail.");
+            Manager man = managerRepository.findByEmail(managerDTO.getEmail());
+            if (managerRepository.existsByEmail(managerDTO.getEmail())) {
+                if (!man.getId().equals(manager.getId())) {
+                    throw new IllegalArgumentException("Já existe um Gerente cadastrado com esse e-mail.");
+                }
+                manager.setEmail(managerDTO.getEmail());
             }
-            manager.setEmail(managerDTO.getEmail());
         }
         if (!managerDTO.getCpf().isBlank()) {
-            if (!managerDTO.getCpf().equals(manager.getCpf()) && managerRepository.existsByCpf(managerDTO.getCpf())) {
-                throw new IllegalArgumentException("Já existe um Gerente cadastrado com esse CPF.");
+            Manager man = managerRepository.findByCpf(managerDTO.getCpf());
+            if (managerRepository.existsByCpf(managerDTO.getCpf())) {
+                if (!man.getId().equals(manager.getId())) {
+                    throw new IllegalArgumentException("Já existe um Gerente cadastrado com esse CPF.");
+                }
+                manager.setCpf(managerDTO.getCpf());
             }
-            manager.setCpf(managerDTO.getCpf());
         }
         if (!managerDTO.getPassword().isBlank()) {
             manager.setPassword(managerDTO.getPassword());
@@ -91,7 +97,4 @@ public class ManagerService {
         managerRepository.delete(manager);
     }
 
-    public boolean login(String email, String password){
-        return managerRepository.existsByEmailAndPassword(email, password);
-    }
 }

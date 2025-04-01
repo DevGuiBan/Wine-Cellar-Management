@@ -13,5 +13,8 @@
     <orderEntry type="library" name="io.github.cdimascio.dotenv.java" level="project" />
     <orderEntry type="library" name="apache.xmlgraphics.batik.all" level="project" />
     <orderEntry type="library" name="toedter.jcalendar" level="project" />
+    <orderEntry type="library" name="google.zxing.core" level="project" />
+    <orderEntry type="library" name="google.zxing.javase" level="project" />
+    <orderEntry type="library" name="itextpdf" level="project" />
   </component>
 </module>

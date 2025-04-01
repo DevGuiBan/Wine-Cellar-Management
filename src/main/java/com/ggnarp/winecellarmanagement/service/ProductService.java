@@ -73,7 +73,7 @@ public class ProductService {
         supplierDTO.setEmail(product.getSupplier().getEmail());
         supplierDTO.setAddress(product.getSupplier().getAddress());
         supplierDTO.setCnpj(product.getSupplier().getCnpj());
-        supplierDTO.setPhone_number(product.getSupplier().getPhone_number());
+        supplierDTO.setPhone_number(product.getSupplier().getPhoneNumber());
         dto.setSupplier(supplierDTO);
 
         return dto;

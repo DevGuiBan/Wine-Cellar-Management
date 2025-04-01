@@ -36,7 +36,7 @@ public class TaxReceiptController {
     @GetMapping("/{saleId}")
     public ResponseEntity<?> getTaxReceiptBySaleId(@PathVariable Long saleId) {
         try{
-            List<TaxReceiptDTO> trs = taxReceiptService.getBySaleId(saleId);
+            TaxReceiptDTO trs = taxReceiptService.getBySaleId(saleId);
             return ResponseEntity.status(HttpStatus.OK).body(trs);
         }
         catch(Exception e){

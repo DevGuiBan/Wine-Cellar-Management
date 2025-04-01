@@ -1,5 +1,6 @@
 package com.ggnarp.winecellarmanagement.controller;
 
+import com.ggnarp.winecellarmanagement.dto.ReportDTO;
 import com.ggnarp.winecellarmanagement.dto.SaleDTO;
 import com.ggnarp.winecellarmanagement.entity.Sale;
 import com.ggnarp.winecellarmanagement.service.SaleService;
@@ -33,6 +34,17 @@ public class SaleController {
     @GetMapping
     public ResponseEntity<?> listSales() {
         return ResponseEntity.ok(saleService.listSales());
+    }
+
+    @GetMapping("/report")
+    public ResponseEntity<?> getReport(@RequestParam("start_date") String startDate,
+                                       @RequestParam("end_date") String endDate){
+        try {
+            ReportDTO sale = saleService.generateReports(startDate,endDate);
+            return ResponseEntity.status(HttpStatus.OK).body(sale);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Erro ao processar a venda: " + e.getMessage());
+        }
     }
 
     @PutMapping("/{id}")

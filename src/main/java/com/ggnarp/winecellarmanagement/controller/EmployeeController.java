@@ -1,7 +1,5 @@
 package com.ggnarp.winecellarmanagement.controller;
 
-import com.ggnarp.winecellarmanagement.dto.ClientDTO;
-import com.ggnarp.winecellarmanagement.dto.DateRangeDTO;
 import com.ggnarp.winecellarmanagement.dto.EmployeeDTO;
 import com.ggnarp.winecellarmanagement.dto.LoginRequest;
 import com.ggnarp.winecellarmanagement.entity.Employee;
@@ -139,21 +137,4 @@ public class EmployeeController {
         }
     }
 
-    @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody LoginRequest loginRequest) {
-        try {
-            boolean result = employeeService.login(loginRequest.getEmail(), loginRequest.getPassword());
-            if(result){
-                return ResponseEntity.status(HttpStatus.OK).build();
-            }
-            else{
-                throw new IllegalArgumentException("Credênciais Inválidas!");
-            }
-        } catch (Exception e) {
-            Map<String, String> errorResponse = new HashMap<>();
-            errorResponse.put("error", "Erro ao realizar o login do funcionário!");
-            errorResponse.put("message", e.getMessage());
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorResponse);
-        }
-    }
 }

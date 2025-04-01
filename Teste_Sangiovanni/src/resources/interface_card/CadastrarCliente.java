@@ -43,10 +43,20 @@ public class CadastrarCliente extends JPanel {
         jLabelDataNascimento = new JLabel();
         jLabelCadastro = new JLabel();
         jLabelNome = new JLabel();
-        jLabelEndereco = new JLabel();
+        jLabelRua = new JLabel();
+        jLabelBairro = new JLabel();
+        jLabelNumero = new JLabel();
+        jLabelCidade = new JLabel();
+        jLabelUF = new JLabel();
 
         jTextFieldNome = new JTextField();
         jTextFieldEmail = new JTextField();
+        jTextFieldRua = new jTextField();
+        jTextFieldBairro = new jTextField();
+        jTextFieldNumero = new jTextField();
+        jTextFieldCidade = new JTextField();
+        jComboBoxUF = new JComboBox<UF>();
+
         try{
             jTextFieldTelefone = new JFormattedTextField(new MaskFormatter("(##) #####-####"));
             jTextFieldCPF = new JFormattedTextField(new MaskFormatter("###.###.###-##"));
@@ -133,8 +143,8 @@ public class CadastrarCliente extends JPanel {
         this.jLabelTelefone.setFont(new Font("Cormorant Garamond", 1, 18));
         this.jLabelTelefone.setText("Telefone:");
         this.jLabelTelefone.setForeground(Color.BLACK);
-        this.gbc.gridx = 1;
-        this.gbc.gridy = 0;
+        this.gbc.gridx = 0;
+        this.gbc.gridy = 2;
         this.gbc.insets = new Insets(0, 0, 0, 0);
         this.jPanelContent.add(this.jLabelTelefone, this.gbc);
 
@@ -143,8 +153,8 @@ public class CadastrarCliente extends JPanel {
         this.jTextFieldTelefone.setFont(new Font("Cormorant Infant", 1, 18));
         this.jTextFieldTelefone.setForeground(Color.BLACK);
         this.jTextFieldTelefone.setPreferredSize(fieldSize);
-        this.gbc.gridx = 1;
-        this.gbc.gridy = 1;
+        this.gbc.gridx = 0;
+        this.gbc.gridy = 3;
         this.gbc.insets = new Insets(0, 0, 20, 0);
         this.jPanelContent.add(this.jTextFieldTelefone, this.gbc);
 
@@ -152,7 +162,7 @@ public class CadastrarCliente extends JPanel {
         this.jLabelCPF.setText("CPF:");
         this.jLabelCPF.setForeground(Color.BLACK);
         this.gbc.gridx = 0;
-        this.gbc.gridy = 2;
+        this.gbc.gridy = 4;
         this.gbc.insets = new Insets(0, 0, 0, 100);
         this.jPanelContent.add(this.jLabelCPF, this.gbc);
 
@@ -163,15 +173,15 @@ public class CadastrarCliente extends JPanel {
         this.jTextFieldCPF.setBorder(new MatteBorder(2, 2, 2, 2, new Color(128, 0, 32)));
         this.jTextFieldCPF.setPreferredSize(fieldSize);
         this.gbc.gridx = 0;
-        this.gbc.gridy = 3;
+        this.gbc.gridy = 5;
         this.gbc.insets = new Insets(0, 0, 20, 100);
         this.jPanelContent.add(this.jTextFieldCPF, this.gbc);
 
         this.jLabelEmail.setText("E-mail:");
         this.jLabelEmail.setFont(new Font("Cormorant Garamond", 1, 18));
         this.jLabelEmail.setForeground(Color.BLACK);
-        this.gbc.gridx = 1;
-        this.gbc.gridy = 2;
+        this.gbc.gridx = 0;
+        this.gbc.gridy = 6;
         this.gbc.insets = new Insets(0, 0, 0, 0);
         this.jPanelContent.add(this.jLabelEmail, this.gbc);
 
@@ -182,37 +192,16 @@ public class CadastrarCliente extends JPanel {
         this.jTextFieldEmail.setText("email@gmail.com");
         this.jTextFieldEmail.setForeground(Color.BLACK);
 
-        this.gbc.gridx = 1;
-        this.gbc.gridy = 3;
+        this.gbc.gridx = 0;
+        this.gbc.gridy = 7;
         this.gbc.insets = new Insets(0, 0, 20, 0);
         this.jPanelContent.add(this.jTextFieldEmail, this.gbc);
-
-        this.jLabelEndereco.setFont(new Font("Cormorant Garamond", 1, 18));
-        this.jLabelEndereco.setText("Endereço:");
-        this.jLabelEndereco.setForeground(Color.BLACK);
-        this.jLabelEndereco.setBackground(Color.WHITE);
-        this.gbc.gridx = 0;
-        this.gbc.gridy = 4;
-        this.gbc.insets = new Insets(0, 0, 0, 100);
-        this.jPanelContent.add(this.jLabelEndereco, this.gbc);
-
-        this.jTextFieldEndereco.setBackground(Color.WHITE);
-        this.jTextFieldEndereco.setFont(new Font("Cormorant Infant", 1, 18));
-        this.jTextFieldEndereco.setBorder(new MatteBorder(2, 2, 2, 2, new Color(128, 0, 32)));
-        this.jTextFieldEndereco.setPreferredSize(fieldSize);
-        this.jTextFieldEndereco.setForeground(Color.BLACK);
-        this.jTextFieldEndereco.setText("Rua, Bairro, Número, Cidade-UF");
-
-        this.gbc.gridx = 0;
-        this.gbc.gridy = 5;
-        this.gbc.insets = new Insets(0, 0, 20, 100);
-        this.jPanelContent.add(this.jTextFieldEndereco, this.gbc);
 
         this.jLabelDataNascimento.setFont(new Font("Cormorant Garamond", 1, 18));
         this.jLabelDataNascimento.setText("Data de Nascimento:");
         this.jLabelDataNascimento.setForeground(Color.BLACK);
-        this.gbc.gridx = 1;
-        this.gbc.gridy = 4;
+        this.gbc.gridx = 0;
+        this.gbc.gridy = 8;
         this.gbc.insets = new Insets(0, 0, 0, 0);
         this.jPanelContent.add(this.jLabelDataNascimento, this.gbc);
 
@@ -221,10 +210,110 @@ public class CadastrarCliente extends JPanel {
         this.jTextFieldDataNascimento.setPreferredSize(fieldSize);
         this.jTextFieldDataNascimento.setForeground(Color.BLACK);
         this.jTextFieldDataNascimento.setFont(new Font("Cormorant Infant", 1, 18));
-        this.gbc.gridx = 1;
-        this.gbc.gridy = 5;
+        this.gbc.gridx = 0;
+        this.gbc.gridy = 9;
         this.gbc.insets = new Insets(0, 0, 20, 0);
         this.jPanelContent.add(this.jTextFieldDataNascimento, this.gbc);
+
+        jLabelRua.setFont(new Font("Cormorant Garamond", 1, 18));
+        jLabelRua.setText("Rua:");
+        jLabelRua.setForeground(Color.BLACK);
+        gbc.gridx = 1;
+        gbc.gridy = 0;
+        gbc.inserts = new Insets(0, 0, 0, 100);
+        jPanelContent.add(jLabelRua, gbc);
+
+        jTextFieldRua.setBackground(Color.WHITE);
+        jTextFieldRua.setFont(new Font("Cormorant Infant", 1, 18));
+        jTextFieldRua.setBorder(new MatteBorder(2, 2, 2, 2, new Color(128, 0, 32)));
+        jTextFieldRua.setPreferredSize(fieldSize);
+        jTextFieldRua.setForeground(Color.BLACK);
+        jTextFieldRua.setText("Rua");
+        gbc.gridx = 1;
+        gbc.gridy = 1;
+        gbc.insets = new Insets(0, 0, 20, 100);
+        jPanelContent.add(jTextFieldRua, gbc);
+
+        jLabelBairro.setFont(new Font("Cormorant Garamond", 1, 18));
+        jLabelBairro.setText("Bairro:");
+        jLabelBairro.setForeground(Color.BLACK);
+        jLabelBairro.setBackground(Color.WHITE);
+        gbc.gridx = 1;
+        gbc.gridy = 2;
+        gbc.insets = new Insets(0, 0, 0, 100);
+        jPanelContent.add(jLabelBairro, gbc);
+
+        jTextFieldBairro.setBackground(Color.WHITE);
+        jTextFieldBairro.setFont(new Font("Cormorant Infant", 1, 18));
+        jTextFieldBairro.setBorder(new MatteBorder(2, 2, 2, 2, new Color(128, 0, 32)));
+        jTextFieldBairro.setPreferredSize(fieldSize);
+        jTextFieldBairro.setForeground(Color.BLACK);
+        jTextFieldBairro.setText("Bairro");
+        gbc.gridx = 1;
+        gbc.gridy = 3;
+        gbc.insets = new Insets(0, 0, 20, 100);
+        jPanelContent.add(jTextFieldBairro, gbc);
+
+        jLabelNumero.setFont(new Font("Cormorant Garamond", 1, 18));
+        jLabelNumero.setText("Número:");
+        jLabelNumero.setForeground(Color.BLACK);
+        jLabelNumero.setBackground(Color.WHITE);
+        gbc.gridx = 1;
+        gbc.gridy = 4;
+        gbc.inserts = new Inserts(0, 0, 0, 100);
+        jPanelContent.add(jLabelNumero, gbc);
+
+        jTextFieldNumero.setBackground(Color.WHITE);
+        jTextFieldNumero.setFont(new Font("Cormorant Infant", 1, 18));
+        jTextFieldNumero.setBorder(new MatteBorder(2, 2, 2, 2, new Color(128, 0, 32)));
+        jTextFieldNumero.setPreferredSize(fieldSize);
+        jTextFieldNumero.setForeground(Color.BLACK);
+        jTextFieldNumero.setText("Número");
+        gbc.gridx = 1;
+        gbc.gridy = 5;
+        gbc.insets = new Insets(0, 0, 20, 100);
+        jPanelContent.add(jTextFieldNumero, gbc);
+
+        jLabelCidade.setFont(new Font("Cormorant Garamond", 1, 18));
+        jLabelCidade.setText("Cidade:");
+        jLabelCidade.setForeground(Color.BLACK);
+        jLabelCidade.setBackground(Color.WHITE);
+        gbc.gridx = 1;
+        gbc.gridy = 6;
+        gbc.insets = new Insets(0, 0, 0, 100);
+        jPanelContent.add(jLabelCidade, gbc);
+
+        jTextFieldCidade.setBackground(Color.WHITE);
+        jTextFieldCidade.setFont(new Font("Cormorant Infant", 1, 18));
+        jTextFieldCidade.setBorder(new MatteBorder(2, 2, 2, 2, new Color(128, 0, 32)));
+        jTextFieldCidade.setPreferredSize(fieldSize);
+        jTextFieldCidade.setForeground(Color.BLACK);
+        jTextFieldCidade.setText("Cidade");
+        gbc.gridx = 1;
+        gbc.gridy = 7;
+        jPanelContent.add(jTextFieldCidade, gbc);
+
+        jLabelUF.setFont(new Font("Cormorant Garamond", 1, 18));
+        jLabelUF.setText("UF:");
+        jLabelUF.setForeground(Color.BLACK);
+        jLabelUF.setBackground(Color.WHITE);
+        gbc.gridx = 1;
+        gbc.gridy = 8;
+        gbc.inserts = new Inserts(0, 0, 0, 100);
+        jPanelContent.add(jLabelUF, gbc);
+
+        jComboBoxUF.setBackground(Color.WHITE);
+        jComboBoxUF.setFont(new Font("Cormorant Infant", 1, 18));
+        jComboBoxUF.setBorder(new MatteBorder(2, 2, 2, 2, new Color(128, 0, 32)));
+        jComboBoxUF.setPreferredSize(fieldSize);
+        jComboBoxUF.setForeground(Color.BLACK);
+        for (UF uf : UF.values()) {
+            jComboBoxUF.addItem(uf);
+        }
+        gbc.gridx = 1;
+        gbc.gridy = 9;
+        gbc.insets = new Insets(0, 0, 20, 100);
+        jPanelContent.add(jComboBoxUF, gbc);
 
 
         this.jButtonCancelar.setBackground(new Color(225, 225, 200));
@@ -352,6 +441,15 @@ public class CadastrarCliente extends JPanel {
             if(name.equals("Nome Completo")){
                 throw new IllegalArgumentException("Insira um nome válido!");
             }
+
+            String address = String.format("%s, %s, %s, %s-%s",
+                jTextFieldRua.getText().trim(),
+                jTextFieldBairro.getText().trim(),
+                jTextFieldNumero.getText().trim(),
+                jTextFieldCidade.getText().trim(),
+                jComboBoxUF.getSelectedItem()
+            );
+
             String phone_number = jTextFieldTelefone.getText();
             String email = jTextFieldEmail.getText();
             String address = jTextFieldEndereco.getText();
@@ -464,9 +562,21 @@ public class CadastrarCliente extends JPanel {
                     jTextFieldNome.setText(name);
                     jTextFieldTelefone.setText(phone_number);
                     jTextFieldEmail.setText(email);
-                    jTextFieldEndereco.setText(address);
+                    String[] address = clientes.get("address").getAsString().split(",");
                     jTextFieldCPF.setText(cpf);
                     jTextFieldDataNascimento.setText(dataFormatada.replace("/",""));
+                    jTextFieldRua.setText(address[0]);
+                    jTextFieldBairro.setText(address[1]);
+                    jTextFieldNumero.setText(address[2]);
+                    String[] cityUF = address[3].split("-");
+                    jTextFieldCidade.setText(cityUF[0]);
+
+                    try {
+                        UF ufSelecionado = UF.valueOf(cityUF[1]);
+                        jComboBoxUF.setSelectedItem(ufSelecionado);
+                    } catch (IllegalArgumentException e) {
+                        throw new Exception("UF não encontrado");
+                    }
 
                     connection.disconnect();
 
@@ -484,7 +594,11 @@ public class CadastrarCliente extends JPanel {
         this.jTextFieldDataNascimento.setText(null);
         this.jButtonCadastrar.setText("Cadastrar");
         this.jTextFieldCPF.setText(null);
-        this.jTextFieldEndereco.setText(null);
+        this.jTextFieldRua.setText(null);
+        this.jTextFieldBairro.setText(null);
+        this.jTextFieldNumero.setText(null);
+        this.jTextFieldCidade.setText(null);
+        this.jComboBoxUF.setSelectedItem(0);
         this.jTextFieldEmail.setText(null);
         this.jTextFieldTelefone.setText(null);
         this.jTextFieldNome.setText(null);
@@ -498,15 +612,23 @@ public class CadastrarCliente extends JPanel {
     private JLabel jLabelTelefone;
     private JLabel jLabelCPF;
     private JLabel jLabelEmail;
-    private JLabel jLabelEndereco;
     private JLabel jLabelDataNascimento;
+    private JLabel jLabelRua;
+    private JLabel jLabelBairro;
+    private JLabel jLabelNumero;
+    private JLabel jLabelCidade;
+    private JLabel jLabelUF;
 
     private JTextField jTextFieldNome;
     private JTextField jTextFieldTelefone;
     private JTextField jTextFieldCPF;
     private JTextField jTextFieldEmail;
-    private JTextField jTextFieldEndereco;
     private JTextField jTextFieldDataNascimento;
+    private JTextField jTextFieldRua;
+    private JTextField jTextFieldBairro;
+    private JTextField jTextFieldNumero;
+    private JTextField jTextFieldCidade;
+    private JComboBox<UF> jComboBoxUF;
 
     private JButton jButtonCancelar;
     private JButton jButtonCadastrar;

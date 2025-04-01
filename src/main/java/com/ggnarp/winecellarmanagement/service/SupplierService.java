@@ -38,7 +38,7 @@ public class SupplierService {
         supplier.setName(supplierDTO.getName());
         supplier.setCnpj(supplierDTO.getCnpj());
         supplier.setEmail(supplierDTO.getEmail());
-        supplier.setPhone_number(supplierDTO.getPhone_number());
+        supplier.setPhoneNumber(supplierDTO.getPhoneNumber());
         supplier.setAddress(supplierDTO.getAddress());
         supplier.setObservation(supplierDTO.getObservation());
         return supplierRepository.save(supplier);
@@ -49,7 +49,7 @@ public class SupplierService {
             SupplierDTO dto = new SupplierDTO();
             dto.setName(supplier.getName());
             dto.setEmail(supplier.getEmail());
-            dto.setPhone_number(supplier.getPhone_number());
+            dto.setPhoneNumber(supplier.getPhoneNumber());
             dto.setAddress(supplier.getAddress());
             dto.setCnpj(supplier.getCnpj());
             dto.setId(supplier.getId());
@@ -75,16 +75,52 @@ public class SupplierService {
                         existingSupplier.setName(supplierDTO.getName());
                     }
                     if (supplierDTO.getAddress() != null) {
-                        existingSupplier.setAddress(supplierDTO.getAddress());
+                        String regex = "^(.+?), (.+?), (\\d+), (.+)-([A-Z]{2})$";
+                        Pattern pattern = Pattern.compile(regex);
+                        Matcher matcher = pattern.matcher(supplierDTO.getAddress());
+                        if(matcher.matches()){
+                            existingSupplier.setAddress(supplierDTO.getAddress());
+                        }else{
+                            throw new IllegalArgumentException("O Endereço deve ser no formato Rua, Bairro, Número, Cidade-UF");
+                        }
                     }
+
                     if (supplierDTO.getCnpj() != null) {
-                        existingSupplier.setCnpj(supplierDTO.getCnpj());
+                        Supplier sup = supplierRepository.findByCnpj(supplierDTO.getCnpj());
+                        String regex = "^\\d{2}\\.\\d{3}\\.\\d{3}/\\d{4}-\\d{2}$";
+                        Pattern pattern = Pattern.compile(regex);
+                        Matcher matcher = pattern.matcher(supplierDTO.getCnpj());
+                        if(matcher.matches()){
+                            if(existingSupplier.getCnpj().equals(supplierDTO.getCnpj())){
+                                if(!sup.getId().equals(existingSupplier.getId())){
+                                    throw new IllegalArgumentException("Já existe um fornecedor com este CNPJ.");
+                                }
+                                existingSupplier.setCnpj(supplierDTO.getCnpj());
+                            }
+
+                        }else{
+                            throw new IllegalArgumentException("O CNPJ deve ser no formato xxx.xxx.xxx/xxxxx-xx");
+                        }
                     }
-                    if (supplierDTO.getPhone_number() != null) {
-                        existingSupplier.setPhone_number(supplierDTO.getPhone_number());
+
+                    if (supplierDTO.getPhoneNumber() != null && !supplierDTO.getPhoneNumber().isBlank()) {
+                        Supplier sup = supplierRepository.findByPhoneNumber(supplierDTO.getPhoneNumber());
+                        if(supplierRepository.existsByPhoneNumber(supplierDTO.getPhoneNumber())){
+                            if(!existingSupplier.getId().equals(sup.getId())){
+                                throw new IllegalArgumentException("Já existe um fornecedor com este número de telefone.");
+                            }
+                            existingSupplier.setPhoneNumber(supplierDTO.getPhoneNumber());
+                        }
+
                     }
-                    if (supplierDTO.getEmail() != null) {
-                        existingSupplier.setEmail(supplierDTO.getEmail());
+                    if (supplierDTO.getEmail() != null && !supplierDTO.getEmail().isBlank()) {
+                        Supplier sup = supplierRepository.findByEmail(supplierDTO.getEmail());
+                        if(supplierRepository.existsByEmail(supplierDTO.getEmail())){
+                            if(!sup.getId().equals(existingSupplier.getId())){
+                                throw new IllegalArgumentException("Já existe um fornecedor com este e-mail.");
+                            }
+                            existingSupplier.setEmail(supplierDTO.getEmail());
+                        }
                     }
                     if(supplierDTO.getObservation() != null){
                         existingSupplier.setObservation(supplierDTO.getObservation());
@@ -105,7 +141,7 @@ public class SupplierService {
             SupplierDTO dto = new SupplierDTO();
             dto.setName(supplier.getName());
             dto.setEmail(supplier.getEmail());
-            dto.setPhone_number(supplier.getPhone_number());
+            dto.setPhoneNumber(supplier.getPhoneNumber());
             dto.setAddress(supplier.getAddress());
             dto.setCnpj(supplier.getCnpj());
             dto.setId(supplier.getId());
