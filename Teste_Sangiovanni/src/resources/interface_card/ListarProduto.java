@@ -6,6 +6,7 @@ import com.google.gson.JsonParser;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
+import javax.swing.border.LineBorder;
 import javax.swing.table.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -44,29 +45,14 @@ public class ListarProduto extends JPanel {
         // Declarando os componentes
         jPanelTopoTabela = new javax.swing.JPanel();
         jPanelTabela = new javax.swing.JPanel();
+        jPanelButtonsStock = new javax.swing.JPanel();
         jButtonCadastrar = new javax.swing.JButton();
         jButtonFiltrar = new javax.swing.JButton();
-        jButtonAtualizarEstoque = new javax.swing.JButton(); // Correção na declaração
+        jButtonAtualizarEstoque = new javax.swing.JButton();
         pesquisaProduto = new javax.swing.JTextField();
         jtable = new javax.swing.JTable();
         jScrollPane = new javax.swing.JScrollPane();
         jPanel4 = new JPanel();
-
-        JButton jButtonProx = new javax.swing.JButton("Próximo");
-        JButton jButtonCancel = new javax.swing.JButton("Cancelar");
-
-
-        jButtonProx.setFont(new Font("Cormorant Garamond", Font.BOLD, 18));
-        jButtonProx.setPreferredSize(new Dimension(120, 40));
-        jButtonProx.setVisible(false); // Oculto no início
-
-        jButtonCancel.setFont(new Font("Cormorant Garamond", Font.BOLD, 18));
-        jButtonCancel.setPreferredSize(new Dimension(120, 40));
-        jButtonCancel.setVisible(false); // Oculto no início
-
-        jPanelTopoTabela.add(jButtonCancel);
-        jPanelTopoTabela.add(jButtonProx);
-
 
         setBackground(new java.awt.Color(243, 243, 223));
         setPreferredSize(new Dimension(1366, 650));
@@ -75,13 +61,10 @@ public class ListarProduto extends JPanel {
         jPanel4.setBackground(new java.awt.Color(255, 255, 255));
         jPanel4.setPreferredSize(new Dimension(1200, 600));
 
-
-
         // Configuração do painel superior
-        jPanelTopoTabela.setPreferredSize(new Dimension(1300, 100));
+        jPanelTopoTabela.setPreferredSize(new Dimension(1200, 100));
         jPanelTopoTabela.setBackground(new java.awt.Color(255, 255, 255));
-        jPanelTopoTabela.setLayout(new FlowLayout(FlowLayout.LEFT, 10, 10));
-
+        jPanelTopoTabela.setLayout(new FlowLayout(FlowLayout.LEFT, 30, 30));
 
         pesquisaProduto.setBackground(new java.awt.Color(240, 240, 240));
         pesquisaProduto.setFont(new Font("Cormorant Garamond", Font.BOLD, 14));
@@ -105,26 +88,19 @@ public class ListarProduto extends JPanel {
                 }
             }
         });
-
         jPanelTopoTabela.add(pesquisaProduto);
 
-        jPanelTopoTabela.add(Box.createHorizontalStrut(500));
+        jPanelTopoTabela.add(Box.createHorizontalStrut(300));
 
         jButtonAtualizarEstoque.setFont(new java.awt.Font("Cormorant Garamond", Font.BOLD, 20));
         jButtonAtualizarEstoque.setIcon(new javax.swing.ImageIcon(Objects.requireNonNull(getClass().getResource("/resources/images/bulk_update.png"))));
-        jButtonAtualizarEstoque.setText("Cadastrar Produto");
+        jButtonAtualizarEstoque.setText("Atualizar Estoque");
         jButtonAtualizarEstoque.setBorder(null);
         jButtonAtualizarEstoque.setContentAreaFilled(false);
         jButtonAtualizarEstoque.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         jButtonAtualizarEstoque.setPreferredSize(new java.awt.Dimension(200, 40));
-        jButtonAtualizarEstoque.addActionListener(e -> {
-            CardLayout cl = (CardLayout) mainPanel.getLayout();
-            cadastrarProduto.atualizarDados();
-            cl.show(mainPanel, "atualizar_produtos");
-        });
 
         jPanelTopoTabela.add(jButtonAtualizarEstoque);
-
 
         jButtonCadastrar.setFont(new java.awt.Font("Cormorant Garamond", Font.BOLD, 20));
         jButtonCadastrar.setIcon(new javax.swing.ImageIcon(Objects.requireNonNull(getClass().getResource("/resources/images/criar.png"))));
@@ -149,32 +125,14 @@ public class ListarProduto extends JPanel {
         jButtonFiltrar.setContentAreaFilled(false);
         jButtonFiltrar.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         jButtonFiltrar.setPreferredSize(new java.awt.Dimension(90, 40));
-        jButtonFiltrar.addActionListener(evt -> {
+        jButtonFiltrar.addActionListener(evt->{
             JFrame frame = (JFrame) SwingUtilities.getWindowAncestor(rootPane);
             abrirDialogoFiltro(frame);
-            atualizarTabelaParaSelecao();
-
         });
-
 
         jPanelTopoTabela.add(jButtonFiltrar);
-        jButtonAtualizarEstoque.addActionListener(e -> {
-            atualizarTabelaParaSelecao();
-            jButtonProx.setVisible(true);
-            jButtonCancel.setVisible(true);
-        });
 
-        jButtonCancel.addActionListener(e -> {
-            restaurarTabelaOriginal();
-            jButtonProx.setVisible(false);
-            jButtonCancel.setVisible(false);
-        });
-
-
-
-
-
-        jPanelTabela.setPreferredSize(new Dimension(1145, 450));
+        jPanelTabela.setPreferredSize(new Dimension(1145, 430));
         jPanelTabela.setBackground(new java.awt.Color(255, 255, 255));
         jPanelTabela.setLayout(new BorderLayout());
 
@@ -225,15 +183,109 @@ public class ListarProduto extends JPanel {
 
         jPanelTabela.add(jScrollPane, BorderLayout.CENTER);
 
+        jPanelButtonsStock.setLayout(new FlowLayout(FlowLayout.RIGHT,10,10));
+        jPanelButtonsStock.setPreferredSize(new Dimension(1145,50));
+        jPanelButtonsStock.setBackground(Color.WHITE);
+
+        JButton jButtonProx = new javax.swing.JButton("Próximo");
+        JButton jButtonCancel = new javax.swing.JButton("Cancelar");
+
+        jButtonProx.setFont(new Font("Cormorant Garamond", Font.BOLD, 18));
+        jButtonProx.setPreferredSize(new Dimension(120, 30));
+        jButtonProx.setBackground((new Color(0, 128, 17)));
+        jButtonProx.setForeground(Color.WHITE);
+        jButtonProx.setFocusPainted(false);
+        jButtonProx.setBorder(null);
+        jButtonProx.addActionListener(evt->abrirModal());
+        jButtonProx.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        jButtonProx.setVisible(false);
+
+        jButtonCancel.setFont(new Font("Cormorant Garamond", Font.BOLD, 18));
+        jButtonCancel.setPreferredSize(new Dimension(120, 30));
+        jButtonCancel.setBackground(new Color(225, 225, 200));
+        jButtonCancel.setFocusPainted(false);
+        jButtonCancel.setBorder(null);
+        jButtonCancel.setVisible(false);
+        jButtonCancel.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        jButtonCancel.addActionListener(e -> {
+            restaurarTabelaOriginal();
+            jButtonProx.setVisible(false);
+            jButtonCancel.setVisible(false);
+        });
+
+        jButtonAtualizarEstoque.addActionListener(e -> {
+            atualizarTabelaParaSelecao();
+            jButtonProx.setVisible(true);
+            jButtonCancel.setVisible(true);
+        });
+
+        jPanelButtonsStock.add(jButtonCancel);
+        jPanelButtonsStock.add(Box.createHorizontalStrut(865));
+        jPanelButtonsStock.add(jButtonProx);
+
         jPanel4.add(jPanelTopoTabela);
         jPanel4.add(jPanelTabela);
+        jPanel4.add(jPanelButtonsStock);
         setBorder(new EmptyBorder(20, 20, 20, 20));
 
         getProduct();
     }
 
-    // FUNÇÃO ATUALIZAR ESTOQUE INICIO
+    private void abrirModal() {
+        JDialog modal = new JDialog();
+        modal.setFont(new java.awt.Font("Cormorant Garamond", Font.BOLD, 20));
+        modal.setTitle("Atualizar estoque");
+        modal.setSize(450, 230);
+        modal.setBackground(Color.WHITE);
+        modal.setLayout(new GridLayout(3, 1));
+        modal.setModal(true);
 
+        JLabel lblInfo = new JLabel("Informe a nova quantidade em estoque para os produtos selecionados.", SwingConstants.CENTER);
+        lblInfo.setFont(new java.awt.Font("Cormorant Garamond", Font.BOLD, 14));
+        lblInfo.setForeground(Color.BLACK);
+        modal.add(lblInfo);
+
+        JSpinner spinnerQuantidade = new JSpinner(new SpinnerNumberModel(0, 0, 10000, 1));
+        spinnerQuantidade.setFont(new java.awt.Font("Cormorant Infant", Font.BOLD, 14));
+        spinnerQuantidade.setPreferredSize(new Dimension(150, 30));
+        spinnerQuantidade.setBorder(new LineBorder(new Color(128, 0, 32),1));
+        modal.add(spinnerQuantidade);
+
+        JPanel panelBotoes = new JPanel();
+        panelBotoes.setBorder(new EmptyBorder(20,20,20,20));
+        panelBotoes.setBackground(Color.WHITE);
+        JButton btnCancelar = new JButton("Cancelar");
+        btnCancelar.setFont(new java.awt.Font("Cormorant Garamond", Font.BOLD, 14));
+        btnCancelar.setBackground(Color.WHITE);
+        btnCancelar.setForeground(Color.RED);
+        btnCancelar.setBorder(new LineBorder(Color.RED,1));
+        btnCancelar.setFocusPainted(false);
+        btnCancelar.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        btnCancelar.setPreferredSize(new Dimension(80,30));
+
+        JButton btnAplicar = new JButton("Aplicar novo estoque");
+        btnAplicar.setBackground(new Color(0, 128, 17));
+        btnAplicar.setForeground(Color.WHITE);
+        btnAplicar.setFocusPainted(false);
+        btnAplicar.setPreferredSize(new Dimension(150,30));
+        btnAplicar.setBorder(null);
+        btnAplicar.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        btnAplicar.setFont(new java.awt.Font("Cormorant Garamond", Font.BOLD, 14));
+
+        btnCancelar.addActionListener(e -> modal.dispose());
+        btnAplicar.addActionListener(e -> {
+            int quantidade = (int) spinnerQuantidade.getValue();
+            JOptionPane.showMessageDialog(modal, "Novo estoque atualizado: " + quantidade);
+            modal.dispose();
+        });
+
+        panelBotoes.add(btnCancelar);
+        panelBotoes.add(btnAplicar);
+        modal.add(panelBotoes);
+
+        modal.setLocationRelativeTo(null);
+        modal.setVisible(true);
+    }
 
     private void atualizarTabelaParaSelecao() {
         DefaultTableModel modelo = (DefaultTableModel) jtable.getModel();
@@ -244,11 +296,11 @@ public class ListarProduto extends JPanel {
         columnModel.getColumn(colunaAcoes).setHeaderValue("Selecionar");
 
         columnModel.getColumn(colunaAcoes).setCellRenderer(new CheckBoxRenderer());
-        columnModel.getColumn(colunaAcoes).setCellEditor(new DefaultCellEditor(new JCheckBox()));
+        columnModel.getColumn(colunaAcoes).setCellEditor(new CheckBoxEditor());
 
         jtable.getTableHeader().repaint();
+        jtable.repaint();
     }
-
 
     class CheckBoxRenderer extends JCheckBox implements TableCellRenderer {
         public CheckBoxRenderer() {
@@ -262,8 +314,27 @@ public class ListarProduto extends JPanel {
         }
     }
 
+    class CheckBoxEditor extends DefaultCellEditor {
+        private final JCheckBox checkBox;
 
-   //FUNÇÃO ADICINONAR ESTOQUE FIM
+        public CheckBoxEditor() {
+            super(new JCheckBox());
+            checkBox = (JCheckBox) getComponent();
+            checkBox.setHorizontalAlignment(SwingConstants.CENTER);
+            checkBox.setOpaque(true);
+        }
+
+        @Override
+        public Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected, int row, int column) {
+            checkBox.setSelected(value != null && (boolean) value);
+            return checkBox;
+        }
+
+        @Override
+        public Object getCellEditorValue() {
+            return checkBox.isSelected();
+        }
+    }
 
     private void restaurarTabelaOriginal() {
         DefaultTableModel modelo = (DefaultTableModel) jtable.getModel();
@@ -277,8 +348,8 @@ public class ListarProduto extends JPanel {
         columnModel.getColumn(colunaSelecionar).setCellEditor(new ButtonEditorProduct_(jtable, rootPane, dotenv.get("API_HOST"), cadastrarProduto, mainPanel));
 
         jtable.getTableHeader().repaint();
+        jtable.repaint();
     }
-
 
     private void loadSupplier(JComboBox<Supplier> cbSupplier){
         try {
@@ -1147,6 +1218,7 @@ public class ListarProduto extends JPanel {
     private javax.swing.JScrollPane jScrollPane;
     private javax.swing.JPanel jPanelTopoTabela;
     private javax.swing.JPanel jPanelTabela;
+    private javax.swing.JPanel jPanelButtonsStock;
     private javax.swing.JPanel jPanel4;
     private javax.swing.JButton jButtonCadastrar;
     private javax.swing.JButton jButtonFiltrar;
@@ -1303,4 +1375,3 @@ class ButtonEditorProduct_ extends AbstractCellEditor implements TableCellEditor
         return null;
     }
 }
-
