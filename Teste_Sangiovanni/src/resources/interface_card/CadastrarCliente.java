@@ -450,11 +450,11 @@ public class CadastrarCliente extends JPanel {
             }
 
             String address = String.format("%s, %s, %s, %s-%s",
-                jTextFieldRua.getText().trim(),
-                jTextFieldBairro.getText().trim(),
-                jTextFieldNumero.getText().trim(),
-                jTextFieldCidade.getText().trim(),
-                jComboBoxUF.getSelectedItem()
+                    jTextFieldRua.getText().trim(),
+                    jTextFieldBairro.getText().trim(),
+                    jTextFieldNumero.getText().trim(),
+                    jTextFieldCidade.getText().trim(),
+                    jComboBoxUF.getSelectedItem()
             );
 
             String phone_number = jTextFieldTelefone.getText();
@@ -535,66 +535,66 @@ public class CadastrarCliente extends JPanel {
     }
 
     private void getCliente(){
-            try {
-                // making the request
-                String urlAPI = this.dotenv.get("API_HOST");
-                URL url = new URL(urlAPI + "/client/" + this.id);
-                HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-                connection.setRequestMethod("GET");
+        try {
+            // making the request
+            String urlAPI = this.dotenv.get("API_HOST");
+            URL url = new URL(urlAPI + "/client/" + this.id);
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.setRequestMethod("GET");
 
-                int responseCode = connection.getResponseCode();
-                if (responseCode == HttpURLConnection.HTTP_OK) {
-                    BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-                    StringBuilder response = new StringBuilder();
-                    String line;
-                    while ((line = reader.readLine()) != null) {
-                        response.append(line);
-                    }
-                    reader.close();
+            int responseCode = connection.getResponseCode();
+            if (responseCode == HttpURLConnection.HTTP_OK) {
+                BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+                StringBuilder response = new StringBuilder();
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    response.append(line);
+                }
+                reader.close();
 
-                    Gson gson = new Gson();
-                    JsonObject prod = JsonParser.parseString(response.toString()).getAsJsonObject();
+                Gson gson = new Gson();
+                JsonObject prod = JsonParser.parseString(response.toString()).getAsJsonObject();
 
-                    String name = prod.get("name").getAsString();
-                    String cpf = prod.get("cpf").getAsString();
-                    String email = prod.get("email").getAsString();
-                    String phone_number = prod.get("phoneNumber").getAsString();
-                    String data = prod.get("dateBirth").getAsString();
+                String name = prod.get("name").getAsString();
+                String cpf = prod.get("cpf").getAsString();
+                String email = prod.get("email").getAsString();
+                String phone_number = prod.get("phoneNumber").getAsString();
+                String data = prod.get("dateBirth").getAsString();
 
-                    DateTimeFormatter formatoEntrada = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-                    DateTimeFormatter formatoSaida = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-                    String dataFormatada = LocalDate.parse(data, formatoEntrada).format(formatoSaida);
+                DateTimeFormatter formatoEntrada = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+                DateTimeFormatter formatoSaida = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+                String dataFormatada = LocalDate.parse(data, formatoEntrada).format(formatoSaida);
 
-                    jTextFieldNome.setText(name);
-                    jTextFieldTelefone.setText(phone_number);
-                    jTextFieldEmail.setText(email);
+                jTextFieldNome.setText(name);
+                jTextFieldTelefone.setText(phone_number);
+                jTextFieldEmail.setText(email);
 
-                    jTextFieldCPF.setText(cpf);
-                    jTextFieldDataNascimento.setText(dataFormatada.replace("/",""));
-                    String[] address = prod.get("address").getAsString().split(",");
-                    jTextFieldRua.setText(address[0]);
-                    jTextFieldBairro.setText(address[1]);
-                    jTextFieldNumero.setText(address[2]);
-                    String[] cityUF = address[3].split("-");
-                    jTextFieldCidade.setText(cityUF[0]);
+                jTextFieldCPF.setText(cpf);
+                jTextFieldDataNascimento.setText(dataFormatada.replace("/",""));
+                String[] address = prod.get("address").getAsString().split(",");
+                jTextFieldRua.setText(address[0]);
+                jTextFieldBairro.setText(address[1]);
+                jTextFieldNumero.setText(address[2]);
+                String[] cityUF = address[3].split("-");
+                jTextFieldCidade.setText(cityUF[0]);
 
-                    try {
-                        UF ufSelecionado = UF.valueOf(cityUF[1]);
-                        jComboBoxUF.setSelectedItem(ufSelecionado);
-                    } catch (IllegalArgumentException e) {
-                        throw new Exception("O UF não foi encontrado!");
-                    }
-
-                    connection.disconnect();
-
-                } else {
-                    JOptionPane.showMessageDialog(framePrincipal, "Erro ao carregar o cliente: " + responseCode);
-                    connection.disconnect();
+                try {
+                    UF ufSelecionado = UF.valueOf(cityUF[1]);
+                    jComboBoxUF.setSelectedItem(ufSelecionado);
+                } catch (IllegalArgumentException e) {
+                    throw new Exception("O UF não foi encontrado!");
                 }
 
-            } catch (Exception e) {
-                JOptionPane.showMessageDialog(framePrincipal, e.getMessage());
+                connection.disconnect();
+
+            } else {
+                JOptionPane.showMessageDialog(framePrincipal, "Erro ao carregar o cliente: " + responseCode);
+                connection.disconnect();
             }
+
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(framePrincipal, e.getMessage());
+        }
     }
 
     public void reset(){

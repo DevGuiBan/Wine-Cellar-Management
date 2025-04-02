@@ -1566,4 +1566,3 @@ class ButtonEditorProduct_ extends AbstractCellEditor implements TableCellEditor
         return null;
     }
 }
-
