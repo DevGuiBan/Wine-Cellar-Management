@@ -13,18 +13,23 @@ import javax.swing.table.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.OutputStream;
 import java.math.BigInteger;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
+import java.util.ArrayList;
 import java.util.Objects;
+
 import com.google.gson.JsonObject;
+
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.io.InputStreamReader;
 import java.io.BufferedReader;
+
 import io.github.cdimascio.dotenv.Dotenv;
 
 public class ListarProduto extends JPanel {
@@ -149,7 +154,7 @@ public class ListarProduto extends JPanel {
         jButtonFiltrar.setContentAreaFilled(false);
         jButtonFiltrar.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         jButtonFiltrar.setPreferredSize(new java.awt.Dimension(90, 40));
-        jButtonFiltrar.addActionListener(evt->{
+        jButtonFiltrar.addActionListener(evt -> {
             JFrame frame = (JFrame) SwingUtilities.getWindowAncestor(rootPane);
             abrirDialogoFiltro(frame);
         });
@@ -207,8 +212,8 @@ public class ListarProduto extends JPanel {
 
         jPanelTabela.add(jScrollPane, BorderLayout.CENTER);
 
-        jPanelButtonsStock.setLayout(new FlowLayout(FlowLayout.RIGHT,10,10));
-        jPanelButtonsStock.setPreferredSize(new Dimension(1145,50));
+        jPanelButtonsStock.setLayout(new FlowLayout(FlowLayout.RIGHT, 10, 10));
+        jPanelButtonsStock.setPreferredSize(new Dimension(1145, 50));
         jPanelButtonsStock.setBackground(Color.WHITE);
 
         JButton jButtonProx = new javax.swing.JButton("Próximo");
@@ -220,7 +225,20 @@ public class ListarProduto extends JPanel {
         jButtonProx.setForeground(Color.WHITE);
         jButtonProx.setFocusPainted(false);
         jButtonProx.setBorder(null);
-        jButtonProx.addActionListener(evt->abrirModal());
+        jButtonProx.addActionListener(evt -> {
+            DefaultTableModel model = (DefaultTableModel) jtable.getModel();
+            ArrayList<BigInteger> codigosSelecionados = new ArrayList<>();
+
+            for (int i = 0; i < model.getRowCount(); i++) {
+                Boolean isSelected = (Boolean) model.getValueAt(i, 6);
+                if (isSelected != null && isSelected) {
+                    BigInteger codigo = (BigInteger) model.getValueAt(i, 0);
+                    codigosSelecionados.add(codigo);
+                }
+            }
+
+            abrirModal(codigosSelecionados);
+        });
         jButtonProx.setCursor(new Cursor(Cursor.HAND_CURSOR));
         jButtonProx.setVisible(false);
 
@@ -255,7 +273,7 @@ public class ListarProduto extends JPanel {
         getProduct();
     }
 
-    private void abrirModal() {
+    private void abrirModal(ArrayList<BigInteger> ids) {
         JDialog modal = new JDialog();
         modal.setFont(new java.awt.Font("Cormorant Garamond", Font.BOLD, 20));
         modal.setTitle("Atualizar estoque");
@@ -272,26 +290,26 @@ public class ListarProduto extends JPanel {
         JSpinner spinnerQuantidade = new JSpinner(new SpinnerNumberModel(0, 0, 10000, 1));
         spinnerQuantidade.setFont(new java.awt.Font("Cormorant Infant", Font.BOLD, 14));
         spinnerQuantidade.setPreferredSize(new Dimension(150, 30));
-        spinnerQuantidade.setBorder(new LineBorder(new Color(128, 0, 32),1));
+        spinnerQuantidade.setBorder(new LineBorder(new Color(128, 0, 32), 1));
         modal.add(spinnerQuantidade);
 
         JPanel panelBotoes = new JPanel();
-        panelBotoes.setBorder(new EmptyBorder(20,20,20,20));
+        panelBotoes.setBorder(new EmptyBorder(20, 20, 20, 20));
         panelBotoes.setBackground(Color.WHITE);
         JButton btnCancelar = new JButton("Cancelar");
         btnCancelar.setFont(new java.awt.Font("Cormorant Garamond", Font.BOLD, 14));
         btnCancelar.setBackground(Color.WHITE);
         btnCancelar.setForeground(Color.RED);
-        btnCancelar.setBorder(new LineBorder(Color.RED,1));
+        btnCancelar.setBorder(new LineBorder(Color.RED, 1));
         btnCancelar.setFocusPainted(false);
         btnCancelar.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        btnCancelar.setPreferredSize(new Dimension(80,30));
+        btnCancelar.setPreferredSize(new Dimension(80, 30));
 
         JButton btnAplicar = new JButton("Aplicar novo estoque");
         btnAplicar.setBackground(new Color(0, 128, 17));
         btnAplicar.setForeground(Color.WHITE);
         btnAplicar.setFocusPainted(false);
-        btnAplicar.setPreferredSize(new Dimension(150,30));
+        btnAplicar.setPreferredSize(new Dimension(150, 30));
         btnAplicar.setBorder(null);
         btnAplicar.setCursor(new Cursor(Cursor.HAND_CURSOR));
         btnAplicar.setFont(new java.awt.Font("Cormorant Garamond", Font.BOLD, 14));
@@ -299,7 +317,7 @@ public class ListarProduto extends JPanel {
         btnCancelar.addActionListener(e -> modal.dispose());
         btnAplicar.addActionListener(e -> {
             int quantidade = (int) spinnerQuantidade.getValue();
-            JOptionPane.showMessageDialog(modal, "Novo estoque atualizado: " + quantidade);
+            updateMassiveStock(quantidade, ids);
             modal.dispose();
         });
 
@@ -309,6 +327,75 @@ public class ListarProduto extends JPanel {
 
         modal.setLocationRelativeTo(null);
         modal.setVisible(true);
+    }
+
+    private void updateMassiveStock(int quantity, ArrayList<BigInteger> prodIds) {
+        try {
+            JsonObject jsonData = new JsonObject();
+            jsonData.addProperty("quantity", quantity);
+            JsonArray jsonProducts = new JsonArray();
+
+            for (BigInteger id : prodIds) {
+                jsonProducts.add(id);
+            }
+
+            jsonData.add("productsIds", jsonProducts);
+
+            // making the request
+            String urlAPI = this.dotenv.get("API_HOST");
+            URL url = new URL(urlAPI + "/product/stock");
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.setRequestMethod("POST");
+            connection.setRequestProperty("Content-Type", "application/json");
+            connection.setDoOutput(true);
+
+            // send the request with json
+            try (OutputStream os = connection.getOutputStream()) {
+                byte[] input = jsonData.toString().getBytes(StandardCharsets.UTF_8);
+                os.write(input, 0, input.length);
+            }
+
+            int statusCode = connection.getResponseCode();
+            StringBuilder response = new StringBuilder();
+
+            if (statusCode >= 200 && statusCode < 300) {
+                JOptionPane.showMessageDialog(this,
+                        "O Estoque foi atualizado com sucesso!",
+                        "Estoque Atualizado",
+                        JOptionPane.INFORMATION_MESSAGE);
+                CardLayout cl = (CardLayout) mainPanel.getLayout();
+                restaurarTabelaOriginal();
+                getProduct();
+            } else {
+                try (BufferedReader br = new BufferedReader(new InputStreamReader(connection.getErrorStream(), StandardCharsets.UTF_8))) {
+                    String responseLine;
+                    while ((responseLine = br.readLine()) != null) {
+                        response.append(responseLine.trim());
+                    }
+                }
+
+                try {
+                    JsonObject err = JsonParser.parseString(response.toString()).getAsJsonObject();
+
+                    String errorMessage = (err.has("message") && !err.get("message").isJsonNull())
+                            ? err.get("message").getAsString()
+                            : response.toString();
+
+                    JOptionPane.showMessageDialog(this,
+                            "Não foi possível atualizar o estoque. Verifique os dados e tente novamente!\n" + errorMessage,
+                            "Erro no Cadastro",
+                            JOptionPane.ERROR_MESSAGE);
+                } catch (Exception jsonException) {
+                    JOptionPane.showMessageDialog(this,
+                            "Erro inesperado ao processar a resposta da API.\nCódigo: " + statusCode + "\nResposta: " + response,
+                            "Erro no Cadastro",
+                            JOptionPane.ERROR_MESSAGE);
+                }
+            }
+
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, e.getMessage());
+        }
     }
 
     private void atualizarTabelaParaSelecao() {
@@ -375,7 +462,7 @@ public class ListarProduto extends JPanel {
                         String quantity = product.get("quantity").getAsString();
                         String price = product.get("price").getAsString();
 
-                        tableModel.addRow(new Object[]{id, nameP, supplierName,product_type, price,quantity});
+                        tableModel.addRow(new Object[]{id, nameP, supplierName, product_type, price, quantity});
                     }
                     connection.disconnect();
                 }
@@ -396,9 +483,9 @@ public class ListarProduto extends JPanel {
         if (searchText.equals("Pesquisar produto") || searchText.isEmpty()) {
             getProduct();
         } else {
-            if(searchText.matches(".*\\d.*")) {
+            if (searchText.matches(".*\\d.*")) {
                 searchProduct(searchText, null);
-            }else{
+            } else {
                 searchProduct(null, searchText);
             }
 
@@ -455,7 +542,7 @@ public class ListarProduto extends JPanel {
         jtable.repaint();
     }
 
-    private void loadSupplier(JComboBox<Supplier> cbSupplier){
+    private void loadSupplier(JComboBox<Supplier> cbSupplier) {
         try {
             String urlAPI = this.dotenv.get("API_HOST");
             URL url = new URL(urlAPI + "/supplier");
@@ -481,7 +568,7 @@ public class ListarProduto extends JPanel {
                     String id = product.get("id").getAsString();
                     String name = product.get("name").getAsString();
 
-                    cb.addElement(new Supplier(id,name));
+                    cb.addElement(new Supplier(id, name));
 
                 }
                 connection.disconnect();
@@ -492,7 +579,7 @@ public class ListarProduto extends JPanel {
                         "Problema no Servidor",
                         JOptionPane.DEFAULT_OPTION,
                         JOptionPane.ERROR_MESSAGE,
-                        null,null,null);
+                        null, null, null);
                 connection.disconnect();
             }
         } catch (Exception e) {
@@ -500,7 +587,7 @@ public class ListarProduto extends JPanel {
         }
     }
 
-    private void loadProductType(JComboBox<ProductType> cbProductType){
+    private void loadProductType(JComboBox<ProductType> cbProductType) {
         try {
             String urlAPI = this.dotenv.get("API_HOST");
             URL url = new URL(urlAPI + "/product_type");
@@ -526,7 +613,7 @@ public class ListarProduto extends JPanel {
                     String id = product.get("id").getAsString();
                     String name = product.get("name").getAsString();
 
-                    cb.addElement(new ProductType(id,name));
+                    cb.addElement(new ProductType(id, name));
 
                 }
                 connection.disconnect();
@@ -537,7 +624,7 @@ public class ListarProduto extends JPanel {
                         "Problema no Servidor",
                         JOptionPane.DEFAULT_OPTION,
                         JOptionPane.ERROR_MESSAGE,
-                        null,null,null);
+                        null, null, null);
                 connection.disconnect();
             }
         } catch (Exception e) {
@@ -545,7 +632,7 @@ public class ListarProduto extends JPanel {
         }
     }
 
-    private void getProduct(){
+    private void getProduct() {
         try {
             String urlAPI = this.dotenv.get("API_HOST");
             URL url = new URL(urlAPI + "/product");
@@ -579,7 +666,7 @@ public class ListarProduto extends JPanel {
                     String quantity = product.get("quantity").getAsString();
                     String price = product.get("price").getAsString();
 
-                    tableModel.addRow(new Object[]{id, name, supplierName,product_type, price,quantity});
+                    tableModel.addRow(new Object[]{id, name, supplierName, product_type, price, quantity});
                     connection.disconnect();
                 }
             } else {
@@ -588,7 +675,7 @@ public class ListarProduto extends JPanel {
                         "Problema no Servidor",
                         JOptionPane.DEFAULT_OPTION,
                         JOptionPane.ERROR_MESSAGE,
-                        null,null,null);
+                        null, null, null);
                 connection.disconnect();
             }
         } catch (Exception e) {
@@ -596,11 +683,11 @@ public class ListarProduto extends JPanel {
         }
     }
 
-    public void atualizarDados(){
+    public void atualizarDados() {
         this.getProduct();
     }
 
-    private void getSupplier(String supplierName){
+    private void getSupplier(String supplierName) {
         try {
             String urlAPI = this.dotenv.get("API_HOST");
             String encodedSupplier = URLEncoder.encode(supplierName, StandardCharsets.UTF_8);
@@ -635,7 +722,7 @@ public class ListarProduto extends JPanel {
                     String quantity = product.get("quantity").getAsString();
                     String price = product.get("price").getAsString();
 
-                    tableModel.addRow(new Object[]{id, name, supplierN,product_type, price,quantity});
+                    tableModel.addRow(new Object[]{id, name, supplierN, product_type, price, quantity});
 
                 }
                 connection.disconnect();
@@ -645,7 +732,7 @@ public class ListarProduto extends JPanel {
                         "Problema no Servidor",
                         JOptionPane.DEFAULT_OPTION,
                         JOptionPane.ERROR_MESSAGE,
-                        null,null,null);
+                        null, null, null);
                 connection.disconnect();
             }
         } catch (Exception e) {
@@ -653,10 +740,10 @@ public class ListarProduto extends JPanel {
         }
     }
 
-    private void getStock(int quantity){
+    private void getStock(int quantity) {
         try {
             String urlAPI = this.dotenv.get("API_HOST");
-            URL url = new URL(urlAPI + "/product/quantity/"+quantity);
+            URL url = new URL(urlAPI + "/product/quantity/" + quantity);
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
             connection.setRequestMethod("GET");
 
@@ -685,7 +772,7 @@ public class ListarProduto extends JPanel {
                     String quantit = product.get("quantity").getAsString();
                     String price = product.get("price").getAsString();
 
-                    tableModel.addRow(new Object[]{id, name, supplierN,product_type, price,quantit});
+                    tableModel.addRow(new Object[]{id, name, supplierN, product_type, price, quantit});
 
                 }
                 connection.disconnect();
@@ -695,7 +782,7 @@ public class ListarProduto extends JPanel {
                         "Problema no Servidor",
                         JOptionPane.DEFAULT_OPTION,
                         JOptionPane.ERROR_MESSAGE,
-                        null,null,null);
+                        null, null, null);
                 connection.disconnect();
             }
         } catch (Exception e) {
@@ -703,7 +790,7 @@ public class ListarProduto extends JPanel {
         }
     }
 
-    private void getLowStock(){
+    private void getLowStock() {
         try {
             String urlAPI = this.dotenv.get("API_HOST");
             URL url = new URL(urlAPI + "/product/quantity");
@@ -735,7 +822,7 @@ public class ListarProduto extends JPanel {
                     String quantit = product.get("quantity").getAsString();
                     String price = product.get("price").getAsString();
 
-                    tableModel.addRow(new Object[]{id, name, supplierN,product_type, price,quantit});
+                    tableModel.addRow(new Object[]{id, name, supplierN, product_type, price, quantit});
 
                 }
                 connection.disconnect();
@@ -745,7 +832,7 @@ public class ListarProduto extends JPanel {
                         "Problema no Servidor",
                         JOptionPane.DEFAULT_OPTION,
                         JOptionPane.ERROR_MESSAGE,
-                        null,null,null);
+                        null, null, null);
                 connection.disconnect();
             }
         } catch (Exception e) {
@@ -753,10 +840,10 @@ public class ListarProduto extends JPanel {
         }
     }
 
-    private void getProductByProdT(String prodT){
+    private void getProductByProdT(String prodT) {
         try {
             String urlAPI = this.dotenv.get("API_HOST");
-            URL url = new URL(urlAPI + "/product/prodType/"+prodT);
+            URL url = new URL(urlAPI + "/product/prodType/" + prodT);
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
             connection.setRequestMethod("GET");
 
@@ -785,7 +872,7 @@ public class ListarProduto extends JPanel {
                     String quantit = product.get("quantity").getAsString();
                     String price = product.get("price").getAsString();
 
-                    tableModel.addRow(new Object[]{id, name, supplierN,product_type, price,quantit});
+                    tableModel.addRow(new Object[]{id, name, supplierN, product_type, price, quantit});
 
                 }
                 connection.disconnect();
@@ -795,7 +882,7 @@ public class ListarProduto extends JPanel {
                         "Problema no Servidor",
                         JOptionPane.DEFAULT_OPTION,
                         JOptionPane.ERROR_MESSAGE,
-                        null,null,null);
+                        null, null, null);
                 connection.disconnect();
             }
         } catch (Exception e) {
@@ -803,7 +890,7 @@ public class ListarProduto extends JPanel {
         }
     }
 
-    private void getSupplierQuantity(String supplierName, int quantity){
+    private void getSupplierQuantity(String supplierName, int quantity) {
         try {
             String urlAPI = this.dotenv.get("API_HOST");
             String urlString = urlAPI + "/product/get/SupQua?quantity=" + URLEncoder.encode(String.valueOf(quantity), StandardCharsets.UTF_8) +
@@ -839,7 +926,7 @@ public class ListarProduto extends JPanel {
                     String quantit = product.get("quantity").getAsString();
                     String price = product.get("price").getAsString();
 
-                    tableModel.addRow(new Object[]{id, name, supplierN,product_type, price,quantit});
+                    tableModel.addRow(new Object[]{id, name, supplierN, product_type, price, quantit});
 
                 }
                 connection.disconnect();
@@ -849,7 +936,7 @@ public class ListarProduto extends JPanel {
                         "Problema no Servidor",
                         JOptionPane.DEFAULT_OPTION,
                         JOptionPane.ERROR_MESSAGE,
-                        null,null,null);
+                        null, null, null);
                 connection.disconnect();
             }
         } catch (Exception e) {
@@ -857,7 +944,7 @@ public class ListarProduto extends JPanel {
         }
     }
 
-    private void getSupplierLowQuantity(String supplierName){
+    private void getSupplierLowQuantity(String supplierName) {
         try {
             String urlAPI = this.dotenv.get("API_HOST");
             String urlString = urlAPI + "/product/get/SupLQ?supplier=" + URLEncoder.encode(supplierName, StandardCharsets.UTF_8);
@@ -892,7 +979,7 @@ public class ListarProduto extends JPanel {
                     String quantit = product.get("quantity").getAsString();
                     String price = product.get("price").getAsString();
 
-                    tableModel.addRow(new Object[]{id, name, supplierN,product_type, price,quantit});
+                    tableModel.addRow(new Object[]{id, name, supplierN, product_type, price, quantit});
 
                 }
                 connection.disconnect();
@@ -902,7 +989,7 @@ public class ListarProduto extends JPanel {
                         "Problema no Servidor",
                         JOptionPane.DEFAULT_OPTION,
                         JOptionPane.ERROR_MESSAGE,
-                        null,null,null);
+                        null, null, null);
                 connection.disconnect();
             }
         } catch (Exception e) {
@@ -910,11 +997,11 @@ public class ListarProduto extends JPanel {
         }
     }
 
-    private void getSupplierProdT(String supplierName, String prodTName){
+    private void getSupplierProdT(String supplierName, String prodTName) {
         try {
             String urlAPI = this.dotenv.get("API_HOST");
             String urlString = urlAPI + "/product/get/SupProdT?supplier=" + URLEncoder.encode(supplierName, StandardCharsets.UTF_8)
-                    +"&prod_t="+URLEncoder.encode(prodTName, StandardCharsets.UTF_8);
+                    + "&prod_t=" + URLEncoder.encode(prodTName, StandardCharsets.UTF_8);
             URL url = new URL(urlString);
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
             connection.setRequestMethod("GET");
@@ -946,7 +1033,7 @@ public class ListarProduto extends JPanel {
                     String quantit = product.get("quantity").getAsString();
                     String price = product.get("price").getAsString();
 
-                    tableModel.addRow(new Object[]{id, name, supplierN,product_type, price,quantit});
+                    tableModel.addRow(new Object[]{id, name, supplierN, product_type, price, quantit});
 
                 }
                 connection.disconnect();
@@ -956,7 +1043,7 @@ public class ListarProduto extends JPanel {
                         "Problema no Servidor",
                         JOptionPane.DEFAULT_OPTION,
                         JOptionPane.ERROR_MESSAGE,
-                        null,null,null);
+                        null, null, null);
                 connection.disconnect();
             }
         } catch (Exception e) {
@@ -964,11 +1051,11 @@ public class ListarProduto extends JPanel {
         }
     }
 
-    private void getQuantityByProdType(int quantity,String prodTName){
+    private void getQuantityByProdType(int quantity, String prodTName) {
         try {
             String urlAPI = this.dotenv.get("API_HOST");
             String urlString = urlAPI + "/product/get/QuaProdT?quantity=" + URLEncoder.encode(String.valueOf(quantity), StandardCharsets.UTF_8)
-                    +"&prod_t="+URLEncoder.encode(prodTName, StandardCharsets.UTF_8);
+                    + "&prod_t=" + URLEncoder.encode(prodTName, StandardCharsets.UTF_8);
             URL url = new URL(urlString);
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
             connection.setRequestMethod("GET");
@@ -1000,7 +1087,7 @@ public class ListarProduto extends JPanel {
                     String quantit = product.get("quantity").getAsString();
                     String price = product.get("price").getAsString();
 
-                    tableModel.addRow(new Object[]{id, name, supplierN,product_type, price,quantit});
+                    tableModel.addRow(new Object[]{id, name, supplierN, product_type, price, quantit});
 
                 }
                 connection.disconnect();
@@ -1010,7 +1097,7 @@ public class ListarProduto extends JPanel {
                         "Problema no Servidor",
                         JOptionPane.DEFAULT_OPTION,
                         JOptionPane.ERROR_MESSAGE,
-                        null,null,null);
+                        null, null, null);
                 connection.disconnect();
             }
         } catch (Exception e) {
@@ -1018,7 +1105,7 @@ public class ListarProduto extends JPanel {
         }
     }
 
-    private void getLowStockAndProdType(String prodTName){
+    private void getLowStockAndProdType(String prodTName) {
         try {
             String urlAPI = this.dotenv.get("API_HOST");
             String urlString = urlAPI + "/product/get/LQProdT?prod_t=" + URLEncoder.encode(prodTName, StandardCharsets.UTF_8);
@@ -1053,7 +1140,7 @@ public class ListarProduto extends JPanel {
                     String quantit = product.get("quantity").getAsString();
                     String price = product.get("price").getAsString();
 
-                    tableModel.addRow(new Object[]{id, name, supplierN,product_type, price,quantit});
+                    tableModel.addRow(new Object[]{id, name, supplierN, product_type, price, quantit});
 
                 }
                 connection.disconnect();
@@ -1063,7 +1150,7 @@ public class ListarProduto extends JPanel {
                         "Problema no Servidor",
                         JOptionPane.DEFAULT_OPTION,
                         JOptionPane.ERROR_MESSAGE,
-                        null,null,null);
+                        null, null, null);
                 connection.disconnect();
             }
         } catch (Exception e) {
@@ -1071,12 +1158,12 @@ public class ListarProduto extends JPanel {
         }
     }
 
-    private void getSupplierQuantityAndProdType(String supplierName, String quantity, String prodTName){
+    private void getSupplierQuantityAndProdType(String supplierName, String quantity, String prodTName) {
         try {
             String urlAPI = this.dotenv.get("API_HOST");
             String urlString = urlAPI + "/product/get/SupQuaProdT?supplier=" + URLEncoder.encode(supplierName, StandardCharsets.UTF_8)
-                    +"&quantity="+URLEncoder.encode(quantity, StandardCharsets.UTF_8)
-                    +"&prod_t="+URLEncoder.encode(prodTName, StandardCharsets.UTF_8);
+                    + "&quantity=" + URLEncoder.encode(quantity, StandardCharsets.UTF_8)
+                    + "&prod_t=" + URLEncoder.encode(prodTName, StandardCharsets.UTF_8);
             URL url = new URL(urlString);
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
             connection.setRequestMethod("GET");
@@ -1108,7 +1195,7 @@ public class ListarProduto extends JPanel {
                     String quantit = product.get("quantity").getAsString();
                     String price = product.get("price").getAsString();
 
-                    tableModel.addRow(new Object[]{id, name, supplierN,product_type, price,quantit});
+                    tableModel.addRow(new Object[]{id, name, supplierN, product_type, price, quantit});
 
                 }
                 connection.disconnect();
@@ -1118,7 +1205,7 @@ public class ListarProduto extends JPanel {
                         "Problema no Servidor",
                         JOptionPane.DEFAULT_OPTION,
                         JOptionPane.ERROR_MESSAGE,
-                        null,null,null);
+                        null, null, null);
                 connection.disconnect();
             }
         } catch (Exception e) {
@@ -1126,11 +1213,11 @@ public class ListarProduto extends JPanel {
         }
     }
 
-    private void getSupplierLowStockAndProdType(String supplierName, String prodTName){
+    private void getSupplierLowStockAndProdType(String supplierName, String prodTName) {
         try {
             String urlAPI = this.dotenv.get("API_HOST");
             String urlString = urlAPI + "/product/get/SupLQProdT?supplier=" + URLEncoder.encode(supplierName, StandardCharsets.UTF_8)
-                    +"&prod_t="+URLEncoder.encode(prodTName, StandardCharsets.UTF_8);
+                    + "&prod_t=" + URLEncoder.encode(prodTName, StandardCharsets.UTF_8);
             URL url = new URL(urlString);
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
             connection.setRequestMethod("GET");
@@ -1162,7 +1249,7 @@ public class ListarProduto extends JPanel {
                     String quantit = product.get("quantity").getAsString();
                     String price = product.get("price").getAsString();
 
-                    tableModel.addRow(new Object[]{id, name, supplierN,product_type, price,quantit});
+                    tableModel.addRow(new Object[]{id, name, supplierN, product_type, price, quantit});
 
                 }
                 connection.disconnect();
@@ -1172,7 +1259,7 @@ public class ListarProduto extends JPanel {
                         "Problema no Servidor",
                         JOptionPane.DEFAULT_OPTION,
                         JOptionPane.ERROR_MESSAGE,
-                        null,null,null);
+                        null, null, null);
                 connection.disconnect();
             }
         } catch (Exception e) {
@@ -1194,44 +1281,44 @@ public class ListarProduto extends JPanel {
         gbc.gridy = 0;
         gbc.gridwidth = 2;
         JCheckBox chkFornecedor = new JCheckBox("Fornecedor");
-        chkFornecedor.setFont(new Font("Cormorant Garamond",Font.BOLD,14));
+        chkFornecedor.setFont(new Font("Cormorant Garamond", Font.BOLD, 14));
         chkFornecedor.setForeground(Color.BLACK);
         dialog.add(chkFornecedor, gbc);
 
         gbc.gridy = 1;
         JComboBox<Supplier> cbFornecedor = new JComboBox<Supplier>();
-        cbFornecedor.setFont(new Font("Cormorant Garamond",Font.BOLD,14));
+        cbFornecedor.setFont(new Font("Cormorant Garamond", Font.BOLD, 14));
         cbFornecedor.setForeground(Color.BLACK);
         this.loadSupplier(cbFornecedor);
         dialog.add(cbFornecedor, gbc);
 
         gbc.gridy = 2;
         JCheckBox chkEstoque = new JCheckBox("Quant. em estoque");
-        chkEstoque.setFont(new Font("Cormorant Garamond",Font.BOLD,14));
+        chkEstoque.setFont(new Font("Cormorant Garamond", Font.BOLD, 14));
         chkEstoque.setForeground(Color.BLACK);
         dialog.add(chkEstoque, gbc);
 
         gbc.gridy = 3;
         JSpinner spnQuantidade = new JSpinner(new SpinnerNumberModel(0, 0, Integer.MAX_VALUE, 1));
-        spnQuantidade.setFont(new Font("Cormorant Infant",Font.BOLD,14));
+        spnQuantidade.setFont(new Font("Cormorant Infant", Font.BOLD, 14));
         spnQuantidade.setForeground(Color.BLACK);
         dialog.add(spnQuantidade, gbc);
 
         gbc.gridy = 4;
         JCheckBox chkBaixoEstoque = new JCheckBox("Com baixo estoque");
-        chkBaixoEstoque.setFont(new Font("Cormorant Garamond",Font.BOLD,14));
+        chkBaixoEstoque.setFont(new Font("Cormorant Garamond", Font.BOLD, 14));
         chkBaixoEstoque.setForeground(Color.BLACK);
         dialog.add(chkBaixoEstoque, gbc);
 
         gbc.gridy = 5;
         JCheckBox chkTipo = new JCheckBox("Tipo");
-        chkTipo.setFont(new Font("Cormorant Garamond",Font.BOLD,14));
+        chkTipo.setFont(new Font("Cormorant Garamond", Font.BOLD, 14));
         chkTipo.setForeground(Color.BLACK);
         dialog.add(chkTipo, gbc);
 
         gbc.gridy = 6;
         JComboBox<ProductType> cbTipo = new JComboBox<ProductType>();
-        cbTipo.setFont(new Font("Cormorant Garamond",Font.BOLD,14));
+        cbTipo.setFont(new Font("Cormorant Garamond", Font.BOLD, 14));
         cbTipo.setForeground(Color.BLACK);
         loadProductType(cbTipo);
         dialog.add(cbTipo, gbc);
@@ -1239,7 +1326,7 @@ public class ListarProduto extends JPanel {
         gbc.gridy = 7;
         JButton btnFiltrar = new JButton("Filtrar");
         btnFiltrar.setBackground(new Color(0, 0, 139));
-        btnFiltrar.setFont(new Font("Cormorant Garamond",Font.BOLD,16));
+        btnFiltrar.setFont(new Font("Cormorant Garamond", Font.BOLD, 16));
         btnFiltrar.setForeground(Color.BLACK);
         btnFiltrar.setForeground(Color.WHITE);
         btnFiltrar.setFocusPainted(false);
@@ -1249,11 +1336,11 @@ public class ListarProduto extends JPanel {
         btnFiltrar.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                if(chkFornecedor.isSelected()){
+                if (chkFornecedor.isSelected()) {
                     if (chkTipo.isSelected()) {
                         Supplier sup = (Supplier) cbFornecedor.getSelectedItem();
                         ProductType prod = (ProductType) cbTipo.getSelectedItem();
-                        getSupplierProdT(sup.getName(),prod.getName());
+                        getSupplierProdT(sup.getName(), prod.getName());
                         dialog.setVisible(false);
                     } else if (chkEstoque.isSelected()) {
                         Supplier sup = (Supplier) cbFornecedor.getSelectedItem();
@@ -1263,7 +1350,7 @@ public class ListarProduto extends JPanel {
                         Supplier sup = (Supplier) cbFornecedor.getSelectedItem();
                         getSupplierLowQuantity(sup.getName());
                         dialog.setVisible(false);
-                    }else{
+                    } else {
                         Supplier sup = (Supplier) cbFornecedor.getSelectedItem();
                         getSupplier(sup.getName());
                         dialog.setVisible(false);
@@ -1273,11 +1360,11 @@ public class ListarProduto extends JPanel {
                 } else if (chkEstoque.isSelected()) {
                     if (chkTipo.isSelected()) {
                         ProductType prod = (ProductType) cbTipo.getSelectedItem();
-                        getQuantityByProdType(Integer.parseInt(spnQuantidade.getValue().toString()),prod.getName());
+                        getQuantityByProdType(Integer.parseInt(spnQuantidade.getValue().toString()), prod.getName());
                         dialog.setVisible(false);
-                    }else if(chkBaixoEstoque.isSelected()){
-                        JOptionPane.showMessageDialog(rootPane,"Não é possivel filtrar por quantidade especifica de estoque e por baixo estoque!","Erro na seleção de filtragem",JOptionPane.ERROR_MESSAGE);
-                    }else{
+                    } else if (chkBaixoEstoque.isSelected()) {
+                        JOptionPane.showMessageDialog(rootPane, "Não é possivel filtrar por quantidade especifica de estoque e por baixo estoque!", "Erro na seleção de filtragem", JOptionPane.ERROR_MESSAGE);
+                    } else {
                         getStock(Integer.parseInt(spnQuantidade.getValue().toString()));
                         dialog.setVisible(false);
                     }
@@ -1288,7 +1375,7 @@ public class ListarProduto extends JPanel {
                         ProductType prod = (ProductType) cbTipo.getSelectedItem();
                         getLowStockAndProdType(prod.getName());
                         dialog.setVisible(false);
-                    }else{
+                    } else {
                         getLowStock();
                         dialog.setVisible(false);
                     }
@@ -1300,16 +1387,15 @@ public class ListarProduto extends JPanel {
                 } else if (chkFornecedor.isSelected() && chkTipo.isSelected() && chkBaixoEstoque.isSelected()) {
                     ProductType prod = (ProductType) cbTipo.getSelectedItem();
                     Supplier sup = (Supplier) cbFornecedor.getSelectedItem();
-                    getSupplierQuantityAndProdType(sup.getName(),spnQuantidade.getValue().toString(),prod.getName());
+                    getSupplierQuantityAndProdType(sup.getName(), spnQuantidade.getValue().toString(), prod.getName());
                     dialog.setVisible(false);
                 } else if (chkFornecedor.isSelected() && chkEstoque.isSelected() && chkTipo.isSelected()) {
                     ProductType prod = (ProductType) cbTipo.getSelectedItem();
                     Supplier sup = (Supplier) cbFornecedor.getSelectedItem();
-                    getSupplierLowStockAndProdType(sup.getName(),prod.getName());
+                    getSupplierLowStockAndProdType(sup.getName(), prod.getName());
                     dialog.setVisible(false);
-                }
-                else{
-                    JOptionPane.showMessageDialog(parent,"Selecione uma opção de Filtro!","Erro na seleção de filtro",JOptionPane.ERROR_MESSAGE);
+                } else {
+                    JOptionPane.showMessageDialog(parent, "Selecione uma opção de Filtro!", "Erro na seleção de filtro", JOptionPane.ERROR_MESSAGE);
                 }
             }
         });
