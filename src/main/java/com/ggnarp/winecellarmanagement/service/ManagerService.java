@@ -6,6 +6,7 @@ import com.ggnarp.winecellarmanagement.repository.ManagerRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -95,6 +96,30 @@ public class ManagerService {
                 .orElseThrow(() -> new IllegalArgumentException("Gerente não encontrado com o ID: " + id));
 
         managerRepository.delete(manager);
+    }
+
+    public Manager verifyManagerInfo(ManagerDTO managerDTO) {
+        try{
+            Manager man = managerRepository.findByEmailAndNameAndCpf(managerDTO.getEmail(), managerDTO.getName(), managerDTO.getCpf());
+            return man;
+        } catch (Exception e) {
+            throw new IllegalArgumentException("Erro ao procurar gerente.");
+        }
+    }
+
+    public Manager changePassword(UUID id, String password) {
+        try {
+            Optional<Manager> optionalManager = managerRepository.findById(id);
+            if (optionalManager.isPresent()) {
+                Manager manager = optionalManager.get();
+                manager.setPassword(password);
+                return managerRepository.save(manager);
+            } else {
+                throw new RuntimeException("Manager com ID " + id + " não encontrado");
+            }
+        } catch (Exception e) {
+            throw new RuntimeException("Erro ao alterar a senha: " + e.getMessage(), e);
+        }
     }
 
 }

@@ -26,7 +26,7 @@ public class JanelaPrincipal extends javax.swing.JFrame {
         cardPanel = new javax.swing.JPanel();
 
         jButton1 = new javax.swing.JButton();
-
+        jButton2 = new javax.swing.JButton();
         jButton3 = new javax.swing.JButton();
         jButton4 = new JButton();
         jButton5 = new JButton();

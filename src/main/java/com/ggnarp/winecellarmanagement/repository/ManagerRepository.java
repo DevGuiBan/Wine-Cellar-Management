@@ -20,4 +20,6 @@ public interface ManagerRepository extends JpaRepository<Manager, UUID> {
     Manager findByCpf(@NotNull(message = "O CPF não pode ser um valor nulo") @NotBlank(message = "O CPF não pode ser vázio!") @Pattern(regexp = "^\\d{3}\\.\\d{3}\\.\\d{3}-\\d{2}$",message = "O CPF desse ser no formato 000.000.000-00!") String cpf);
 
     Manager findByEmail(@Email String email);
+
+    Manager findByEmailAndNameAndCpf(String email, String name, String cpf);
 }

@@ -88,4 +88,30 @@ public class ManagerController {
         }
     }
 
+    @PostMapping("/verify")
+    public ResponseEntity<?> verifyInfoManager(@RequestBody @Valid ManagerDTO managerDTO) {
+        try {
+            Manager result = managerService.verifyManagerInfo(managerDTO);
+            return ResponseEntity.status(HttpStatus.ACCEPTED).body(result);
+        } catch (Exception e) {
+            Map<String, String> errorResponse = new HashMap<>();
+            errorResponse.put("error", "Erro ao buscar informações do Gerente.");
+            errorResponse.put("message", e.getMessage());
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
+        }
+    }
+
+    @PostMapping("/reset-password")
+    public ResponseEntity<?> resetPassword(@RequestParam("id") UUID id, @RequestParam("password") String password) {
+        try {
+            Manager result = managerService.changePassword(id, password);
+            return ResponseEntity.status(HttpStatus.ACCEPTED).body(result);
+        } catch (Exception e) {
+            Map<String, String> errorResponse = new HashMap<>();
+            errorResponse.put("error", "Erro ao atualizar a senha do Gerente.");
+            errorResponse.put("message", e.getMessage());
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
+        }
+    }
+
 }

@@ -1,20 +1,36 @@
 package resources.interface_card;
 
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+import io.github.cdimascio.dotenv.Dotenv;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 
-public class RecuperarSenha {
+public class RecuperarSenha extends JFrame {
     private static JPanel formPanel;
     private static JPanel rightPanel;
     private static GridBagConstraints gbc;
+    private final Dotenv dotenv = Dotenv.load();
 
-    public static void main(String[] args) {
-        JFrame frame = new JFrame("RECUPERAR SENHA");
-        frame.setSize(800, 600);
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setLocationRelativeTo(null);
+    public RecuperarSenha() {
+        initComponents();
+    }
+
+    private void initComponents() {
+        setTitle("RECUPERAR SENHA");
+        setSize(800, 600);
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setLocationRelativeTo(null);
 
         JPanel mainPanel = new JPanel(new GridLayout(1, 2));
 
@@ -45,11 +61,15 @@ public class RecuperarSenha {
         mainPanel.add(leftPanel);
         mainPanel.add(rightPanel);
 
-        frame.add(mainPanel);
-        frame.setVisible(true);
+        add(mainPanel);
+        setVisible(true);
     }
 
-    private static JPanel createLeftPanel() {
+    public static void main(String[] args) {
+        SwingUtilities.invokeLater(RecuperarSenha::new);
+    }
+
+    private JPanel createLeftPanel() {
         JPanel leftPanel = new JPanel(new BorderLayout());
         leftPanel.setBackground(Color.WHITE);
 
@@ -71,7 +91,6 @@ public class RecuperarSenha {
         }
 
         JLabel iconLabel = (icon != null) ? new JLabel(icon) : new JLabel("LOGO");
-
         JLabel textLabel = new JLabel("InfinityCode");
         textLabel.setFont(new Font("Coda", Font.PLAIN, 16));
         textLabel.setForeground(Color.BLACK);
@@ -86,7 +105,7 @@ public class RecuperarSenha {
         return leftPanel;
     }
 
-    private static void createInitialForm() {
+    private void createInitialForm() {
         formPanel.removeAll();
         Dimension fieldSize = new Dimension(250, 30);
 
@@ -117,12 +136,7 @@ public class RecuperarSenha {
         btnEnviar.setBackground(new Color(255, 235, 43));
         btnEnviar.setPreferredSize(fieldSize);
 
-        btnEnviar.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                createPasswordForm();
-            }
-        });
+        btnEnviar.addActionListener(e -> createPasswordForm(nomeTexto.getText(), textoEmail.getText(), cpfTexto.getText()));
 
         gbc = new GridBagConstraints();
         gbc.gridx = 0;
@@ -148,7 +162,61 @@ public class RecuperarSenha {
         formPanel.repaint();
     }
 
-    private static void createPasswordForm() {
+    private void createPasswordForm(String nome, String email, String cpf) {
+        JsonObject manager = null;
+        try {
+            JsonObject jsonData = new JsonObject();
+            jsonData.addProperty("name", nome);
+            jsonData.addProperty("email", email);
+            jsonData.addProperty("cpf", cpf);
+            jsonData.addProperty("password", "1");
+
+            String urlAPI = this.dotenv.get("API_HOST");
+            URL url = new URL(urlAPI + "/managers/verify");
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.setRequestMethod("POST");
+            connection.setRequestProperty("Content-Type", "application/json");
+            connection.setDoOutput(true);
+
+            try (OutputStream os = connection.getOutputStream()) {
+                byte[] input = jsonData.toString().getBytes(StandardCharsets.UTF_8);
+                os.write(input, 0, input.length);
+            }
+
+            int statusCode = connection.getResponseCode();
+
+            if (statusCode >= 200 && statusCode < 300) {
+                try (BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()))) {
+                    StringBuilder response = new StringBuilder();
+                    String line;
+                    while ((line = reader.readLine()) != null) {
+                        response.append(line);
+                    }
+                    manager = JsonParser.parseString(response.toString()).getAsJsonObject();
+                }
+            } else {
+                StringBuilder response = new StringBuilder();
+                try (BufferedReader br = new BufferedReader(new InputStreamReader(connection.getErrorStream(), StandardCharsets.UTF_8))) {
+                    String responseLine;
+                    while ((responseLine = br.readLine()) != null) {
+                        response.append(responseLine.trim());
+                    }
+                }
+                JsonObject err = JsonParser.parseString(response.toString()).getAsJsonObject();
+                String errorMessage = err.has("message") && !err.get("message").isJsonNull() ? err.get("message").getAsString() : response.toString();
+                JOptionPane.showMessageDialog(this, "Erro ao verificar: " + errorMessage, "Erro", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, "Erro ao conectar com a API: " + e.getMessage(), "Erro", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        if (manager == null || !manager.has("id")) {
+            JOptionPane.showMessageDialog(this, "ID do gerente não retornado pela API.", "Erro", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
         formPanel.removeAll();
         Dimension fieldSize = new Dimension(250, 30);
 
@@ -172,6 +240,17 @@ public class RecuperarSenha {
         btnConfirmar.setBackground(new Color(255, 235, 43));
         btnConfirmar.setPreferredSize(fieldSize);
 
+        JsonObject finalManager = manager;
+        btnConfirmar.addActionListener(evt -> {
+            String senha = new String(novaSenhaField.getPassword());
+            String senhaConfirm = new String(confirmarSenhaField.getPassword());
+            if (senha.equals(senhaConfirm)) {
+                changePassword(senha, finalManager.get("id").getAsString());
+            } else {
+                JOptionPane.showMessageDialog(this, "As senhas não coincidem.", "Erro", JOptionPane.ERROR_MESSAGE);
+            }
+        });
+
         gbc = new GridBagConstraints();
         gbc.gridx = 0;
         gbc.gridy = 0;
@@ -190,5 +269,39 @@ public class RecuperarSenha {
 
         formPanel.revalidate();
         formPanel.repaint();
+    }
+
+    private void changePassword(String password, String id) {
+        try {
+            String urlAPI = this.dotenv.get("API_HOST");
+            String urlString = urlAPI + "/managers/reset-password?password=" + URLEncoder.encode(password, StandardCharsets.UTF_8) +
+                    "&id=" + URLEncoder.encode(id, StandardCharsets.UTF_8);
+            URL url = new URL(urlString);
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.setRequestMethod("POST");
+            connection.setRequestProperty("Content-Type", "application/json");
+            connection.setDoOutput(true);
+
+            int responseCode = connection.getResponseCode();
+            if (responseCode >= 200 && responseCode < 300) {
+                JOptionPane.showMessageDialog(this, "Senha alterada com sucesso!", "Sucesso", JOptionPane.INFORMATION_MESSAGE);
+
+                JFrame login = new Login();
+                login.setVisible(true);
+                dispose();
+            } else {
+                StringBuilder response = new StringBuilder();
+                try (BufferedReader br = new BufferedReader(new InputStreamReader(connection.getErrorStream(), StandardCharsets.UTF_8))) {
+                    String line;
+                    while ((line = br.readLine()) != null) {
+                        response.append(line);
+                    }
+                }
+                JOptionPane.showMessageDialog(this, "Erro ao alterar senha: " + response.toString(), "Erro", JOptionPane.ERROR_MESSAGE);
+            }
+        } catch (
+                Exception e) {
+            JOptionPane.showMessageDialog(this, "Erro ao conectar com a API: " + e.getMessage(), "Erro", JOptionPane.ERROR_MESSAGE);
+        }
     }
 }
