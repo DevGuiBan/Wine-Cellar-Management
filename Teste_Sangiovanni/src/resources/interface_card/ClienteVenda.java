@@ -299,6 +299,16 @@ public class ClienteVenda extends JPanel {
         }
     }
 
+    public void cadastrarClient(){
+        CadastroClienteDialog dialog = new CadastroClienteDialog(this.framePrincipal);
+        dialog.setVisible(true);
+        if(!dialog.isVisible()){
+            boolean result = dialog.getResult();
+            if(result){
+                getClient();
+            }
+        }
+    }
 
     private JLabel jLabelCPF;
     private JLabel jLabelNome;

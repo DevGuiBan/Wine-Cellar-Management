@@ -124,6 +124,7 @@ public class Cadastro extends JFrame{
         btnCadastrar.setForeground(Color.BLACK);
         btnCadastrar.setBackground(new Color(255, 235, 43));
         btnCadastrar.setPreferredSize(fieldSize);
+        btnCadastrar.setCursor(new Cursor(Cursor.HAND_CURSOR));
         btnCadastrar.addActionListener(evt->{
                 cadastrar();
         });
@@ -134,6 +135,7 @@ public class Cadastro extends JFrame{
         btnJaTenhoConta.setBackground(new Color(128, 0, 32));
         btnJaTenhoConta.setBorder(BorderFactory.createLineBorder(new Color(255, 235, 43), 2));
         btnJaTenhoConta.setPreferredSize(fieldSize);
+        btnJaTenhoConta.setCursor(new Cursor(Cursor.HAND_CURSOR));
         btnJaTenhoConta.addActionListener(evt->{
             login();
         });

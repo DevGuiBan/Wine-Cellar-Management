@@ -9,6 +9,8 @@ import io.github.cdimascio.dotenv.Dotenv;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import javax.swing.table.*;
 import java.awt.*;
 import java.io.BufferedReader;
@@ -18,6 +20,7 @@ import java.net.URL;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Objects;
 
 public class ListarCliente extends JPanel {
@@ -79,6 +82,23 @@ public class ListarCliente extends JPanel {
                 }
             }
         });
+        timer.setRepeats(false);
+        pesquisaProduto.getDocument().addDocumentListener(new DocumentListener() {
+            @Override
+            public void insertUpdate(DocumentEvent e) {
+                timer.restart();
+            }
+
+            @Override
+            public void removeUpdate(DocumentEvent e) {
+                timer.restart();
+            }
+
+            @Override
+            public void changedUpdate(DocumentEvent e) {
+                timer.restart();
+            }
+        });
         jPanelTopoTabela.add(pesquisaProduto);
 
         jPanelTopoTabela.add(Box.createHorizontalStrut(500));
@@ -128,8 +148,6 @@ public class ListarCliente extends JPanel {
         DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
         centerRenderer.setHorizontalAlignment(SwingConstants.CENTER);
 
-        jtable.getColumnModel().getColumn(0).setCellRenderer(centerRenderer);
-
         jtable.setFont(new java.awt.Font("Cormorant Infant",Font.BOLD,14));
         jtable.setShowGrid(false);
         jtable.setIntercellSpacing(new Dimension(0, 0));
@@ -139,6 +157,7 @@ public class ListarCliente extends JPanel {
         JTableHeader header = jtable.getTableHeader();
         header.setFont(new java.awt.Font("Cormorant Garamond",Font.BOLD,18));
         header.setBackground(Color.WHITE);
+        header.setEnabled(false);
         header.setForeground(new java.awt.Color(128, 0, 32));
         header.setBorder(javax.swing.BorderFactory.createMatteBorder(0, 0, 2, 0, new java.awt.Color(128, 0, 32)));
 
@@ -519,6 +538,87 @@ public class ListarCliente extends JPanel {
         frame.setVisible(true);
     }
 
+    private void searchClient(String name, String email, String cpf) {
+        try {
+            String urlAPI = this.dotenv.get("API_HOST");
+            StringBuilder urlBuilder = new StringBuilder(urlAPI + "/client/search");
+            urlBuilder.append("?");
+            boolean hasParam = false;
+
+            if (name != null && !name.isEmpty()) {
+                if (hasParam) urlBuilder.append("&");
+                urlBuilder.append("name=").append(URLEncoder.encode(name, "UTF-8"));
+                hasParam = true;
+            }
+
+            if (email != null && !email.isEmpty()) {
+                if (hasParam) urlBuilder.append("&");
+                urlBuilder.append("email=").append(URLEncoder.encode(email, "UTF-8"));
+                hasParam = true;
+            }
+
+            if (cpf != null && !cpf.isEmpty()) {
+                if (hasParam) urlBuilder.append("&");
+                urlBuilder.append("cpf=").append(URLEncoder.encode(cpf, "UTF-8"));
+            }
+
+            URL url = new URL(urlBuilder.toString());
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.setRequestMethod("GET");
+
+            int responseCode = connection.getResponseCode();
+            if (responseCode == HttpURLConnection.HTTP_OK) {
+                try (BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()))) {
+                    StringBuilder response = new StringBuilder();
+                    String line;
+                    while ((line = reader.readLine()) != null) {
+                        response.append(line);
+                    }
+
+                    JsonArray clients = JsonParser.parseString(response.toString()).getAsJsonArray();
+
+                    DefaultTableModel tableModel = (DefaultTableModel) jtable.getModel();
+                    tableModel.setRowCount(0);
+
+                    for (int i = 0; i < clients.size(); i++) {
+                        JsonObject client = clients.get(i).getAsJsonObject();
+                        String id = client.get("id").getAsString();
+                        String nameC = client.get("name").getAsString();
+                        String cpfC = client.get("cpf").getAsString();
+                        String address = client.get("address").getAsString();
+                        String phone_number = client.get("phoneNumber").getAsString();
+                        String emailC = client.get("email").getAsString();
+                        String data = client.get("dateBirth").getAsString();
+                        tableModel.addRow(new Object[]{id, nameC,address,cpfC,data,phone_number,emailC});
+                    }
+                    connection.disconnect();
+                }
+            } else {
+                JOptionPane.showMessageDialog(rootPane,
+                        "Erro ao buscar produtos: Código " + responseCode,
+                        "Problema na Busca",
+                        JOptionPane.ERROR_MESSAGE);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(rootPane, "Erro na busca: " + e.getMessage());
+        }
+    }
+
+    private void filterClient() {
+        String searchText = pesquisaProduto.getText().trim();
+        if (searchText.equals("Pesquisar Cliente") || searchText.isEmpty()) {
+            getClientes();
+        } else {
+            if (searchText.contains("@")) {
+                searchClient( null, searchText, null);
+            } else {
+                searchClient(searchText, null, null);
+            }
+
+        }
+    }
+
     private javax.swing.JTextField pesquisaProduto;
     private javax.swing.JTable jtable;
     private javax.swing.JScrollPane jScrollPane;
@@ -527,6 +627,7 @@ public class ListarCliente extends JPanel {
     private javax.swing.JPanel jPanel4;
     private javax.swing.JButton jButtonCadastrar;
     private javax.swing.JButton jButtonFiltrar;
+    private final Timer timer = new Timer(300, e -> filterClient());
 }
 
 class ButtonRendererProductClient extends JPanel implements TableCellRenderer {

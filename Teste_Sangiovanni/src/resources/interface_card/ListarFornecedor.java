@@ -560,7 +560,7 @@ public class ListarFornecedor extends JPanel {
         }
     }
 
-    private void filterSales() {
+    private void filterSupplier() {
         String searchText = pesquisaProduto.getText().trim();
         if (searchText.equals("Pesquisar Fornecedor") || searchText.isEmpty()) {
             getSupplier();
@@ -583,7 +583,7 @@ public class ListarFornecedor extends JPanel {
     private javax.swing.JTextField pesquisaProduto;
     private javax.swing.JTable jtable;
     private javax.swing.JScrollPane jScrollPane;
-    private final Timer timer = new Timer(300, e -> filterSales());
+    private final Timer timer = new Timer(300, e -> filterSupplier());
 }
 
 class ButtonRendererSupplier extends JPanel implements TableCellRenderer {

@@ -191,9 +191,7 @@ public class Login extends JFrame {
             // Tentando login como Manager
             JsonObject isLogged = tryLogin(urlAPI + "/auth/login", jsonString);
 
-            // Verificando se o login foi bem-sucedido
-            assert isLogged != null;
-            if (!isLogged.isEmpty()) {
+            if (isLogged!=null) {
                 JFrame frame = new JanelaPrincipal(isLogged);
                 JOptionPane.showMessageDialog(this.rootPane,
                         "Login realizado com sucesso!",
@@ -255,7 +253,8 @@ public class Login extends JFrame {
                 }
             }
 
-            // Tenta interpretar o erro em JSON
+            // Tenta interpretar o erro em JSON debug
+            /*
             try {
                 JsonObject err = JsonParser.parseString(response.toString()).getAsJsonObject();
                 String errorMessage = err.has("message") ? err.get("message").getAsString() : response.toString();
@@ -268,7 +267,7 @@ public class Login extends JFrame {
                         "Erro inesperado ao processar a resposta. Código: " + statusCode + "\nResposta: " + response,
                         "Erro",
                         JOptionPane.ERROR_MESSAGE);
-            }
+            }*/
 
             connection.disconnect();
             return null;

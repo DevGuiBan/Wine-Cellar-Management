@@ -199,6 +199,8 @@ public class RegistrarVenda extends JPanel {
                 abrirModal(frame);
             }else if(cardProdutos.isVisible()){
                 cardProdutos.addProduct();
+            }else if(cardClientes.isVisible()){
+                cardClientes.cadastrarClient();
             }
         });
 

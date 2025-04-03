@@ -9,6 +9,8 @@ import io.github.cdimascio.dotenv.Dotenv;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import javax.swing.table.*;
 import java.awt.*;
 import java.io.BufferedReader;
@@ -27,17 +29,17 @@ public class ListarFuncionario extends JPanel {
     private CadastrarFuncionario card;
     private boolean isAdmin;
 
-    public ListarFuncionario(JRootPane rootPane,JPanel mainPanel,CadastrarFuncionario cardFuncionario, boolean isAdmin) {
-      this.isAdmin = isAdmin;
-      this.rootPane = rootPane;
-      this.mainPanel = mainPanel;
-      this.dotenv = Dotenv.load();
-      this.card = cardFuncionario;
-      this.initComponents();
-      this.getFuncionarios();
+    public ListarFuncionario(JRootPane rootPane, JPanel mainPanel, CadastrarFuncionario cardFuncionario, boolean isAdmin) {
+        this.isAdmin = isAdmin;
+        this.rootPane = rootPane;
+        this.mainPanel = mainPanel;
+        this.dotenv = Dotenv.load();
+        this.card = cardFuncionario;
+        this.initComponents();
+        this.getFuncionarios();
     }
 
-    private void initComponents(){
+    private void initComponents() {
         // iniciar Componentes
         jPanelTopoTabela = new javax.swing.JPanel();
         jPanelTabela = new javax.swing.JPanel();
@@ -81,12 +83,29 @@ public class ListarFuncionario extends JPanel {
                 }
             }
         });
+        timer.setRepeats(false);
+        pesquisaProduto.getDocument().addDocumentListener(new DocumentListener() {
+            @Override
+            public void insertUpdate(DocumentEvent e) {
+                timer.restart();
+            }
+
+            @Override
+            public void removeUpdate(DocumentEvent e) {
+                timer.restart();
+            }
+
+            @Override
+            public void changedUpdate(DocumentEvent e) {
+                timer.restart();
+            }
+        });
         jPanelTopoTabela.add(pesquisaProduto);
 
-        if(this.isAdmin){
+        if (this.isAdmin) {
             jPanelTopoTabela.add(Box.createHorizontalStrut(500));
             jButtonCadastrar.setVisible(true);
-        }else{
+        } else {
             jPanelTopoTabela.add(Box.createHorizontalStrut(750));
             jButtonCadastrar.setVisible(false);
         }
@@ -114,7 +133,7 @@ public class ListarFuncionario extends JPanel {
         jButtonFiltrar.setContentAreaFilled(false);
         jButtonFiltrar.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         jButtonFiltrar.setPreferredSize(new java.awt.Dimension(90, 40));
-        jButtonFiltrar.addActionListener(evt->{
+        jButtonFiltrar.addActionListener(evt -> {
             this.filtro();
         });
         jPanelTopoTabela.add(jButtonFiltrar);
@@ -123,60 +142,99 @@ public class ListarFuncionario extends JPanel {
         jPanelTabela.setBackground(new java.awt.Color(255, 255, 255));
         jPanelTabela.setLayout(new BorderLayout());
 
-        jtable.setModel(new javax.swing.table.DefaultTableModel(
-                new Object[][]{},
-                new String[]{
-                        "Código", "Nome", "CPF", "Endereço", "Telefone", "E-mail", "Data de Nascimento", "Ações"
+        if (isAdmin) {
+            jtable.setModel(new javax.swing.table.DefaultTableModel(
+                    new Object[][]{},
+                    new String[]{
+                            "Código", "Nome", "CPF", "Endereço", "Telefone", "E-mail", "Data de Nascimento", "Ações"
+                    }
+            ));
+
+            jtable.setIntercellSpacing(new Dimension(0, 0));
+            jtable.setShowHorizontalLines(false);
+            jtable.setShowVerticalLines(false);
+
+            DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
+            centerRenderer.setHorizontalAlignment(SwingConstants.CENTER);
+
+            jtable.getColumnModel().getColumn(0).setCellRenderer(centerRenderer);
+
+            jtable.setFont(new java.awt.Font("Cormorant Infant", Font.BOLD, 14));
+            jtable.setShowGrid(false);
+            jtable.setIntercellSpacing(new Dimension(0, 0));
+            jtable.setRowHeight(30);
+            jtable.setFocusable(false);
+
+            JTableHeader header = jtable.getTableHeader();
+            header.setFont(new java.awt.Font("Cormorant Garamond", Font.BOLD, 18));
+            header.setBackground(Color.WHITE);
+            header.setForeground(new java.awt.Color(128, 0, 32));
+            header.setBorder(javax.swing.BorderFactory.createMatteBorder(0, 0, 2, 0, new java.awt.Color(128, 0, 32)));
+
+            jtable.setBackground(new java.awt.Color(255, 255, 255));
+            jtable.setSelectionBackground(new java.awt.Color(228, 236, 242));
+            jtable.setSelectionForeground(new java.awt.Color(0, 0, 0));
+
+            for (int i = 0; i < jtable.getColumnCount(); i++) {
+                if (!jtable.getColumnName(i).equals("Ações")) {
+                    jtable.getColumnModel().getColumn(i).setCellRenderer(centerRenderer);
                 }
-        ));
+            }
 
-        jtable.setIntercellSpacing(new Dimension(0, 0));
-        jtable.setShowHorizontalLines(false);
-        jtable.setShowVerticalLines(false);
+            jtable.getColumn("Ações").setCellRenderer(new ButtonRendererEmployee());
+            jtable.getColumn("Ações").setCellEditor(new ButtonEditorEmployee(jtable, rootPane, this.dotenv.get("API_HOST"), card, this.mainPanel));
 
-        DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
-        centerRenderer.setHorizontalAlignment(SwingConstants.CENTER);
+        } else {
+            jtable.setModel(new javax.swing.table.DefaultTableModel(
+                    new Object[][]{},
+                    new String[]{
+                            "Código", "Nome", "CPF", "Endereço", "Telefone", "E-mail", "Data de Nascimento"
+                    }
+            ));
 
-        jtable.getColumnModel().getColumn(0).setCellRenderer(centerRenderer);
+            jtable.setIntercellSpacing(new Dimension(0, 0));
+            jtable.setShowHorizontalLines(false);
+            jtable.setShowVerticalLines(false);
 
-        jtable.setFont(new java.awt.Font("Cormorant Infant",Font.BOLD,14));
-        jtable.setShowGrid(false);
-        jtable.setIntercellSpacing(new Dimension(0, 0));
-        jtable.setRowHeight(30);
-        jtable.setFocusable(false);
+            DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
+            centerRenderer.setHorizontalAlignment(SwingConstants.CENTER);
 
-        JTableHeader header = jtable.getTableHeader();
-        header.setFont(new java.awt.Font("Cormorant Garamond",Font.BOLD,18));
-        header.setBackground(Color.WHITE);
-        header.setForeground(new java.awt.Color(128, 0, 32));
-        header.setBorder(javax.swing.BorderFactory.createMatteBorder(0, 0, 2, 0, new java.awt.Color(128, 0, 32)));
+            jtable.getColumnModel().getColumn(0).setCellRenderer(centerRenderer);
 
-        jtable.setBackground(new java.awt.Color(255, 255, 255));
-        jtable.setSelectionBackground(new java.awt.Color(228, 236, 242));
-        jtable.setSelectionForeground(new java.awt.Color(0, 0, 0));
+            jtable.setFont(new java.awt.Font("Cormorant Infant", Font.BOLD, 14));
+            jtable.setShowGrid(false);
+            jtable.setIntercellSpacing(new Dimension(0, 0));
+            jtable.setRowHeight(30);
+            jtable.setFocusable(false);
 
-        for (int i = 0; i < jtable.getColumnCount(); i++) {
-            if (!jtable.getColumnName(i).equals("Ações")) {
+            JTableHeader header = jtable.getTableHeader();
+            header.setFont(new java.awt.Font("Cormorant Garamond", Font.BOLD, 18));
+            header.setBackground(Color.WHITE);
+            header.setForeground(new java.awt.Color(128, 0, 32));
+            header.setBorder(javax.swing.BorderFactory.createMatteBorder(0, 0, 2, 0, new java.awt.Color(128, 0, 32)));
+
+            jtable.setBackground(new java.awt.Color(255, 255, 255));
+            jtable.setSelectionBackground(new java.awt.Color(228, 236, 242));
+            jtable.setSelectionForeground(new java.awt.Color(0, 0, 0));
+
+            for (int i = 0; i < jtable.getColumnCount(); i++) {
                 jtable.getColumnModel().getColumn(i).setCellRenderer(centerRenderer);
             }
+
         }
 
-        jtable.getColumn("Ações").setCellRenderer(new ButtonRendererEmployee());
-        jtable.getColumn("Ações").setCellEditor(new ButtonEditorEmployee(jtable, rootPane,this.dotenv.get("API_HOST"),card,this.mainPanel));
-
         jScrollPane.setViewportView(jtable);
-        jScrollPane.setBorder(javax.swing.BorderFactory.createMatteBorder(2, 2, 2, 2, new java.awt.Color(128, 0, 32)));
-        jScrollPane.setBorder(javax.swing.BorderFactory.createMatteBorder(0, 0, 2, 0, new java.awt.Color(128, 0, 32)));
-
+        jScrollPane.setBorder(BorderFactory.createMatteBorder(2, 2, 2, 2, new Color(128, 0, 32)));
+        jScrollPane.setBorder(BorderFactory.createMatteBorder(0, 0, 2, 0, new Color(128, 0, 32)));
         jPanelTabela.add(jScrollPane, BorderLayout.CENTER);
-
         jPanel4.add(jPanelTopoTabela);
         jPanel4.add(jPanelTabela);
         setBorder(new EmptyBorder(20, 20, 20, 20));
         add(jPanel4);
+
     }
 
-    private void getFuncionarios(){
+    private void getFuncionarios() {
         try {
             String urlAPI = this.dotenv.get("API_HOST");
             URL url = new URL(urlAPI + "/employee");
@@ -217,7 +275,7 @@ public class ListarFuncionario extends JPanel {
                         "Problema no Servidor",
                         JOptionPane.DEFAULT_OPTION,
                         JOptionPane.ERROR_MESSAGE,
-                        null,null,null);
+                        null, null, null);
                 connection.disconnect();
             }
         } catch (Exception e) {
@@ -225,10 +283,10 @@ public class ListarFuncionario extends JPanel {
         }
     }
 
-    private void getFuncionarioByAddress(String endereco){
+    private void getFuncionarioByAddress(String endereco) {
         try {
             String urlAPI = this.dotenv.get("API_HOST");
-            URL url = new URL(urlAPI + "/employee/address/"+endereco);
+            URL url = new URL(urlAPI + "/employee/address/" + endereco);
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
             connection.setRequestMethod("GET");
 
@@ -266,7 +324,7 @@ public class ListarFuncionario extends JPanel {
                         "Problema no Servidor",
                         JOptionPane.DEFAULT_OPTION,
                         JOptionPane.ERROR_MESSAGE,
-                        null,null,null);
+                        null, null, null);
                 connection.disconnect();
             }
         } catch (Exception e) {
@@ -274,7 +332,7 @@ public class ListarFuncionario extends JPanel {
         }
     }
 
-    private void getFuncionariosByDate(String dateIn,String dateOut){
+    private void getFuncionariosByDate(String dateIn, String dateOut) {
         try {
             String urlAPI = this.dotenv.get("API_HOST");
             String urlString = urlAPI + "/employee/date?start_date=" + URLEncoder.encode(dateIn, StandardCharsets.UTF_8) +
@@ -344,7 +402,7 @@ public class ListarFuncionario extends JPanel {
                         "Problema no Servidor",
                         JOptionPane.DEFAULT_OPTION,
                         JOptionPane.ERROR_MESSAGE,
-                        null,null,null);
+                        null, null, null);
                 connection.disconnect();
             }
         } catch (Exception e) {
@@ -352,11 +410,11 @@ public class ListarFuncionario extends JPanel {
         }
     }
 
-    private void getFuncionariosByDateAddress(String endereco, String dateIn, String dateOut){
+    private void getFuncionariosByDateAddress(String endereco, String dateIn, String dateOut) {
         try {
             String urlAPI = this.dotenv.get("API_HOST");
             String urlString = urlAPI + "/employee/searchByAeD?start_date=" + URLEncoder.encode(dateIn, StandardCharsets.UTF_8) +
-                    "&end_date=" + URLEncoder.encode(dateOut, StandardCharsets.UTF_8)+"&addressTerm="+URLEncoder.encode(endereco, StandardCharsets.UTF_8);
+                    "&end_date=" + URLEncoder.encode(dateOut, StandardCharsets.UTF_8) + "&addressTerm=" + URLEncoder.encode(endereco, StandardCharsets.UTF_8);
             URL url = new URL(urlString);
 
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
@@ -422,7 +480,7 @@ public class ListarFuncionario extends JPanel {
                         "Problema no Servidor",
                         JOptionPane.DEFAULT_OPTION,
                         JOptionPane.ERROR_MESSAGE,
-                        null,null,null);
+                        null, null, null);
                 connection.disconnect();
             }
         } catch (Exception e) {
@@ -430,11 +488,11 @@ public class ListarFuncionario extends JPanel {
         }
     }
 
-    public void atualizarDados(){
+    public void atualizarDados() {
         this.getFuncionarios();
     }
 
-    private void filtro(){
+    private void filtro() {
         JFrame frame = (JFrame) SwingUtilities.getWindowAncestor(rootPane);
 
         JDialog dialog = new JDialog(frame, "Filtros", true);
@@ -448,7 +506,7 @@ public class ListarFuncionario extends JPanel {
 
         JCheckBox chkDataNascimento = new JCheckBox("Data de Nascimento:");
         chkDataNascimento.setForeground(Color.BLACK);
-        chkDataNascimento.setFont(new Font("Cormorant Garamond",Font.BOLD,14));
+        chkDataNascimento.setFont(new Font("Cormorant Garamond", Font.BOLD, 14));
         gbc.gridx = 0;
         gbc.gridy = 0;
         gbc.gridwidth = 2;
@@ -457,26 +515,26 @@ public class ListarFuncionario extends JPanel {
         gbc.gridwidth = 1;
         gbc.gridy = 1;
         JLabel de = new JLabel("de");
-        de.setFont(new Font("Cormorant Garamond",Font.BOLD,14));
+        de.setFont(new Font("Cormorant Garamond", Font.BOLD, 14));
         de.setForeground(Color.BLACK);
         dialog.add(de, gbc);
         gbc.gridx = 1;
         JDateChooser dateChooserDe = new JDateChooser();
         dateChooserDe.setDateFormatString("dd/MM/yyyy");
-        dateChooserDe.setFont(new Font("Cormorant Infant",Font.BOLD,14));
+        dateChooserDe.setFont(new Font("Cormorant Infant", Font.BOLD, 14));
         dateChooserDe.setForeground(Color.BLACK);
         dialog.add(dateChooserDe, gbc);
 
         gbc.gridx = 0;
         gbc.gridy = 2;
         JLabel ate = new JLabel("até");
-        ate.setFont(new Font("Cormorant Garamond",Font.BOLD,14));
+        ate.setFont(new Font("Cormorant Garamond", Font.BOLD, 14));
         ate.setForeground(Color.BLACK);
         dialog.add(ate, gbc);
         gbc.gridx = 1;
         JDateChooser dateChooserAte = new JDateChooser();
         dateChooserAte.setDateFormatString("dd/MM/yyyy");
-        dateChooserAte.setFont(new Font("Cormorant Infant",Font.BOLD,14));
+        dateChooserAte.setFont(new Font("Cormorant Infant", Font.BOLD, 14));
         dateChooserAte.setForeground(Color.BLACK);
         dialog.add(dateChooserAte, gbc);
 
@@ -484,20 +542,20 @@ public class ListarFuncionario extends JPanel {
         gbc.gridy = 3;
         gbc.gridwidth = 2;
         JCheckBox chkEndereco = new JCheckBox("Endereço");
-        chkEndereco.setFont(new Font("Cormorant Garamond",Font.BOLD,14));
+        chkEndereco.setFont(new Font("Cormorant Garamond", Font.BOLD, 14));
         chkEndereco.setForeground(Color.BLACK);
         dialog.add(chkEndereco, gbc);
 
         gbc.gridy = 4;
         JTextField txtEndereco = new JTextField(15);
-        txtEndereco.setFont(new Font("Cormorant Infant",Font.BOLD,14));
+        txtEndereco.setFont(new Font("Cormorant Infant", Font.BOLD, 14));
         txtEndereco.setForeground(Color.BLACK);
         dialog.add(txtEndereco, gbc);
 
         gbc.gridy = 5;
         JButton btnFiltrar = new JButton("Filtrar");
         btnFiltrar.setBackground(new Color(0, 0, 139));
-        btnFiltrar.setFont(new Font("Cormorant Garamond",Font.BOLD,16));
+        btnFiltrar.setFont(new Font("Cormorant Garamond", Font.BOLD, 16));
         btnFiltrar.setForeground(Color.WHITE);
         btnFiltrar.setFocusPainted(false);
         btnFiltrar.setCursor(new Cursor(Cursor.HAND_CURSOR));
@@ -509,23 +567,104 @@ public class ListarFuncionario extends JPanel {
             String dataAte = dateChooserAte.getDate() != null ? sdf.format(dateChooserAte.getDate()) : "Não selecionado";
             String endereco = txtEndereco.getText().trim().isEmpty() ? "Não informado" : txtEndereco.getText();
 
-            if(chkEndereco.isSelected()){
+            if (chkEndereco.isSelected()) {
                 getFuncionarioByAddress(endereco);
                 dialog.setVisible(false);
             } else if (chkDataNascimento.isSelected()) {
                 getFuncionariosByDate(dataDe, dataAte);
                 dialog.setVisible(false);
             } else if (chkDataNascimento.isSelected() && chkEndereco.isSelected()) {
-                getFuncionariosByDateAddress(endereco,dataDe,dataAte);
+                getFuncionariosByDateAddress(endereco, dataDe, dataAte);
                 dialog.setVisible(false);
-            }else {
-                JOptionPane.showMessageDialog(frame,"Selecione uma opção de Filtro!","Erro na pesquisa",JOptionPane.ERROR_MESSAGE);
+            } else {
+                JOptionPane.showMessageDialog(frame, "Selecione uma opção de Filtro!", "Erro na pesquisa", JOptionPane.ERROR_MESSAGE);
             }
 
         });
 
         dialog.setVisible(true);
         frame.setVisible(true);
+    }
+
+    private void searchEmployee(String name, String email, String cpf) {
+        try {
+            String urlAPI = this.dotenv.get("API_HOST");
+            StringBuilder urlBuilder = new StringBuilder(urlAPI + "/employee/search");
+            urlBuilder.append("?");
+            boolean hasParam = false;
+
+            if (name != null && !name.isEmpty()) {
+                if (hasParam) urlBuilder.append("&");
+                urlBuilder.append("name=").append(URLEncoder.encode(name, "UTF-8"));
+                hasParam = true;
+            }
+
+            if (email != null && !email.isEmpty()) {
+                if (hasParam) urlBuilder.append("&");
+                urlBuilder.append("email=").append(URLEncoder.encode(email, "UTF-8"));
+                hasParam = true;
+            }
+
+            if (cpf != null && !cpf.isEmpty()) {
+                if (hasParam) urlBuilder.append("&");
+                urlBuilder.append("cpf=").append(URLEncoder.encode(cpf, "UTF-8"));
+            }
+
+            URL url = new URL(urlBuilder.toString());
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.setRequestMethod("GET");
+
+            int responseCode = connection.getResponseCode();
+            if (responseCode == HttpURLConnection.HTTP_OK) {
+                try (BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()))) {
+                    StringBuilder response = new StringBuilder();
+                    String line;
+                    while ((line = reader.readLine()) != null) {
+                        response.append(line);
+                    }
+
+                    JsonArray employees = JsonParser.parseString(response.toString()).getAsJsonArray();
+
+                    DefaultTableModel tableModel = (DefaultTableModel) jtable.getModel();
+                    tableModel.setRowCount(0);
+
+                    for (int i = 0; i < employees.size(); i++) {
+                        JsonObject employee = employees.get(i).getAsJsonObject();
+                        String id = employee.get("id").getAsString();
+                        String nameE = employee.get("name").getAsString();
+                        String cpfE = employee.get("cpf").getAsString();
+                        String address = employee.get("address").getAsString();
+                        String phone_number = employee.get("phoneNumber").getAsString();
+                        String emailE = employee.get("email").getAsString();
+                        String data = employee.get("dateBirth").getAsString();
+                        tableModel.addRow(new Object[]{id, nameE, cpfE, address, phone_number, emailE, data});
+                    }
+                    connection.disconnect();
+                }
+            } else {
+                JOptionPane.showMessageDialog(rootPane,
+                        "Erro ao buscar produtos: Código " + responseCode,
+                        "Problema na Busca",
+                        JOptionPane.ERROR_MESSAGE);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(rootPane, "Erro na busca: " + e.getMessage());
+        }
+    }
+
+    private void filterEmployee() {
+        String searchText = pesquisaProduto.getText().trim();
+        if (searchText.equals("Pesquisar Cliente") || searchText.isEmpty()) {
+            getFuncionarios();
+        } else {
+            if (searchText.contains("@")) {
+                searchEmployee( null, searchText, null);
+            } else {
+                searchEmployee(searchText, null, null);
+            }
+
+        }
     }
 
     private javax.swing.JTextField pesquisaProduto;
@@ -536,6 +675,7 @@ public class ListarFuncionario extends JPanel {
     private javax.swing.JPanel jPanel4;
     private javax.swing.JButton jButtonCadastrar;
     private javax.swing.JButton jButtonFiltrar;
+    private final Timer timer = new Timer(300, e -> filterEmployee());
 }
 
 class ButtonRendererEmployee extends JPanel implements TableCellRenderer {
@@ -583,7 +723,7 @@ class ButtonEditorEmployee extends AbstractCellEditor implements TableCellEditor
     private final JFrame frame;
     private final String APIURL;
 
-    public ButtonEditorEmployee(JTable table,JRootPane rootPane,String APIURL,CadastrarFuncionario cardFuncionario,JPanel mainPanel) {
+    public ButtonEditorEmployee(JTable table, JRootPane rootPane, String APIURL, CadastrarFuncionario cardFuncionario, JPanel mainPanel) {
         this.table = table;
         this.frame = (JFrame) SwingUtilities.getWindowAncestor(rootPane);
         this.APIURL = APIURL;
@@ -617,7 +757,7 @@ class ButtonEditorEmployee extends AbstractCellEditor implements TableCellEditor
         // Action for edit button
         editButton.addActionListener(evt -> {
             int cellIndex = table.getSelectedRow();
-            Object cellValue = table.getValueAt(cellIndex,0);
+            Object cellValue = table.getValueAt(cellIndex, 0);
             cardFuncionario.setId(cellValue.toString());
             CardLayout cl = (CardLayout) mainPanel.getLayout();
             cl.show(mainPanel, "cadastrar_funcionario");
@@ -626,7 +766,7 @@ class ButtonEditorEmployee extends AbstractCellEditor implements TableCellEditor
 
         // Action for delete button
         deleteButton.addActionListener(e -> {
-            String[] options = {"Cancelar","Excluir"};
+            String[] options = {"Cancelar", "Excluir"};
             int confirmation = JOptionPane.showOptionDialog(table,
                     "Deseja excluir o funcionário? Essa ação não poderá ser desfeita. ",
                     "Deletar Funcionário",
@@ -636,12 +776,12 @@ class ButtonEditorEmployee extends AbstractCellEditor implements TableCellEditor
                     options,
                     options[0]);
             if (confirmation == 1) {
-                try{
+                try {
                     int cellIndex = table.getSelectedRow();
                     if (table.isEditing()) {
                         table.getCellEditor().stopCellEditing();
                     }
-                    Object cellValue = table.getValueAt(cellIndex,0);
+                    Object cellValue = table.getValueAt(cellIndex, 0);
                     String id_funcionario = cellValue.toString();
                     URL url = new URL(this.APIURL + "/employee/" + id_funcionario);
                     HttpURLConnection connection = (HttpURLConnection) url.openConnection();
@@ -649,7 +789,7 @@ class ButtonEditorEmployee extends AbstractCellEditor implements TableCellEditor
                     connection.setRequestMethod("DELETE");
 
                     int responseCode = connection.getResponseCode();
-                    if(responseCode==HttpURLConnection.HTTP_NO_CONTENT || responseCode == HttpURLConnection.HTTP_OK){
+                    if (responseCode == HttpURLConnection.HTTP_NO_CONTENT || responseCode == HttpURLConnection.HTTP_OK) {
                         ((DefaultTableModel) table.getModel()).removeRow(currentRow);
                         JOptionPane.showOptionDialog(this.frame,
                                 "O funcionário foi deletado com sucesso",
@@ -659,8 +799,7 @@ class ButtonEditorEmployee extends AbstractCellEditor implements TableCellEditor
                                 null,
                                 null,
                                 null);
-                    }
-                    else{
+                    } else {
                         JOptionPane.showOptionDialog(this.frame,
                                 "Ocorreu um erro no servidor ao deletar o funcionário",
                                 "Erro ao deletar funcionário",
@@ -671,10 +810,9 @@ class ButtonEditorEmployee extends AbstractCellEditor implements TableCellEditor
                                 null);
                     }
                 } catch (Exception ex) {
-                    JOptionPane.showMessageDialog(this.frame,ex.getMessage());
+                    JOptionPane.showMessageDialog(this.frame, ex.getMessage());
                 }
-            }
-            else{
+            } else {
                 stopCellEditing();
             }
 

@@ -90,27 +90,12 @@ public class JanelaPrincipal extends javax.swing.JFrame {
         jPanelBotaoWrapper.setBackground(new Color(243, 243, 223));
 
         JButton botaoSair = new JButton("Sair");
-
-        String caminhoIcone = "../images/sair.png";
-        ImageIcon iconeRedimensionado = null;
-
-        try {
-            ImageIcon iconeOriginal = new ImageIcon(caminhoIcone);
-            Image imagemRedimensionada = iconeOriginal.getImage().getScaledInstance(20, 20, Image.SCALE_SMOOTH);
-            iconeRedimensionado = new ImageIcon(imagemRedimensionada);
-        } catch (Exception e) {
-            System.out.println("Erro ao carregar ícone: " + e.getMessage());
-        }
-
-        if (iconeRedimensionado != null) {
-            botaoSair.setIcon(iconeRedimensionado);
-            botaoSair.setHorizontalTextPosition(SwingConstants.LEFT);
-        }
-
-        botaoSair.setFont(new Font("Arial", Font.BOLD, 14));
+        botaoSair.setIcon(new javax.swing.ImageIcon(Objects.requireNonNull(getClass().getResource("/resources/images/leave.png"))));
+        botaoSair.setFont(new Font("Cormorant Garamond", Font.BOLD, 20));
         botaoSair.setForeground(new Color(128, 0, 32));
         botaoSair.setBackground(new Color(243, 243, 223));
         botaoSair.setFocusPainted(false);
+        botaoSair.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         botaoSair.setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 10));
         botaoSair.setContentAreaFilled(false);
 
