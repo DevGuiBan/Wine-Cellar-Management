@@ -13,8 +13,8 @@ public class ManagerDTO {
 
     private UUID id;
 
-    @NotNull(message = "O nome do funcionário não pode ser nulo")
-    @NotBlank(message = "O nome do funcionário não pode ser vázio!")
+    @NotNull(message = "O nome do gerente não pode ser nulo")
+    @NotBlank(message = "O nome do gerente não pode ser vázio!")
     private String name;
 
     @NotNull(message = "O CPF não pode ser um valor nulo")

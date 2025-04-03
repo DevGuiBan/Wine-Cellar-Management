@@ -40,9 +40,10 @@ import java.util.Objects;
 import java.util.Scanner;
 
 public class ListarVendas extends JPanel {
-
     private Dotenv dotenv;
     private JRootPane rootPane;
+    private boolean isAdmin;
+    private PainelRelatorioVendas relatorio;
 
     private void initComponents() {
         JanelaPrincipal frame = (JanelaPrincipal) SwingUtilities.getWindowAncestor(rootPane);
@@ -50,6 +51,7 @@ public class ListarVendas extends JPanel {
         jPanelTabela = new javax.swing.JPanel();
         jButtonCadastrar = new javax.swing.JButton();
         jButtonFiltrar = new javax.swing.JButton();
+        jButtonRelatorios = new javax.swing.JButton();
         pesquisaProduto = new javax.swing.JTextField();
         jtable = new javax.swing.JTable();
         jScrollPane = new javax.swing.JScrollPane();
@@ -109,7 +111,15 @@ public class ListarVendas extends JPanel {
 
         jPanelTopoTabela.add(pesquisaProduto);
 
-        jPanelTopoTabela.add(Box.createHorizontalStrut(500));
+        if(isAdmin){
+            jPanelTopoTabela.add(Box.createHorizontalStrut(300));
+            jButtonRelatorios.setVisible(true);
+        }else{
+            jPanelTopoTabela.add(Box.createHorizontalStrut(500));
+            jButtonRelatorios.setVisible(false);
+        }
+
+
 
         jButtonCadastrar.setFont(new java.awt.Font("Cormorant Garamond", Font.BOLD, 20));
         jButtonCadastrar.setIcon(new javax.swing.ImageIcon(Objects.requireNonNull(getClass().getResource("/resources/images/criar.png"))));
@@ -123,6 +133,18 @@ public class ListarVendas extends JPanel {
         });
 
         jPanelTopoTabela.add(jButtonCadastrar);
+
+        jButtonRelatorios.setFont(new java.awt.Font("Cormorant Garamond", Font.BOLD, 20));
+        jButtonRelatorios.setIcon(new javax.swing.ImageIcon(Objects.requireNonNull(getClass().getResource("/resources/images/report.png"))));
+        jButtonRelatorios.setText("Gerar Relatório");
+        jButtonRelatorios.setBorder(null);
+        jButtonRelatorios.setContentAreaFilled(false);
+        jButtonRelatorios.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        jButtonRelatorios.setPreferredSize(new java.awt.Dimension(200, 40));
+        jButtonRelatorios.addActionListener(e -> {
+            relatorio();
+        });
+        jPanelTopoTabela.add(jButtonRelatorios);
 
         jButtonFiltrar.setFont(new java.awt.Font("Cormorant Garamond", Font.BOLD, 20));
         jButtonFiltrar.setForeground(new java.awt.Color(6, 6, 10));
@@ -192,8 +214,10 @@ public class ListarVendas extends JPanel {
         add(jPanel4);
     }
 
-    public ListarVendas(JRootPane rootPane, JPanel mainPanel) {
+    public ListarVendas(JRootPane rootPane, PainelRelatorioVendas cardVendas, boolean admin) {
         this.rootPane = rootPane;
+        this.isAdmin = admin;
+        this.relatorio = cardVendas;
         this.dotenv = Dotenv.load();
         this.initComponents();
         this.getVendas();
@@ -253,7 +277,7 @@ public class ListarVendas extends JPanel {
     private void searchSales(Long saleId, String clientName, String productName) {
         try {
             String urlAPI = this.dotenv.get("API_HOST");
-            // Construindo a URL com os parâmetros de busca
+
             StringBuilder urlBuilder = new StringBuilder(urlAPI + "/sale/search");
             urlBuilder.append("?");
             boolean hasParam = false;
@@ -299,11 +323,11 @@ public class ListarVendas extends JPanel {
                         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
                         String dateFormatted;
                         try {
-                            // Tenta parsear a data presumindo que ela vem em formato ISO (ex.: 2025-04-01)
+
                             LocalDate parsedDate = LocalDate.parse(date);
                             dateFormatted = parsedDate.format(formatter);
                         } catch (DateTimeParseException e) {
-                            dateFormatted = date; // Usa o valor original se não puder formatar
+                            dateFormatted = date;
                         }
                         String paymentMethod = sale.get("paymentMethod").getAsString();
                         String totalValue = sale.get("totalPrice").getAsString();
@@ -415,7 +439,7 @@ public class ListarVendas extends JPanel {
         JFrame frame = (JFrame) SwingUtilities.getWindowAncestor(rootPane);
 
         JDialog dialog = new JDialog(frame, "Filtros", true);
-        dialog.setSize(200, 200);
+        dialog.setSize(250, 200);
         dialog.setLayout(new GridBagLayout());
         dialog.setLocationRelativeTo(jButtonFiltrar);
 
@@ -440,6 +464,7 @@ public class ListarVendas extends JPanel {
         gbc.gridx = 1;
         JDateChooser dateChooserDe = new JDateChooser();
         dateChooserDe.setDateFormatString("dd/MM/yyyy");
+        dateChooserDe.setPreferredSize(new Dimension(120,25));
         dateChooserDe.setFont(new java.awt.Font("Cormorant Infant", java.awt.Font.BOLD, 14));
         dateChooserDe.setForeground(Color.BLACK);
         dialog.add(dateChooserDe, gbc);
@@ -455,6 +480,7 @@ public class ListarVendas extends JPanel {
         dateChooserAte.setDateFormatString("dd/MM/yyyy");
         dateChooserAte.setFont(new java.awt.Font("Cormorant Infant", java.awt.Font.BOLD, 14));
         dateChooserAte.setForeground(Color.BLACK);
+        dateChooserAte.setPreferredSize(new Dimension(120,25));
         dialog.add(dateChooserAte, gbc);
 
         gbc.gridx = 0;
@@ -486,6 +512,85 @@ public class ListarVendas extends JPanel {
         frame.setVisible(true);
     }
 
+    private void relatorio() {
+        JanelaPrincipal frame = (JanelaPrincipal) SwingUtilities.getWindowAncestor(rootPane);
+
+        JDialog dialog = new JDialog(frame, "Relatório", true);
+        dialog.setSize(250, 200);
+        dialog.setLayout(new GridBagLayout());
+        dialog.setLocationRelativeTo(jButtonFiltrar);
+
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.insets = new Insets(5, 5, 5, 5);
+
+        JLabel chkDataNascimento = new JLabel("Informe o período:");
+        chkDataNascimento.setForeground(Color.BLACK);
+        chkDataNascimento.setFont(new java.awt.Font("Cormorant Garamond", java.awt.Font.BOLD, 14));
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.gridwidth = 2;
+        dialog.add(chkDataNascimento, gbc);
+
+        gbc.gridwidth = 1;
+        gbc.gridy = 1;
+        JLabel de = new JLabel("de");
+        de.setFont(new java.awt.Font("Cormorant Garamond", java.awt.Font.BOLD, 14));
+        de.setForeground(Color.BLACK);
+        dialog.add(de, gbc);
+        gbc.gridx = 1;
+        JDateChooser dateChooserDe = new JDateChooser();
+        dateChooserDe.setDateFormatString("dd/MM/yyyy");
+        dateChooserDe.setPreferredSize(new Dimension(120,25));
+        dateChooserDe.setFont(new java.awt.Font("Cormorant Infant", java.awt.Font.BOLD, 14));
+        dateChooserDe.setForeground(Color.BLACK);
+        dialog.add(dateChooserDe, gbc);
+
+        gbc.gridx = 0;
+        gbc.gridy = 2;
+        JLabel ate = new JLabel("até");
+        ate.setFont(new java.awt.Font("Cormorant Garamond", java.awt.Font.BOLD, 14));
+        ate.setForeground(Color.BLACK);
+        dialog.add(ate, gbc);
+        gbc.gridx = 1;
+        JDateChooser dateChooserAte = new JDateChooser();
+        dateChooserAte.setDateFormatString("dd/MM/yyyy");
+        dateChooserAte.setFont(new java.awt.Font("Cormorant Infant", java.awt.Font.BOLD, 14));
+        dateChooserAte.setForeground(Color.BLACK);
+        dateChooserAte.setPreferredSize(new Dimension(120,25));
+        dialog.add(dateChooserAte, gbc);
+
+        gbc.gridx = 0;
+        gbc.gridy = 3;
+        gbc.gridwidth = 2;
+
+        JButton btnFiltrar = new JButton("Filtrar");
+        btnFiltrar.setBackground(new Color(0, 0, 139));
+        btnFiltrar.setFont(new java.awt.Font("Cormorant Garamond", java.awt.Font.BOLD, 16));
+        btnFiltrar.setForeground(Color.WHITE);
+        btnFiltrar.setFocusPainted(false);
+        btnFiltrar.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        dialog.add(btnFiltrar, gbc);
+
+        btnFiltrar.addActionListener(e -> {
+            SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+            String dataDe = dateChooserDe.getDate() != null ? sdf.format(dateChooserDe.getDate()) : "Não selecionado";
+            String dataAte = dateChooserAte.getDate() != null ? sdf.format(dateChooserAte.getDate()) : "Não selecionado";
+
+            if (dataDe.equals("Não selecionado") || dataAte.equals("Não selecionado")) {
+                JOptionPane.showMessageDialog(frame, "Informe o perído corretamente!", "Erro ao selecionar datas do perído", JOptionPane.ERROR_MESSAGE);
+            } else {
+                relatorio.atualizarDadosDaAPI(dataDe,dataAte);
+                dialog.dispose();
+                frame.showCard("relatorios");
+            }
+
+        });
+
+        dialog.setVisible(true);
+        frame.setVisible(true);
+    }
+
     private javax.swing.JTextField pesquisaProduto;
     private javax.swing.JTable jtable;
     private javax.swing.JScrollPane jScrollPane;
@@ -494,6 +599,7 @@ public class ListarVendas extends JPanel {
     private javax.swing.JPanel jPanel4;
     private javax.swing.JButton jButtonCadastrar;
     private javax.swing.JButton jButtonFiltrar;
+    private javax.swing.JButton jButtonRelatorios;
     private final Timer timer = new Timer(300, e -> filterSales());
 }
 

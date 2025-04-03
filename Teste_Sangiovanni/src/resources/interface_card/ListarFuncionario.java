@@ -25,8 +25,10 @@ public class ListarFuncionario extends JPanel {
     private JPanel mainPanel;
     private Dotenv dotenv;
     private CadastrarFuncionario card;
+    private boolean isAdmin;
 
-    public ListarFuncionario(JRootPane rootPane,JPanel mainPanel,CadastrarFuncionario cardFuncionario){
+    public ListarFuncionario(JRootPane rootPane,JPanel mainPanel,CadastrarFuncionario cardFuncionario, boolean isAdmin) {
+      this.isAdmin = isAdmin;
       this.rootPane = rootPane;
       this.mainPanel = mainPanel;
       this.dotenv = Dotenv.load();
@@ -81,7 +83,14 @@ public class ListarFuncionario extends JPanel {
         });
         jPanelTopoTabela.add(pesquisaProduto);
 
-        jPanelTopoTabela.add(Box.createHorizontalStrut(500));
+        if(this.isAdmin){
+            jPanelTopoTabela.add(Box.createHorizontalStrut(500));
+            jButtonCadastrar.setVisible(true);
+        }else{
+            jPanelTopoTabela.add(Box.createHorizontalStrut(750));
+            jButtonCadastrar.setVisible(false);
+        }
+
 
         jButtonCadastrar.setFont(new java.awt.Font("Cormorant Garamond", Font.BOLD, 20));
         jButtonCadastrar.setIcon(new javax.swing.ImageIcon(Objects.requireNonNull(getClass().getResource("/resources/images/criar.png"))));

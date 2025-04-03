@@ -21,6 +21,7 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Objects;
+
 import io.github.cdimascio.dotenv.Dotenv;
 
 public class ListarFornecedor extends JPanel {
@@ -29,14 +30,14 @@ public class ListarFornecedor extends JPanel {
     private final JPanel mainPanel;
     private final CadastrarFornecedor cadastrarFornecedor;
 
-    public ListarFornecedor(JRootPane rootPane,JPanel mainPanel,CadastrarFornecedor cardCadastroEdicao){
-       this.rootPane = rootPane;
-       this.mainPanel = mainPanel;
-       this.cadastrarFornecedor = cardCadastroEdicao;
-       this.dotenv = Dotenv.load();
+    public ListarFornecedor(JRootPane rootPane, JPanel mainPanel, CadastrarFornecedor cardCadastroEdicao) {
+        this.rootPane = rootPane;
+        this.mainPanel = mainPanel;
+        this.cadastrarFornecedor = cardCadastroEdicao;
+        this.dotenv = Dotenv.load();
 
-       initComponents();
-       getSupplier();
+        initComponents();
+        getSupplier();
     }
 
     private void getSupplier() {
@@ -89,7 +90,7 @@ public class ListarFornecedor extends JPanel {
                         "Problema no Servidor",
                         JOptionPane.DEFAULT_OPTION,
                         JOptionPane.ERROR_MESSAGE,
-                        null,null,null);
+                        null, null, null);
                 connection.disconnect();
             }
         } catch (Exception e) {
@@ -186,7 +187,7 @@ public class ListarFornecedor extends JPanel {
         jButtonFiltrar.setContentAreaFilled(false);
         jButtonFiltrar.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         jButtonFiltrar.setPreferredSize(new java.awt.Dimension(90, 40));
-        jButtonFiltrar.addActionListener(evt->{
+        jButtonFiltrar.addActionListener(evt -> {
             JFrame frame = (JFrame) SwingUtilities.getWindowAncestor(rootPane);
             abrirDialogoFiltro(frame);
         });
@@ -199,7 +200,7 @@ public class ListarFornecedor extends JPanel {
         jtable.setModel(new javax.swing.table.DefaultTableModel(
                 new Object[][]{},
                 new String[]{
-                        "Código", "Nome", "E-mail", "CPNJ", "Endereço","Telefone","N° Produtos","Ações"
+                        "Código", "Nome", "E-mail", "CPNJ", "Endereço", "Telefone", "N° Produtos", "Ações"
                 }
         ));
 
@@ -212,14 +213,14 @@ public class ListarFornecedor extends JPanel {
 
         jtable.getColumnModel().getColumn(0).setCellRenderer(centerRenderer);
 
-        jtable.setFont(new java.awt.Font("Cormorant Infant",Font.BOLD,14));
+        jtable.setFont(new java.awt.Font("Cormorant Infant", Font.BOLD, 14));
         jtable.setShowGrid(false);
         jtable.setIntercellSpacing(new Dimension(0, 0));
         jtable.setRowHeight(30);
         jtable.setFocusable(false);
 
         JTableHeader header = jtable.getTableHeader();
-        header.setFont(new java.awt.Font("Cormorant Garamond",Font.BOLD,18));
+        header.setFont(new java.awt.Font("Cormorant Garamond", Font.BOLD, 18));
         header.setBackground(Color.WHITE);
         header.setForeground(new java.awt.Color(128, 0, 32));
         header.setBorder(javax.swing.BorderFactory.createMatteBorder(0, 0, 2, 0, new java.awt.Color(128, 0, 32)));
@@ -235,7 +236,7 @@ public class ListarFornecedor extends JPanel {
         }
 
         jtable.getColumn("Ações").setCellRenderer(new ButtonRendererSupplier());
-        jtable.getColumn("Ações").setCellEditor(new ButtonEditorSupplier(jtable, rootPane,this.dotenv.get("API_HOST"),mainPanel,cadastrarFornecedor));
+        jtable.getColumn("Ações").setCellEditor(new ButtonEditorSupplier(jtable, rootPane, this.dotenv.get("API_HOST"), mainPanel, cadastrarFornecedor));
 
         jScrollPane.setViewportView(jtable);
         jScrollPane.setBorder(javax.swing.BorderFactory.createMatteBorder(2, 2, 2, 2, new java.awt.Color(128, 0, 32)));
@@ -250,11 +251,11 @@ public class ListarFornecedor extends JPanel {
 
     }
 
-    public void atualizarDados(){
+    public void atualizarDados() {
         this.getSupplier();
     }
 
-    private ArrayList<SupplierCount> getSupplierCount(){
+    private ArrayList<SupplierCount> getSupplierCount() {
         ArrayList<SupplierCount> list = new ArrayList<SupplierCount>();
         try {
             String urlAPI = this.dotenv.get("API_HOST");
@@ -291,7 +292,7 @@ public class ListarFornecedor extends JPanel {
                         "Problema no Servidor",
                         JOptionPane.DEFAULT_OPTION,
                         JOptionPane.ERROR_MESSAGE,
-                        null,null,null);
+                        null, null, null);
                 connection.disconnect();
                 return null;
             }
@@ -301,7 +302,7 @@ public class ListarFornecedor extends JPanel {
         }
     }
 
-    private void getSupplierByAddress(String adress){
+    private void getSupplierByAddress(String adress) {
         try {
             String urlAPI = this.dotenv.get("API_HOST");
             String urlString = urlAPI + "/supplier/address/?address=" + URLEncoder.encode(adress, StandardCharsets.UTF_8);
@@ -343,7 +344,7 @@ public class ListarFornecedor extends JPanel {
                         }
                     }
 
-                    tableModel.addRow(new Object[]{id, name, email, cnpj, address, phone,count});
+                    tableModel.addRow(new Object[]{id, name, email, cnpj, address, phone, count});
                     connection.disconnect();
                 }
             } else {
@@ -352,7 +353,7 @@ public class ListarFornecedor extends JPanel {
                         "Problema no Servidor",
                         JOptionPane.DEFAULT_OPTION,
                         JOptionPane.ERROR_MESSAGE,
-                        null,null,null);
+                        null, null, null);
                 connection.disconnect();
             }
         } catch (Exception e) {
@@ -360,7 +361,7 @@ public class ListarFornecedor extends JPanel {
         }
     }
 
-    private void getSupplierByQtdProd(String quantity){
+    private void getSupplierByQtdProd(String quantity) {
         try {
             String urlAPI = this.dotenv.get("API_HOST");
             String urlString = urlAPI + "/supplier/countBigThan/?quantity=" + URLEncoder.encode(quantity, StandardCharsets.UTF_8);
@@ -396,7 +397,7 @@ public class ListarFornecedor extends JPanel {
                     Long count = supplier.get("productCount").getAsLong();
 
 
-                    tableModel.addRow(new Object[]{id, name, email, cnpj, address, phone,count});
+                    tableModel.addRow(new Object[]{id, name, email, cnpj, address, phone, count});
                     connection.disconnect();
                 }
             } else {
@@ -405,7 +406,7 @@ public class ListarFornecedor extends JPanel {
                         "Problema no Servidor",
                         JOptionPane.DEFAULT_OPTION,
                         JOptionPane.ERROR_MESSAGE,
-                        null,null,null);
+                        null, null, null);
                 connection.disconnect();
             }
         } catch (Exception e) {
@@ -427,32 +428,32 @@ public class ListarFornecedor extends JPanel {
         gbc.gridy = 0;
         gbc.gridwidth = 2;
         JCheckBox chkAddress = new JCheckBox("Endereço");
-        chkAddress.setFont(new Font("Cormorant Garamond",Font.BOLD,14));
+        chkAddress.setFont(new Font("Cormorant Garamond", Font.BOLD, 14));
         chkAddress.setForeground(Color.BLACK);
         dialog.add(chkAddress, gbc);
 
         gbc.gridy = 1;
         JTextField jTextFieldAdress = new JTextField();
-        jTextFieldAdress.setFont(new Font("Cormorant Garamond",Font.BOLD,14));
+        jTextFieldAdress.setFont(new Font("Cormorant Garamond", Font.BOLD, 14));
         jTextFieldAdress.setForeground(Color.BLACK);
         dialog.add(jTextFieldAdress, gbc);
 
         gbc.gridy = 2;
         JCheckBox chkNProd = new JCheckBox("N° Produtos");
-        chkNProd.setFont(new Font("Cormorant Garamond",Font.BOLD,14));
+        chkNProd.setFont(new Font("Cormorant Garamond", Font.BOLD, 14));
         chkNProd.setForeground(Color.BLACK);
         dialog.add(chkNProd, gbc);
 
         gbc.gridy = 3;
         JSpinner spnQuantidade = new JSpinner(new SpinnerNumberModel(0, 0, 1000, 1));
-        spnQuantidade.setFont(new Font("Cormorant Infant",Font.BOLD,14));
+        spnQuantidade.setFont(new Font("Cormorant Infant", Font.BOLD, 14));
         spnQuantidade.setForeground(Color.BLACK);
         dialog.add(spnQuantidade, gbc);
 
         gbc.gridy = 7;
         JButton btnFiltrar = new JButton("Filtrar");
         btnFiltrar.setBackground(new Color(0, 0, 139));
-        btnFiltrar.setFont(new Font("Cormorant Garamond",Font.BOLD,16));
+        btnFiltrar.setFont(new Font("Cormorant Garamond", Font.BOLD, 16));
         btnFiltrar.setForeground(Color.WHITE);
         btnFiltrar.setFocusPainted(false);
         btnFiltrar.setCursor(new Cursor(Cursor.HAND_CURSOR));
@@ -461,15 +462,14 @@ public class ListarFornecedor extends JPanel {
         btnFiltrar.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                if(chkAddress.isSelected()) {
+                if (chkAddress.isSelected()) {
                     getSupplierByAddress(jTextFieldAdress.getText());
                     dialog.setVisible(false);
                 } else if (chkNProd.isSelected()) {
                     getSupplierByQtdProd(spnQuantidade.getValue().toString());
                     dialog.setVisible(false);
-                }
-                else{
-                    JOptionPane.showMessageDialog(parent,"Selecione uma opção de Filtro!","Erro na seleção de filtro",JOptionPane.ERROR_MESSAGE);
+                } else {
+                    JOptionPane.showMessageDialog(parent, "Selecione uma opção de Filtro!", "Erro na seleção de filtro", JOptionPane.ERROR_MESSAGE);
                 }
             }
         });
@@ -477,7 +477,7 @@ public class ListarFornecedor extends JPanel {
         dialog.setVisible(true);
     }
 
-    private void searchSupplier(String supId, String name,String email, String cnpj) {
+    private void searchSupplier(String supId, String name, String email, String cnpj) {
         try {
             String urlAPI = this.dotenv.get("API_HOST");
             // Construindo a URL com os parâmetros de busca
@@ -565,14 +565,10 @@ public class ListarFornecedor extends JPanel {
         if (searchText.equals("Pesquisar Fornecedor") || searchText.isEmpty()) {
             getSupplier();
         } else {
-            if(searchText.contains(".")){
-                searchSupplier(null, null, null,searchText);
-            }else if(searchText.contains("@")){
-                searchSupplier(null, null, searchText,null);
-            }else if(searchText.matches(".*\\d.*")){
-                searchSupplier(searchText, null, null,null);
-            }else{
-                searchSupplier(null, searchText, null,null);
+            if (searchText.contains("@")) {
+                searchSupplier(null, null, searchText, null);
+            } else {
+                searchSupplier(null, searchText, null, null);
             }
 
         }
@@ -635,7 +631,7 @@ class ButtonEditorSupplier extends AbstractCellEditor implements TableCellEditor
     private final JFrame frame;
     private final String APIURL;
 
-    public ButtonEditorSupplier(JTable table,JRootPane rootPane,String APIURL,JPanel mainPanel,CadastrarFornecedor cardF) {
+    public ButtonEditorSupplier(JTable table, JRootPane rootPane, String APIURL, JPanel mainPanel, CadastrarFornecedor cardF) {
         this.table = table;
         this.frame = (JFrame) SwingUtilities.getWindowAncestor(rootPane);
         this.APIURL = APIURL;
@@ -669,7 +665,7 @@ class ButtonEditorSupplier extends AbstractCellEditor implements TableCellEditor
         // Action for edit button
         editButton.addActionListener(evt -> {
             int cellIndex = table.getSelectedRow();
-            Object cellValue = table.getValueAt(cellIndex,0);
+            Object cellValue = table.getValueAt(cellIndex, 0);
             cardF.setId(cellValue.toString());
             CardLayout cl = (CardLayout) mainPanel.getLayout();
             cl.show(mainPanel, "cadastrar_fornecedor");
@@ -678,7 +674,7 @@ class ButtonEditorSupplier extends AbstractCellEditor implements TableCellEditor
 
         // Action for delete button
         deleteButton.addActionListener(e -> {
-            String[] options = {"Cancelar","Excluir"};
+            String[] options = {"Cancelar", "Excluir"};
             int confirmation = JOptionPane.showOptionDialog(table,
                     "Deseja excluir o fornecedor? Essa ação não poderá ser desfeita. ",
                     "Deletar Fornecedor",
@@ -688,12 +684,12 @@ class ButtonEditorSupplier extends AbstractCellEditor implements TableCellEditor
                     options,
                     options[0]);
             if (confirmation == 1) {
-                try{
+                try {
                     int cellIndex = table.getSelectedRow();
                     if (table.isEditing()) {
                         table.getCellEditor().stopCellEditing();
                     }
-                    Object cellValue = table.getValueAt(cellIndex,0);
+                    Object cellValue = table.getValueAt(cellIndex, 0);
                     String id_product = cellValue.toString();
                     URL url = new URL(this.APIURL + "/supplier/" + id_product);
                     HttpURLConnection connection = (HttpURLConnection) url.openConnection();
@@ -701,7 +697,7 @@ class ButtonEditorSupplier extends AbstractCellEditor implements TableCellEditor
                     connection.setRequestMethod("DELETE");
 
                     int responseCode = connection.getResponseCode();
-                    if(responseCode==HttpURLConnection.HTTP_NO_CONTENT || responseCode == HttpURLConnection.HTTP_OK){
+                    if (responseCode == HttpURLConnection.HTTP_NO_CONTENT || responseCode == HttpURLConnection.HTTP_OK) {
                         ((DefaultTableModel) table.getModel()).removeRow(currentRow);
                         JOptionPane.showOptionDialog(this.frame,
                                 "O fornecedor foi deletado com sucesso",
@@ -711,8 +707,7 @@ class ButtonEditorSupplier extends AbstractCellEditor implements TableCellEditor
                                 null,
                                 null,
                                 null);
-                    }
-                    else{
+                    } else {
                         JOptionPane.showOptionDialog(this.frame,
                                 "Ocorreu um erro no servidor ao deletar o fornecedor",
                                 "Erro ao deletar fornecedor",
@@ -723,10 +718,9 @@ class ButtonEditorSupplier extends AbstractCellEditor implements TableCellEditor
                                 null);
                     }
                 } catch (Exception ex) {
-                    JOptionPane.showMessageDialog(this.frame,ex.getMessage());
+                    JOptionPane.showMessageDialog(this.frame, ex.getMessage());
                 }
-            }
-            else{
+            } else {
                 stopCellEditing();
             }
 

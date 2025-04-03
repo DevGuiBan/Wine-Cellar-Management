@@ -1,169 +1,162 @@
 package resources.interface_card;
 
 import javax.swing.*;
+import javax.swing.border.EmptyBorder;
+import javax.swing.border.LineBorder;
+import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.table.JTableHeader;
 import java.awt.*;
-import java.awt.image.BufferedImage;
-import java.io.IOException;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.util.Scanner;
-import javax.imageio.ImageIO;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
-import com.google.gson.JsonArray;
-import com.google.zxing.BarcodeFormat;
-import com.google.zxing.MultiFormatWriter;
-import com.google.zxing.WriterException;
-import com.google.zxing.client.j2se.MatrixToImageWriter;
-import com.google.zxing.common.BitMatrix;
 
-public class Teste {
+public class Teste extends JFrame {
+
+    // Componentes da interface
+    private JPanel painelPrincipal;
+    private JTable tabelaVendas;
+    private JTextField txtTotalVendas;
+    private JTextField txtTotalReais;
+    private JTextField txtMediaVendas;
+
+    public Teste() {
+        // Configurações básicas da janela
+        setTitle("Relatório de Vendas");
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setSize(600, 400);
+        setLocationRelativeTo(null); // Centraliza a janela
+
+        // Inicializa o painel principal
+        painelPrincipal = new JPanel();
+        painelPrincipal.setLayout(new BorderLayout(10, 10));
+        painelPrincipal.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+
+        // Inicializa os componentes no painel
+        inicializarComponentes(painelPrincipal);
+
+        // Adiciona o painel principal à janela
+        add(painelPrincipal);
+    }
+
+    private void inicializarComponentes(JPanel painel) {
+        JPanel painelTitulo = new JPanel();
+        painelTitulo.setLayout(new BorderLayout());
+
+        JLabel lblTitulo = new JLabel("RELATÓRIO DE FUNCIONÁRIOS - de 08/01/2025 até 08/02/2025");
+        lblTitulo.setFont(new Font("Cormorant Infant Bold", Font.BOLD, 18));
+        lblTitulo.setHorizontalAlignment(SwingConstants.LEFT);
+
+        JLabel lblInfo = new JLabel("Ordenado por maior número de vendas");
+        lblInfo.setFont(new Font("Cormorant Garamond", Font.BOLD, 16));
+        lblInfo.setHorizontalAlignment(SwingConstants.LEFT);
+
+        painelTitulo.add(lblTitulo, BorderLayout.NORTH);
+        painelTitulo.add(lblInfo, BorderLayout.SOUTH);
+
+        painel.add(painelTitulo, BorderLayout.NORTH);
+
+        String[] colunas = {"Produto", "Quantidade", "TOTAL (R$)"};
+        Object[][] dados = {
+                {"Anna Duarte", 500, "10.000,00"},
+                {"João Mario", 490, "11.000,00"},
+                {"Antony V.", 399, "5.000,00"}
+        };
+
+        DefaultTableModel modeloTabela = new DefaultTableModel(dados, colunas);
+        tabelaVendas = new JTable(modeloTabela);
+        tabelaVendas.setFillsViewportHeight(true);
+        tabelaVendas.setEnabled(false);
+        tabelaVendas.setShowHorizontalLines(false);
+        tabelaVendas.setShowVerticalLines(false);
+
+        DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
+        centerRenderer.setHorizontalAlignment(SwingConstants.CENTER);
+
+
+        tabelaVendas.getColumnModel().getColumn(0).setCellRenderer(centerRenderer);
+        tabelaVendas.getColumnModel().getColumn(1).setCellRenderer(centerRenderer);
+        tabelaVendas.getColumnModel().getColumn(2).setCellRenderer(centerRenderer);
+        tabelaVendas.setFont(new java.awt.Font("Cormorant Infant", Font.BOLD, 14));
+        tabelaVendas.setShowGrid(false);
+        tabelaVendas.setIntercellSpacing(new Dimension(0, 0));
+        tabelaVendas.setRowHeight(30);
+        tabelaVendas.setFocusable(false);
+
+        JTableHeader header = tabelaVendas.getTableHeader();
+        header.setFont(new Font("Courier New", Font.BOLD, 30));
+        header.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+        header.setResizingAllowed(false);
+        header.setReorderingAllowed(false);
+
+        DefaultTableCellRenderer headerRenderer = new DefaultTableCellRenderer();
+        headerRenderer.setHorizontalAlignment(SwingConstants.CENTER);
+        headerRenderer.setBackground(new Color(217, 217, 217));
+        headerRenderer.setForeground(Color.BLACK);
+        for (int i = 0; i < tabelaVendas.getColumnModel().getColumnCount(); i++) {
+            tabelaVendas.getColumnModel().getColumn(i).setHeaderRenderer(headerRenderer);
+        }
+
+
+        JScrollPane scrollPane = new JScrollPane(tabelaVendas);
+        painel.add(scrollPane, BorderLayout.CENTER);
+
+
+        JPanel painelInferior = new JPanel(new GridLayout(1, 3, 10, 10));
+
+        JPanel painelTotalVendas = new JPanel(new BorderLayout());
+        JLabel lbl = new JLabel("Total de Vendas Realizadas:");
+        lbl.setFont(new Font("Cormorant Garamond Bold",Font.BOLD,16));
+        lbl.setHorizontalAlignment(SwingConstants.CENTER);
+        painelTotalVendas.add(lbl, BorderLayout.NORTH);
+        txtTotalVendas = new JTextField("1.389");
+        txtTotalVendas.setFont(new Font("Cormorant Infant",Font.BOLD,18));
+        txtTotalVendas.setEditable(false);
+        txtTotalVendas.setBorder(new LineBorder(Color.DARK_GRAY,1));
+        txtTotalVendas.setFocusable(false);
+        txtTotalVendas.setPreferredSize(new Dimension(250,100));
+        txtTotalVendas.setBackground(Color.WHITE);
+        txtTotalVendas.setHorizontalAlignment(JTextField.CENTER);
+        painelTotalVendas.add(txtTotalVendas, BorderLayout.CENTER);
+        painelInferior.add(painelTotalVendas);
+
+        JPanel painelTotalReais = new JPanel(new BorderLayout());
+        JLabel lbl2 = new JLabel("Total de Vendas em Reais:");
+        lbl2.setFont(new Font("Cormorant Garamond Bold",Font.BOLD,16));
+        lbl2.setHorizontalAlignment(SwingConstants.CENTER);
+        painelTotalReais.add(lbl2, BorderLayout.NORTH);
+        txtTotalReais = new JTextField("R$ 26.000,00");
+        txtTotalReais.setFont(new Font("Cormorant Infant",Font.BOLD,18));
+        txtTotalReais.setEditable(false);
+        txtTotalReais.setBorder(new LineBorder(Color.DARK_GRAY,1));
+        txtTotalReais.setFocusable(false);
+        txtTotalReais.setPreferredSize(new Dimension(250,100));
+        txtTotalReais.setBackground(Color.WHITE);
+        txtTotalReais.setHorizontalAlignment(JTextField.CENTER);
+        painelTotalReais.add(txtTotalReais, BorderLayout.CENTER);
+        painelInferior.add(painelTotalReais);
+
+        JPanel painelMediaVendas = new JPanel(new BorderLayout());
+        JLabel lbl3 = new JLabel("Média de Vendas:");
+        lbl3.setFont(new Font("Cormorant Garamond Bold",Font.BOLD,16));
+        lbl3.setHorizontalAlignment(SwingConstants.CENTER);
+        painelMediaVendas.add(lbl3, BorderLayout.NORTH);
+        txtMediaVendas = new JTextField("46,6");
+        txtMediaVendas.setFont(new Font("Cormorant Infant",Font.BOLD,18));
+        txtMediaVendas.setBorder(new LineBorder(Color.DARK_GRAY,1));
+        txtMediaVendas.setEditable(false);
+        txtMediaVendas.setFocusable(false);
+        txtMediaVendas.setPreferredSize(new Dimension(250,100));
+        txtMediaVendas.setBackground(Color.WHITE);
+        txtMediaVendas.setHorizontalAlignment(JTextField.CENTER);
+        painelMediaVendas.add(txtMediaVendas, BorderLayout.CENTER);
+        painelInferior.add(painelMediaVendas);
+
+        painel.add(painelInferior, BorderLayout.SOUTH);
+    }
+
     public static void main(String[] args) {
-        SwingUtilities.invokeLater(Teste::criarJanelaPrincipal);
-    }
-
-    private static void criarJanelaPrincipal() {
-        JFrame frame = new JFrame("Sistema de Vendas");
-        frame.setSize(600, 400);
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setLayout(new GridBagLayout());
-
-        JButton btnVisualizar = new JButton("Visualizar Cupom Fiscal");
-        btnVisualizar.addActionListener(e -> abrirModalCupom());
-
-        frame.add(btnVisualizar);
-        frame.setLocationRelativeTo(null);
-        frame.setVisible(true);
-    }
-
-    private static void abrirModalCupom() {
-        String jsonResponse = obterDadosCupom();
-        if (jsonResponse == null) {
-            JOptionPane.showMessageDialog(null, "Erro ao obter dados do cupom.");
-            return;
-        }
-
-        JsonObject json = JsonParser.parseString(jsonResponse).getAsJsonObject();
-        String empresa = json.get("enterpiseName").getAsString();
-        String endereco = json.get("address").getAsString();
-        String cidadeEstado = json.get("cityState").getAsString();
-        String cnpj = json.get("cpnj").getAsString();
-        String data = json.get("dateOpenCnpj").getAsString();
-        String hora = json.get("hourIE").getAsString();
-        String ccf = json.get("ccf").getAsString();
-        String ie = json.get("ie").getAsString();
-        String cdd = json.get("cdd").getAsString();
-        String im = json.get("im").getAsString();
-        String qrCode = json.get("qrCode").getAsString();
-
-        JsonObject sale = json.getAsJsonObject("sale");
-        String pagamento = sale.get("paymentMethod").getAsString();
-        double totalPrice = sale.get("totalPrice").getAsDouble();
-        double discount = sale.get("discount").getAsDouble();
-        JsonArray products = sale.getAsJsonArray("products");
-
-        StringBuilder produtosStr = new StringBuilder();
-        produtosStr.append("<table border='1' width='100%'>");
-        produtosStr.append("<tr><th>Item</th><th>Nome</th><th>Valor Unit.</th><th>Qtd</th><th>Total</th></tr>");
-
-        for (int i = 0; i < products.size(); i++) {
-            JsonObject product = products.get(i).getAsJsonObject();
-            int quantity = product.get("quantity").getAsInt();
-            double price = product.get("price").getAsDouble();
-            double total = quantity * price;
-
-            produtosStr.append("<tr>");
-            produtosStr.append("<td>" + (i + 1) + "</td>");
-            produtosStr.append("<td>" + product.get("name").getAsString() + "</td>");
-            produtosStr.append("<td>R$" + price + "</td>");
-            produtosStr.append("<td>" + quantity + "</td>");
-            produtosStr.append("<td>R$" + total + "</td>");
-            produtosStr.append("</tr>");
-        }
-        produtosStr.append("</table>");
-
-        JDialog modal = new JDialog();
-        modal.setTitle("Cupom Fiscal");
-        modal.setSize(500, 600);
-        modal.setModal(true);
-        modal.setLayout(new BorderLayout());
-
-        JPanel panel = new JPanel(new GridBagLayout());
-        GridBagConstraints constraints = new GridBagConstraints();
-        panel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-
-        // Centralizando a label com as informações do cupom
-        JLabel lblCupom = new JLabel("<html><center><b>CUPOM FISCAL</b><br><br>"
-                + empresa + "<br>"
-                + endereco + "<br>"
-                + cidadeEstado + "<br><br>"
-                + "CNPJ: " + cnpj + " &nbsp;&nbsp; " + data + "<br>"
-                + "Hora: " + hora + "<br>"
-                + "CCF: " + ccf + " - IE: " + ie + " - CDD: " + cdd + "<br>"
-                + "IM: " + im + "<br>"
-                + "------------------------------------------------------------------------------------------------<br>"
-                + produtosStr.toString() + "<br>"
-                + "TOTAL: <b>R$" + totalPrice + "</b><br>"
-                + "DESCONTO: R$" + discount + "<br>"
-                + "PAGAMENTO: " + pagamento + "<br>"
-                + "----------------------------------------------------------------<br>"
-                +"CÓDIGO DO QR CODE: " + qrCode + "<br>"
-                + "QR CODE:" + "<br></center></html>");
-
-        lblCupom.setHorizontalAlignment(SwingConstants.CENTER);
-        constraints.gridx = 0;
-        constraints.gridy = 0;
-        constraints.anchor = GridBagConstraints.CENTER;
-        panel.add(lblCupom, constraints);
-        panel.setBackground(Color.WHITE);
-
-        try {
-            BufferedImage qrImage = gerarQRCode(qrCode, 100, 100);
-            JLabel qrLabel = new JLabel(new ImageIcon(qrImage));
-
-
-            constraints.gridy = 1;
-            panel.add(qrLabel, constraints);
-        } catch (WriterException | IOException e) {
-            e.printStackTrace();
-        }
-
-        JButton btnImprimir = new JButton("Imprimir");
-        btnImprimir.addActionListener(e -> JOptionPane.showMessageDialog(modal, "Imprimindo cupom..."));
-        constraints.gridy = 2;
-        panel.add(btnImprimir, constraints);
-
-        modal.add(panel, BorderLayout.CENTER);
-        modal.setLocationRelativeTo(null);
-        modal.setVisible(true);
-    }
-
-    private static BufferedImage gerarQRCode(String text, int width, int height) throws WriterException, IOException {
-        BitMatrix matrix = new MultiFormatWriter().encode(text, BarcodeFormat.QR_CODE, width, height);
-        return MatrixToImageWriter.toBufferedImage(matrix);
-    }
-
-    private static String obterDadosCupom() {
-        try {
-            URL url = new URL("http://localhost:8081/api/sale/tax-receipt/1");
-            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-            conn.setRequestMethod("GET");
-            conn.setRequestProperty("Accept", "application/json");
-
-            if (conn.getResponseCode() != 200) {
-                return null;
-            }
-
-            Scanner scanner = new Scanner(conn.getInputStream());
-            StringBuilder json = new StringBuilder();
-            while (scanner.hasNext()) {
-                json.append(scanner.nextLine());
-            }
-            scanner.close();
-            return json.toString();
-        } catch (IOException e) {
-            e.printStackTrace();
-            return null;
-        }
+        // Executa a interface na thread de despacho de eventos
+        SwingUtilities.invokeLater(() -> {
+            Teste frame = new Teste();
+            frame.setVisible(true);
+        });
     }
 }

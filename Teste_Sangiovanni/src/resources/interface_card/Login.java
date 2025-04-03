@@ -14,6 +14,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.util.Objects;
 
 public class Login extends JFrame {
 
@@ -21,6 +22,7 @@ public class Login extends JFrame {
 
     private void initComponents() {
         this.setTitle("Login");
+        setIconImage(new ImageIcon(Objects.requireNonNull(getClass().getResource("/resources/images/icon.png"))).getImage());
         setSize(800, 600);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
@@ -88,13 +90,24 @@ public class Login extends JFrame {
         textoSenha.setFont(new Font("Cormorant Infant", Font.PLAIN, 20));
         textoSenha.setPreferredSize(fieldSize);
 
-        JLabel esqueciSenha = new JLabel("Esqueci minha senha");
+        JButton esqueciSenha = new JButton("Esqueci minha senha");
+        esqueciSenha.setBorder(null);
+        esqueciSenha.setBackground(new Color(128, 0, 32));
+        esqueciSenha.setFocusable(false);
+        esqueciSenha.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        esqueciSenha.setFocusPainted(false);
         esqueciSenha.setFont(new Font("Cormorant Infant", Font.PLAIN, 18));
         esqueciSenha.setForeground(new Color(255, 235, 43));
+        esqueciSenha.addActionListener(evt->{
+            JFrame tela = new RecuperarSenha();
+            tela.setVisible(true);
+            this.dispose();
+        });
 
         JButton btnEntrar = new JButton("Entrar");
         btnEntrar.setFont(new Font("Cormorant Infant", Font.BOLD, 20));
         btnEntrar.setForeground(Color.BLACK);
+        btnEntrar.setCursor(new Cursor(Cursor.HAND_CURSOR));
         btnEntrar.setBackground(new Color(255, 235, 43));
         btnEntrar.setPreferredSize(fieldSize);
         btnEntrar.addActionListener(evt -> {
@@ -104,6 +117,7 @@ public class Login extends JFrame {
         JButton btnCadastrar = new JButton("Cadastrar-se");
         btnCadastrar.setFont(new Font("Cormorant Infant", Font.BOLD, 20));
         btnCadastrar.setForeground(Color.WHITE);
+        btnCadastrar.setCursor(new Cursor(Cursor.HAND_CURSOR));
         btnCadastrar.setBackground(new Color(128, 0, 32));
         btnCadastrar.setBorder(BorderFactory.createLineBorder(new Color(255, 235, 43), 2));
         btnCadastrar.setPreferredSize(fieldSize);

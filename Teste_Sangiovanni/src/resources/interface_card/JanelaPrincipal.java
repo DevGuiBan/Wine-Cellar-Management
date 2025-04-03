@@ -32,6 +32,11 @@ public class JanelaPrincipal extends javax.swing.JFrame {
         jButton5 = new JButton();
         jButton6 = new JButton();
 
+        boolean isAdmin;
+
+        isAdmin = !user.has("address");
+
+        cardRelatorioVendas = new PainelRelatorioVendas(cardPanel);
         cardVisualizarCupom = new VisualizarCupomPosCompra(this);
         cardCadastroProdutos = new CadastrarProduto(cardPanel, this.rootPane);
         cardCadastroFornecedores = new CadastrarFornecedor(cardPanel, this.rootPane);
@@ -39,10 +44,10 @@ public class JanelaPrincipal extends javax.swing.JFrame {
         cardRegistrarVenda = new RegistrarVenda(cardPanel, this,cardVisualizarCupom);
         cardListarProdutos = new ListarProduto(this.rootPane, cardPanel, cardCadastroProdutos);
         cardListarFornecedores = new ListarFornecedor(this.rootPane, cardPanel, cardCadastroFornecedores);
-        cardListarVendas = new ListarVendas(this.rootPane, cardPanel);
+        cardListarVendas = new ListarVendas(this.rootPane, cardRelatorioVendas,isAdmin);
         cardListarClientes = new ListarCliente(this.rootPane, cardPanel, cardCadastrarClientes);
         cardCadastroFuncionario = new CadastrarFuncionario(cardPanel, this.rootPane);
-        cardListarFuncionario = new ListarFuncionario(this.rootPane, cardPanel, cardCadastroFuncionario);
+        cardListarFuncionario = new ListarFuncionario(this.rootPane, cardPanel, cardCadastroFuncionario,isAdmin);
         cardPerfil = new Perfil(cardPanel,this.rootPane,user);
 
         jLabel1 = new javax.swing.JLabel();
@@ -259,6 +264,7 @@ public class JanelaPrincipal extends javax.swing.JFrame {
         cardPanel.add(cardListarFuncionario, "listar_Funcionario");
         cardPanel.add(cardVisualizarCupom,"visualizar_cupom");
         cardPanel.add(cardPerfil,"perfil_gerente");
+        cardPanel.add(cardRelatorioVendas,"relatorios");
 
         // Adicionar cardPanel ao sul do jPanel1
         jPanel1.add(cardPanel, BorderLayout.SOUTH);
@@ -435,5 +441,6 @@ public class JanelaPrincipal extends javax.swing.JFrame {
     private ListarFuncionario cardListarFuncionario;
     private VisualizarCupomPosCompra cardVisualizarCupom;
     private Perfil cardPerfil;
+    private PainelRelatorioVendas cardRelatorioVendas;
 }
 

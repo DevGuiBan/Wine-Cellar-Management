@@ -15,6 +15,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.util.Objects;
 
 public class RecuperarSenha extends JFrame {
     private static JPanel formPanel;
@@ -27,7 +28,8 @@ public class RecuperarSenha extends JFrame {
     }
 
     private void initComponents() {
-        setTitle("RECUPERAR SENHA");
+        setTitle("Recuperar Senha");
+        setIconImage(new ImageIcon(Objects.requireNonNull(getClass().getResource("/resources/images/icon.png"))).getImage());
         setSize(800, 600);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
@@ -83,7 +85,7 @@ public class RecuperarSenha extends JFrame {
 
         ImageIcon icon = null;
         try {
-            icon = new ImageIcon(RecuperarSenha.class.getResource("/resources/images/icon.png"));
+            icon = new ImageIcon(Objects.requireNonNull(RecuperarSenha.class.getResource("/resources/images/icon.png")));
             Image image = icon.getImage().getScaledInstance(25, 25, Image.SCALE_SMOOTH);
             icon = new ImageIcon(image);
         } catch (Exception e) {
@@ -133,8 +135,26 @@ public class RecuperarSenha extends JFrame {
         JButton btnEnviar = new JButton("Verificar");
         btnEnviar.setFont(new Font("Cormorant Infant", Font.BOLD, 25));
         btnEnviar.setForeground(Color.BLACK);
+        btnEnviar.setFocusable(false);
+        btnEnviar.setFocusPainted(false);
+        btnEnviar.setCursor(new Cursor(Cursor.HAND_CURSOR));
         btnEnviar.setBackground(new Color(255, 235, 43));
         btnEnviar.setPreferredSize(fieldSize);
+
+        JButton btnVoltar = new JButton("Voltar");
+        btnVoltar.setFont(new Font("Cormorant Infant", Font.BOLD, 18));
+        btnVoltar.setForeground(Color.WHITE);
+        btnVoltar.setBackground(new Color(128, 0, 32));
+        btnVoltar.setBorder(BorderFactory.createLineBorder(new Color(255, 235, 43), 2));
+        btnVoltar.setPreferredSize(fieldSize);
+        btnVoltar.setFocusable(false);
+        btnVoltar.setFocusPainted(false);
+        btnVoltar.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        btnVoltar.addActionListener(evt->{
+            Login login = new Login();
+            login.setVisible(true);
+            this.dispose();
+        });
 
         btnEnviar.addActionListener(e -> createPasswordForm(nomeTexto.getText(), textoEmail.getText(), cpfTexto.getText()));
 
@@ -157,6 +177,8 @@ public class RecuperarSenha extends JFrame {
         formPanel.add(textoEmail, gbc);
         gbc.gridy++;
         formPanel.add(btnEnviar, gbc);
+        gbc.gridy++;
+        formPanel.add(btnVoltar, gbc);
 
         formPanel.revalidate();
         formPanel.repaint();

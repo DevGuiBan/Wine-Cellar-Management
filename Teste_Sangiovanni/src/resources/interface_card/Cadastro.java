@@ -12,13 +12,15 @@ import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.util.Objects;
 
 public class Cadastro extends JFrame{
 
     private Dotenv dotenv;
 
     private void initComponents() {
-        setTitle("CADASTRAR");
+        setTitle("Cadastrar");
+        setIconImage(new ImageIcon(Objects.requireNonNull(getClass().getResource("/resources/images/icon.png"))).getImage());
         setSize(800, 600);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
@@ -128,7 +130,7 @@ public class Cadastro extends JFrame{
 
         JButton btnJaTenhoConta = new JButton("Já tenho conta");
         btnJaTenhoConta.setFont(new Font("Cormorant Infant", Font.BOLD, 18));
-        btnJaTenhoConta.setForeground(Color.BLACK);
+        btnJaTenhoConta.setForeground(Color.WHITE);
         btnJaTenhoConta.setBackground(new Color(128, 0, 32));
         btnJaTenhoConta.setBorder(BorderFactory.createLineBorder(new Color(255, 235, 43), 2));
         btnJaTenhoConta.setPreferredSize(fieldSize);
