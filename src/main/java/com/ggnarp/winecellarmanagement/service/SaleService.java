@@ -256,7 +256,7 @@ public class SaleService {
         }
     }
 
-    public List<Sale> searchSales(Long saleId, String clientName, String productName) {
+    public List<Sale> searchSales(Long saleId, String clientName, String productName)  {
 
         Specification<Sale> spec = (root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();
