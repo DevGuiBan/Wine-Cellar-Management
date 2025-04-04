@@ -74,4 +74,17 @@ public class SaleController {
         List<Sale> sales = saleService.searchSales(saleId, clientName, productName);
         return ResponseEntity.ok(sales);
     }
+
+    @GetMapping("/filter")
+    public ResponseEntity<?> filterSales(
+            @RequestParam("startDate") String startDate,
+            @RequestParam("endDate") String endDate) {
+        try {
+            List<Sale> filteredSales = saleService.filterSalesByDate(startDate, endDate);
+            return ResponseEntity.ok(filteredSales);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body("Erro ao filtrar vendas: " + e.getMessage());
+        }
+    }
 }
