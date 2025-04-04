@@ -278,4 +278,10 @@ public class SaleService {
 
         return saleRepository.findAll(spec);
     }
+
+    public List<Sale> filterSalesByDate(String startDate, String endDate) {
+        LocalDate start = LocalDate.parse(startDate);
+        LocalDate end = LocalDate.parse(endDate);
+        return saleRepository.findBySaleDateBetween(start, end);
+    }
 }
