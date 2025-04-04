@@ -257,6 +257,7 @@ public class ListarVendas extends JPanel {
 
                         tableModel.addRow(new Object[]{id, clientName, dateFormated, paymentMethod, totalValue, "Ações"});
                     }
+                    connection.disconnect();
                 }
             } else {
                 JOptionPane.showMessageDialog(rootPane,
@@ -360,8 +361,8 @@ public class ListarVendas extends JPanel {
     private void getFuncionariosByDate(String dateIn, String dateOut) {
         try {
             String urlAPI = this.dotenv.get("API_HOST");
-            String urlString = urlAPI + "/employee/date?start_date=" + URLEncoder.encode(dateIn, StandardCharsets.UTF_8) +
-                    "&end_date=" + URLEncoder.encode(dateOut, StandardCharsets.UTF_8);
+            String urlString = urlAPI + "/sale/filter?startDate=" + URLEncoder.encode(dateIn, StandardCharsets.UTF_8) +
+                    "&endDate=" + URLEncoder.encode(dateOut, StandardCharsets.UTF_8);
             URL url = new URL(urlString);
 
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
@@ -379,21 +380,23 @@ public class ListarVendas extends JPanel {
                 }
                 reader.close();
 
-                JsonArray products = JsonParser.parseString(response.toString()).getAsJsonArray();
+                JsonArray sales = JsonParser.parseString(response.toString()).getAsJsonArray();
 
                 DefaultTableModel tableModel = (DefaultTableModel) jtable.getModel();
                 tableModel.setRowCount(0);
 
-                for (int i = 0; i < products.size(); i++) {
-                    JsonObject product = products.get(i).getAsJsonObject();
-                    String id = product.get("id").getAsString();
-                    String name = product.get("name").getAsString();
-                    String cpf = product.get("cpf").getAsString();
-                    String address = product.get("address").getAsString();
-                    String phone_number = product.get("phoneNumber").getAsString();
-                    String email = product.get("email").getAsString();
-                    String data = product.get("dateBirth").getAsString();
-                    tableModel.addRow(new Object[]{id, name, cpf, address, phone_number, email, data});
+                for (int i = 0; i < sales.size(); i++) {
+                    JsonObject sale = sales.get(i).getAsJsonObject();
+                    String id = sale.get("id").getAsString();
+                    JsonObject clientDTO = sale.get("client").getAsJsonObject();
+                    String clientName = clientDTO.get("name").getAsString();
+                    String date = sale.get("saleDate").getAsString();
+                    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+                    String dateFormated = date.formatted(formatter);
+                    String paymentMethod = sale.get("paymentMethod").getAsString();
+                    String totalValue = sale.get("totalPrice").getAsString();
+
+                    tableModel.addRow(new Object[]{id, clientName, dateFormated, paymentMethod, totalValue, "Ações"});
                 }
                 connection.disconnect();
             } else {
@@ -413,7 +416,7 @@ public class ListarVendas extends JPanel {
                             : response.toString();
 
                     JOptionPane.showMessageDialog(this.rootPane,
-                            "Não foi possível encontrar o funcionário. Verifique os dados e tente novamente!\n" + errorMessage,
+                            "Não foi possível encontrar a venda. Verifique os dados e tente novamente!\n" + errorMessage,
                             "Erro na Pesquisa",
                             JOptionPane.ERROR_MESSAGE);
                 } catch (Exception jsonException) {
@@ -423,7 +426,7 @@ public class ListarVendas extends JPanel {
                             JOptionPane.ERROR_MESSAGE);
                 }
                 JOptionPane.showOptionDialog(rootPane,
-                        "Ocorreu um erro ao carregar os funcionários.",
+                        "Ocorreu um erro ao carregar as vendas deste período.",
                         "Problema no Servidor",
                         JOptionPane.DEFAULT_OPTION,
                         JOptionPane.ERROR_MESSAGE,

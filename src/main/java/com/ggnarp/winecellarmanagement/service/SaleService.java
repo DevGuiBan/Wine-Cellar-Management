@@ -280,8 +280,9 @@ public class SaleService {
     }
 
     public List<Sale> filterSalesByDate(String startDate, String endDate) {
-        LocalDate start = LocalDate.parse(startDate);
-        LocalDate end = LocalDate.parse(endDate);
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+        LocalDate start = LocalDate.parse(startDate, formatter);
+        LocalDate end = LocalDate.parse(endDate, formatter);
         return saleRepository.findBySaleDateBetween(start, end);
     }
 }
