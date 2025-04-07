@@ -108,7 +108,7 @@ public class FinalizarVenda extends JPanel {
                     // Chamar API para gerar cupom fiscal
                     if (generateTaxReceipt(urlAPI, saleId)) {
                         JOptionPane.showMessageDialog(this.rootPane,
-                                "A venda foi realizada com sucesso!\nID da Venda: " + saleId + "\nCupom fiscal gerado!",
+                                "A venda foi realizada com sucesso!\n"+"\nCupom fiscal gerado!",
                                 "Venda Realizada",
                                 JOptionPane.INFORMATION_MESSAGE);
                     } else {
@@ -193,6 +193,7 @@ public class FinalizarVenda extends JPanel {
     private void loadClient() {
         jLabelIconCliente.setText(client.getName());
         jLabelPagamento.setText(client.getPayment());
+        jLabelFormaPagamento.setText("Forma de Pagamento: ");
         DateTimeFormatter inputFormatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
 
         LocalDate aniversario = LocalDate.parse(client.getData().replace("/", "-"), inputFormatter);
@@ -211,6 +212,7 @@ public class FinalizarVenda extends JPanel {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
         String dataFormatada = hojeData.format(formatter);
+        jLabelData.setText("Data: ");
         jTextFieldData.setText(dataFormatada);
 
     }

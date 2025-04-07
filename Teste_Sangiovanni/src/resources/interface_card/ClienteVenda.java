@@ -225,7 +225,7 @@ public class ClienteVenda extends JPanel {
         jComboBoxMetodoPagamento.setBorder(new MatteBorder(2, 2, 2, 2, new Color(128, 0, 32)));
         jComboBoxMetodoPagamento.setPreferredSize(fieldSize);
         jComboBoxMetodoPagamento.addItem("CARTÃO_DE_CRÉDITO");
-        jComboBoxMetodoPagamento.addItem("CARTÃO_DE_DÉBITO,");
+        jComboBoxMetodoPagamento.addItem("CARTÃO_DE_DÉBITO");
         jComboBoxMetodoPagamento.addItem("DINHEIRO");
         jComboBoxMetodoPagamento.addItem("PIX");
         jComboBoxMetodoPagamento.addItem("TRANSFERÊNCIA_BANCÁRIA");

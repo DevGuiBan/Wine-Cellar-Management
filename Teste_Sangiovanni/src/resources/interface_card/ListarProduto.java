@@ -532,6 +532,10 @@ public class ListarProduto extends JPanel {
 
         int colunaSelecionar = jtable.getColumn("Selecionar").getModelIndex();
 
+        for (int row = 0; row < modelo.getRowCount(); row++) {
+            modelo.setValueAt(false, row, colunaSelecionar);
+        }
+
         TableColumnModel columnModel = jtable.getColumnModel();
         columnModel.getColumn(colunaSelecionar).setHeaderValue("Ações");
 
@@ -1441,7 +1445,6 @@ class ButtonRendererProduct_ extends JPanel implements TableCellRenderer {
         editButton.setFocusable(false);
         deleteButton.setFocusable(false);
     }
-
 
     @Override
     public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {

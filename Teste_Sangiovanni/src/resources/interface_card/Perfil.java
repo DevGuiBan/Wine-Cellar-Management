@@ -354,6 +354,7 @@ public class Perfil extends JPanel {
     }
 
     public void reset() {
+        this.getManager();
         jTextFieldNome.setFocusable(false);
         jTextFieldNome.setEditable(false);
         jTextFieldNome.setBackground(Color.LIGHT_GRAY);
