@@ -45,3 +45,5 @@ mvn flyway:clean
 ```
 mvn flyway:migrate
 ```
+### Link do protótipo no Figma:
+https://www.figma.com/design/JbmlVKAGLE1rgJCDOVfqbZ/Sistema-Adega---PRINTI?node-id=0-1&t=AhQDesWIjSlnnrH6-1
