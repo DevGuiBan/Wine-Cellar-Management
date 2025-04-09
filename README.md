@@ -87,6 +87,8 @@ As funcionalidades do sistema estão de acordo com as competências dos atores. 
 * **Administrador:** administrador geral da aplicação desktop Casa San'Giovanni. Gestão de estoque de produtos, fornecedores, clientes, vendas, funcionários, etc.
 * **Funcionário:** usuário da aplicação desktop Casa San'Giovanni. Gestão de estoque de produtos, fornecedores, clientes, vendas, etc.
 
+[🎥 Clique aqui para ver o vídeo de demonstração](https://github.com/DevGuiBan/Wine-Cellar-Management/blob/main/explainer-video/casa-sanGiovanni.mp4)
+
 ## 7. Colaboradores
 
 🍺 André Casimiro da Silva  (https://github.com/Andre-nemesis)  
