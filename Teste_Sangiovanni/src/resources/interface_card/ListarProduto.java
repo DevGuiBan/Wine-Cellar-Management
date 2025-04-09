@@ -847,7 +847,7 @@ public class ListarProduto extends JPanel {
     private void getProductByProdT(String prodT) {
         try {
             String urlAPI = this.dotenv.get("API_HOST");
-            URL url = new URL(urlAPI + "/product/prodType/" + prodT);
+            URL url = new URL(urlAPI + "/product/prodType/?t_name=" + URLEncoder.encode(prodT, StandardCharsets.UTF_8));
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
             connection.setRequestMethod("GET");
 

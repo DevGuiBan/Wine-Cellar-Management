@@ -27,10 +27,8 @@ public class ListarFuncionario extends JPanel {
     private JPanel mainPanel;
     private Dotenv dotenv;
     private CadastrarFuncionario card;
-    private boolean isAdmin;
 
-    public ListarFuncionario(JRootPane rootPane, JPanel mainPanel, CadastrarFuncionario cardFuncionario, boolean isAdmin) {
-        this.isAdmin = isAdmin;
+    public ListarFuncionario(JRootPane rootPane, JPanel mainPanel, CadastrarFuncionario cardFuncionario) {
         this.rootPane = rootPane;
         this.mainPanel = mainPanel;
         this.dotenv = Dotenv.load();
@@ -101,16 +99,9 @@ public class ListarFuncionario extends JPanel {
             }
         });
         jPanelTopoTabela.add(pesquisaProduto);
+        jPanelTopoTabela.add(Box.createHorizontalStrut(500));
 
-        if (this.isAdmin) {
-            jPanelTopoTabela.add(Box.createHorizontalStrut(500));
-            jButtonCadastrar.setVisible(true);
-        } else {
-            jPanelTopoTabela.add(Box.createHorizontalStrut(750));
-            jButtonCadastrar.setVisible(false);
-        }
-
-
+        jButtonCadastrar.setVisible(true);
         jButtonCadastrar.setFont(new java.awt.Font("Cormorant Garamond", Font.BOLD, 20));
         jButtonCadastrar.setIcon(new javax.swing.ImageIcon(Objects.requireNonNull(getClass().getResource("/resources/images/criar.png"))));
         jButtonCadastrar.setText("Cadastrar Funcionário");
@@ -142,86 +133,46 @@ public class ListarFuncionario extends JPanel {
         jPanelTabela.setBackground(new java.awt.Color(255, 255, 255));
         jPanelTabela.setLayout(new BorderLayout());
 
-        if (isAdmin) {
-            jtable.setModel(new javax.swing.table.DefaultTableModel(
-                    new Object[][]{},
-                    new String[]{
-                            "Código", "Nome", "CPF", "Endereço", "Telefone", "E-mail", "Data de Nascimento", "Ações"
-                    }
-            ));
-
-            jtable.setIntercellSpacing(new Dimension(0, 0));
-            jtable.setShowHorizontalLines(false);
-            jtable.setShowVerticalLines(false);
-
-            DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
-            centerRenderer.setHorizontalAlignment(SwingConstants.CENTER);
-
-            jtable.getColumnModel().getColumn(0).setCellRenderer(centerRenderer);
-
-            jtable.setFont(new java.awt.Font("Cormorant Infant", Font.BOLD, 14));
-            jtable.setShowGrid(false);
-            jtable.setIntercellSpacing(new Dimension(0, 0));
-            jtable.setRowHeight(30);
-            jtable.setFocusable(false);
-
-            JTableHeader header = jtable.getTableHeader();
-            header.setFont(new java.awt.Font("Cormorant Garamond", Font.BOLD, 18));
-            header.setBackground(Color.WHITE);
-            header.setForeground(new java.awt.Color(128, 0, 32));
-            header.setBorder(javax.swing.BorderFactory.createMatteBorder(0, 0, 2, 0, new java.awt.Color(128, 0, 32)));
-
-            jtable.setBackground(new java.awt.Color(255, 255, 255));
-            jtable.setSelectionBackground(new java.awt.Color(228, 236, 242));
-            jtable.setSelectionForeground(new java.awt.Color(0, 0, 0));
-
-            for (int i = 0; i < jtable.getColumnCount(); i++) {
-                if (!jtable.getColumnName(i).equals("Ações")) {
-                    jtable.getColumnModel().getColumn(i).setCellRenderer(centerRenderer);
+        jtable.setModel(new javax.swing.table.DefaultTableModel(
+                new Object[][]{},
+                new String[]{
+                        "Código", "Nome", "CPF", "Endereço", "Telefone", "E-mail", "Data de Nascimento", "Ações"
                 }
-            }
+        ));
 
-            jtable.getColumn("Ações").setCellRenderer(new ButtonRendererEmployee());
-            jtable.getColumn("Ações").setCellEditor(new ButtonEditorEmployee(jtable, rootPane, this.dotenv.get("API_HOST"), card, this.mainPanel));
+        jtable.setIntercellSpacing(new Dimension(0, 0));
+        jtable.setShowHorizontalLines(false);
+        jtable.setShowVerticalLines(false);
 
-        } else {
-            jtable.setModel(new javax.swing.table.DefaultTableModel(
-                    new Object[][]{},
-                    new String[]{
-                            "Código", "Nome", "CPF", "Endereço", "Telefone", "E-mail", "Data de Nascimento"
-                    }
-            ));
+        DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
+        centerRenderer.setHorizontalAlignment(SwingConstants.CENTER);
 
-            jtable.setIntercellSpacing(new Dimension(0, 0));
-            jtable.setShowHorizontalLines(false);
-            jtable.setShowVerticalLines(false);
+        jtable.getColumnModel().getColumn(0).setCellRenderer(centerRenderer);
 
-            DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
-            centerRenderer.setHorizontalAlignment(SwingConstants.CENTER);
+        jtable.setFont(new java.awt.Font("Cormorant Infant", Font.BOLD, 14));
+        jtable.setShowGrid(false);
+        jtable.setIntercellSpacing(new Dimension(0, 0));
+        jtable.setRowHeight(30);
+        jtable.setFocusable(false);
 
-            jtable.getColumnModel().getColumn(0).setCellRenderer(centerRenderer);
+        JTableHeader header = jtable.getTableHeader();
+        header.setFont(new java.awt.Font("Cormorant Garamond", Font.BOLD, 18));
+        header.setBackground(Color.WHITE);
+        header.setForeground(new java.awt.Color(128, 0, 32));
+        header.setBorder(javax.swing.BorderFactory.createMatteBorder(0, 0, 2, 0, new java.awt.Color(128, 0, 32)));
 
-            jtable.setFont(new java.awt.Font("Cormorant Infant", Font.BOLD, 14));
-            jtable.setShowGrid(false);
-            jtable.setIntercellSpacing(new Dimension(0, 0));
-            jtable.setRowHeight(30);
-            jtable.setFocusable(false);
+        jtable.setBackground(new java.awt.Color(255, 255, 255));
+        jtable.setSelectionBackground(new java.awt.Color(228, 236, 242));
+        jtable.setSelectionForeground(new java.awt.Color(0, 0, 0));
 
-            JTableHeader header = jtable.getTableHeader();
-            header.setFont(new java.awt.Font("Cormorant Garamond", Font.BOLD, 18));
-            header.setBackground(Color.WHITE);
-            header.setForeground(new java.awt.Color(128, 0, 32));
-            header.setBorder(javax.swing.BorderFactory.createMatteBorder(0, 0, 2, 0, new java.awt.Color(128, 0, 32)));
-
-            jtable.setBackground(new java.awt.Color(255, 255, 255));
-            jtable.setSelectionBackground(new java.awt.Color(228, 236, 242));
-            jtable.setSelectionForeground(new java.awt.Color(0, 0, 0));
-
-            for (int i = 0; i < jtable.getColumnCount(); i++) {
+        for (int i = 0; i < jtable.getColumnCount(); i++) {
+            if (!jtable.getColumnName(i).equals("Ações")) {
                 jtable.getColumnModel().getColumn(i).setCellRenderer(centerRenderer);
             }
-
         }
+
+        jtable.getColumn("Ações").setCellRenderer(new ButtonRendererEmployee());
+        jtable.getColumn("Ações").setCellEditor(new ButtonEditorEmployee(jtable, rootPane, this.dotenv.get("API_HOST"), card, this.mainPanel));
 
         jScrollPane.setViewportView(jtable);
         jScrollPane.setBorder(BorderFactory.createMatteBorder(2, 2, 2, 2, new Color(128, 0, 32)));

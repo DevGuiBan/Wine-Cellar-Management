@@ -47,7 +47,7 @@ public class JanelaPrincipal extends javax.swing.JFrame {
         cardListarVendas = new ListarVendas(this.rootPane, cardRelatorioVendas,isAdmin);
         cardListarClientes = new ListarCliente(this.rootPane, cardPanel, cardCadastrarClientes);
         cardCadastroFuncionario = new CadastrarFuncionario(cardPanel, this.rootPane);
-        cardListarFuncionario = new ListarFuncionario(this.rootPane, cardPanel, cardCadastroFuncionario,isAdmin);
+        cardListarFuncionario = new ListarFuncionario(this.rootPane, cardPanel, cardCadastroFuncionario);
         cardPerfil = new Perfil(cardPanel,this.rootPane,user);
 
         jLabel1 = new javax.swing.JLabel();
@@ -181,6 +181,11 @@ public class JanelaPrincipal extends javax.swing.JFrame {
             }
         });
 
+        if(!isAdmin){
+            jButton5.setVisible(false);
+
+        }
+
         jButton5.setBackground(new java.awt.Color(128, 0, 32));
         jButton5.setFont(new java.awt.Font("Cormorant Garamond SemiBold", 0, 18)); // NOI18N
         jButton5.setForeground(new java.awt.Color(225, 255, 255));
@@ -226,7 +231,12 @@ public class JanelaPrincipal extends javax.swing.JFrame {
         jPanel3.add(jButton3);
         jPanel3.add(jButton4);
         jPanel3.add(jButton5);
-        jPanel3.add(Box.createHorizontalStrut(200));
+        if(!isAdmin){
+            jPanel3.add(Box.createHorizontalStrut(420));
+        }else {
+            jPanel3.add(Box.createHorizontalStrut(200));
+        }
+
         jPanel3.add(jButton6);
 
         // Adicionando jPanel3 ao centro do jPanel1

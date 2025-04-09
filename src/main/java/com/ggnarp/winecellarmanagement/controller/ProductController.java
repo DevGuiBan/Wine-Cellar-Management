@@ -76,8 +76,8 @@ public class ProductController {
         }
     }
 
-    @GetMapping("/prodType/{t_name}")
-    public ResponseEntity<?> getProductByProductType(@PathVariable("t_name") String name) {
+    @GetMapping("/prodType/")
+    public ResponseEntity<?> getProductByProductType(@RequestParam("t_name") String name) {
         try{
             List<ProductDTO> product = productService.getProductByProductType(name);
             return ResponseEntity.status(HttpStatus.OK).body(product);

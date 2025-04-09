@@ -214,7 +214,7 @@ public class Perfil extends JPanel {
         jButtonCancelar.setBorder(new EmptyBorder(5, 20, 5, 20));
         jButtonCancelar.setVisible(false);
         jButtonCancelar.addActionListener(e -> {
-            reset();
+            reset(null);
         });
 
         jButtonCadastrar.setBackground(new Color(0, 28, 128));
@@ -278,7 +278,7 @@ public class Perfil extends JPanel {
             StringBuilder response = new StringBuilder();
 
             if (statusCode >= 200 && statusCode < 300) {
-                this.reset();
+                this.reset(true);
                 JOptionPane.showMessageDialog(this.rootPane,
                         "O Gerente foi atualizado com sucesso!",
                         "Gerente Atualizado",
@@ -353,8 +353,10 @@ public class Perfil extends JPanel {
         jButtonCadastrar.setText("Salvar");
     }
 
-    public void reset() {
-        this.getManager();
+    public void reset(Boolean isEdit) {
+        if(isEdit == null){
+            this.getManager();
+        }
         jTextFieldNome.setFocusable(false);
         jTextFieldNome.setEditable(false);
         jTextFieldNome.setBackground(Color.LIGHT_GRAY);
