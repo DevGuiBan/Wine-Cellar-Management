@@ -8,7 +8,7 @@ Este projeto visa o desenvolvimento de uma aplicação desktop de gerenciamento 
 
 ## 2. Tecnologias utilizadas
 
-<img src="https://cdn-icons-png.flaticon.com/128/5968/5968282.png" width="50" height="50">
+<img src="https://cdn-icons-png.flaticon.com/128/5968/5968282.png" width="50" height="50"> <img src="https://cdn-icons-png.flaticon.com/128/15466/15466163.png" width="50" height="50"> <img src="https://www.svgrepo.com/show/303301/postgresql-logo.svg" width="50" height="50"> <img src="https://img.icons8.com/?size=48&id=90519&format=png" width="50" height="50">
 
 ## 3. Dependências necessárias
 
